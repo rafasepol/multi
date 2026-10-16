@@ -4,6 +4,8 @@ Revista web em 3D do trabalho multidisciplinar do 2º ano: mudanças climáticas
 
 Feita com Three.js (pela CDN) e shaders GLSL, sem instalar nada.
 
+**Ver online:** <https://rafasepol.github.io/multi/>. O site é publicado sozinho pelo GitHub Actions a cada push na `main`.
+
 ## Como abrir
 
 Na pasta do projeto:
