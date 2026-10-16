@@ -1,0 +1,73 @@
+:root {
+  --fundo: #d8cfc0;
+  --tinta: #1d1d1f;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--fundo);
+  font-family: "Inter", system-ui, sans-serif;
+  color: var(--tinta);
+}
+
+/* Canvas WebGL em tela cheia */
+#cena {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none; /* o arrasto é tratado pelo JS */
+  cursor: grab;
+}
+#cena.arrastando { cursor: grabbing; }
+#cena.link { cursor: pointer; }
+#cena.fora { cursor: default; } /* fora da revista (na grama) */
+
+/* Controles sobre a lombada */
+.controles {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,.75);
+  backdrop-filter: blur(8px);
+  padding: 6px 8px;
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  user-select: none;
+}
+.controles button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--tinta);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform .15s, opacity .2s;
+}
+.controles button:hover:not(:disabled) { transform: scale(1.08); }
+.controles button:disabled { opacity: .25; cursor: default; }
+#indicador { min-width: 110px; text-align: center; font-size: 12px; font-weight: 500; }
+
+/* Contador de quadros por segundo (abra com ?fps na URL) */
+.fps {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  font: 600 12px/1 ui-monospace, monospace;
+  pointer-events: none;
+}

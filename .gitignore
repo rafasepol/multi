@@ -1,0 +1,5 @@
+# cópias locais das versões (o repositório guarda a versão atual na raiz)
+versoes/
+
+# configuração local do Claude Code
+.claude/

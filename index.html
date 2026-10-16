@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Revista Horizonte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- O livro é renderizado em WebGL e ocupa a tela inteira -->
+  <canvas id="cena" aria-label="Revista Horizonte — arraste as páginas para folhear"></canvas>
+
+  <nav class="controles" aria-label="Navegação da revista">
+    <button id="btnAnterior" aria-label="Página anterior">&#8592;</button>
+    <span id="indicador">Carregando…</span>
+    <button id="btnProximo" aria-label="Próxima página">&#8594;</button>
+  </nav>
+
+  <script src="paginas/paginas-pdf.js"></script>
+  <script src="dados.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
