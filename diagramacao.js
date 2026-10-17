@@ -60,6 +60,7 @@ const ESPACO = {
   nota: [0.4, 2.6],
   citacao: [2.4, 3.4],
   grafico: [2.6, 3.6],
+  imagem: [2.8, 3.5],
   fonte: [0, 1.4],
 };
 
@@ -295,6 +296,15 @@ function itemGrafico(b, esc, cor) {
 }
 
 // fonte da lista: número, texto e endereço (clicável)
+function itemImagem(b, esc) {
+  const largura = LARG_TEXTO;
+  const alturaFoto = 30 * esc;
+  const legenda = quebrar(b.legenda, "nota", esc, largura);
+  return { k: "imagem", flutua: true, src: b.src, esc, legenda,
+    alturaFoto, h: alturaFoto + 1.4 * esc + legenda.length * ESTILO.nota.alt * esc,
+    ...espaco("imagem", esc) };
+}
+
 function itemFonte(f, esc) {
   const recuo = FONTE_RECUO * esc;
   const lw = LARG_TEXTO - recuo;
@@ -409,6 +419,7 @@ function itensDaParte(parte, esc) {
       case "nota": return itemNota(b.texto, esc);
       case "citacao": return itemCitacao(b, esc);
       case "grafico": return itemGrafico(b, esc, parte.cor);
+      case "imagem": return itemImagem(b, esc);
       default:
         console.warn(`[diagramação] bloco desconhecido: ${b.t}`);
         return null;
@@ -467,6 +478,10 @@ export function diagramar(R) {
     ],
     { rotulo: R.titulo, cor: "#c8553d" },
   ));
+
+  if (R.aberturaFoto) {
+    pags.push(...fluir([itemImagem(R.aberturaFoto, 1)], { rotulo: "Abertura", cor: "#2f5d46" }));
+  }
 
   // 4+ — as partes: cada uma começa em página nova, com o título no topo
   for (const parte of R.partes) {

@@ -15,8 +15,8 @@ const REVISTA = {
   titulo: "Horizonte",
   edicao: "Germinare Tech • 2º F • Setembro de 2026",
   capa: {
-    chamada: "Mudanças climáticas e justiça climática no Brasil",
-    subtitulo: "Como a mudança do clima se transforma em perdas tão diferentes para pessoas que vivem no mesmo país?",
+    chamada: "Clima em desequilíbrio, vidas desiguais",
+    subtitulo: "Como as emissões, as decisões das grandes empresas e a desigualdade se cruzam na crise climática brasileira.",
     destaques: ["Quem sofre", "Quem causa", "Enfrentar a crise com justiça"],
     cor: "#1f3a5f",
   },
@@ -30,14 +30,15 @@ const REVISTA = {
     ],
     assinatura: "A equipe editorial",
   },
+  aberturaFoto: { src: "assets/fotos/abertura.jpg", legenda: "Comunidade ribeirinha em seu cotidiano. Foto documental fornecida para a revista; verificar crédito e localidade antes da publicação." },
   partes: [
     {
       numero: 1,
-      titulo: "Contextualização",
+      titulo: "Um planeta mais quente, um Brasil desigual",
       linhaFina: "Emissões, aquecimento e mudanças no Brasil",
       cor: "#2f5d46",
       blocos: [
-        { t: "inter", texto: "Como as emissões mudam o clima" },
+        { t: "inter", texto: "O aquecimento começa nas emissões" },
         {
           t: "p",
           texto: "Mudanças climáticas são alterações duradouras nos padrões do clima. No aquecimento atual, a ação humana tem papel central: atividades que liberam gases de efeito estufa intensificam a retenção de calor na atmosfera. O IPCC concluiu que a temperatura média global de 2011 a 2020 ficou cerca de 1,1 °C acima da média de 1850 a 1900. Esse valor descreve um período histórico, não a temperatura de um ano atual. [1]",
@@ -50,7 +51,7 @@ const REVISTA = {
           t: "p",
           texto: "CO₂ e CO₂ equivalente não são a mesma medida. O primeiro é um gás específico; CO₂e reúne diferentes gases em uma unidade comparável segundo seu efeito de aquecimento. Assim, um total de emissões em CO₂e não representa somente gás carbônico. Essa distinção será importante ao comparar empresas e setores econômicos. [2]",
         },
-        { t: "inter", texto: "Do aquecimento aos impactos" },
+        { t: "inter", texto: "Quando o aquecimento transforma o cotidiano" },
         {
           t: "p",
           texto: "O aquecimento modifica o ciclo da água e as condições em que ocorrem eventos extremos. Pode intensificar chuvas fortes e aumentar a exposição a calor e secas, com diferenças entre regiões. Isso não autoriza atribuir qualquer enchente ou incêndio exclusivamente à mudança climática: o dano também depende da ocupação do território, da infraestrutura, do manejo ambiental e da prevenção. [1]",
@@ -70,7 +71,8 @@ const REVISTA = {
           autor: "Rosely, sobrevivente de um incêndio no Pantanal",
           credito: "Relato publicado por O Globo, 27 jul. 2024. Fonte completa em [3]. A fala é de uma reportagem, não de uma entrevista realizada pelo grupo.",
         },
-        { t: "inter", texto: "O perfil brasileiro de emissões" },
+        { t: "imagem", src: "assets/fotos/pantanal.jpg", legenda: "Queimada e fumaça em paisagem natural. Foto fornecida para a revista; confirmar local, data e crédito antes de identificar como Pantanal." },
+        { t: "inter", texto: "De onde vêm as emissões brasileiras" },
         {
           t: "p",
           texto: "Para entender as causas no país, é preciso observar os setores. O panorama setorial desta revista utiliza emissões brutas de 2024 do SEEG, coleção 13. Uso da terra e agropecuária têm grande peso. Seus totais descrevem setores, e não um ranking de empresas. [2]",
@@ -93,7 +95,7 @@ const REVISTA = {
           t: "p",
           texto: "O uso da terra inclui a liberação de carbono relacionada à conversão de vegetação. Na agropecuária, destacam-se o metano da digestão dos bovinos e gases associados ao manejo e aos fertilizantes. Na energia, o uso de combustíveis em transportes e atividades produtivas contribui para as emissões. Esse perfil exige discutir tanto combustíveis fósseis quanto cadeias que dependem da terra. [2]",
         },
-        { t: "inter", texto: "O compromisso brasileiro" },
+        { t: "inter", texto: "As metas do Brasil e o caminho para cumpri-las" },
         {
           t: "p",
           texto: "A NDC apresentada pelo Brasil em novembro de 2024 estabelece reduzir emissões líquidas entre 59% e 67% até 2035, em relação a 2005. O intervalo corresponde a 850 milhões a 1,05 bilhão de toneladas de CO₂e. É uma meta, não um resultado já alcançado. Emissões líquidas descontam remoções; por isso, não devem ser comparadas diretamente com o gráfico de emissões brutas. [4]",
@@ -110,11 +112,11 @@ const REVISTA = {
     },
     {
       numero: 2,
-      titulo: "Quem sofre",
+      titulo: "Quando o clima encontra a desigualdade",
       linhaFina: "Vulnerabilidade, território e histórias reais",
       cor: "#8a6a2a",
       blocos: [
-        { t: "inter", texto: "O que é vulnerabilidade climática" },
+        { t: "inter", texto: "Por que algumas pessoas perdem mais" },
         {
           t: "p",
           texto: "Vulnerabilidade climática é a propensão a sofrer danos e a dificuldade de lidar com seus efeitos. Ela envolve condições como renda, saúde, moradia, infraestrutura, acesso à informação e capacidade de recuperação. Não é uma característica natural de uma população. É produzida também por escolhas políticas, desigualdades históricas e formas de ocupação do território.",
@@ -123,7 +125,7 @@ const REVISTA = {
           t: "p",
           texto: "Uma chuva intensa é um perigo. Pessoas e casas localizadas onde ela pode causar inundação estão expostas. Se faltam drenagem, moradia segura e recursos para sair ou reconstruir, a vulnerabilidade aumenta. O risco resulta da interação entre perigo, exposição e vulnerabilidade; o desastre ocorre quando essa interação produz danos graves e compromete a capacidade de resposta. Separar esses conceitos evita tratar toda perda como inevitável.",
         },
-        { t: "inter", texto: "Quem é mais afetado e por quê" },
+        { t: "inter", texto: "Quem enfrenta a crise com menos proteção" },
         {
           t: "p",
           texto: "Famílias de baixa renda e moradores de periferias podem enfrentar maior dificuldade de acessar moradia segura, transporte, saneamento e reservas financeiras. Populações negras sofrem os efeitos de desigualdades raciais que também organizam o acesso à renda e ao espaço urbano. Não é a identidade dessas pessoas que produz o risco: são as condições desiguais de proteção e de acesso a direitos.",
@@ -175,7 +177,7 @@ const REVISTA = {
           t: "p",
           texto: "A maior incidência de pobreza entre pretos e pardos evidencia uma desigualdade anterior aos eventos climáticos. Quando perdas ambientais exigem dinheiro para deslocamento e reconstrução, essa desigualdade pode se transformar em menor capacidade de resposta. O gráfico não é uma contagem de vítimas de desastres. [6]",
         },
-        { t: "inter", texto: "Território e racismo ambiental" },
+        { t: "inter", texto: "O endereço também define a proteção" },
         {
           t: "p",
           texto: "O território é mais do que um endereço: nele se distribuem serviços, oportunidades e riscos. A discussão de Lúcio Kowarick sobre espoliação urbana ajuda a interpretar a privação de infraestrutura nas periferias. Henri Lefebvre contribui ao tratar o espaço como resultado das relações sociais. Aplicados ao tema, esses conceitos ajudam a perguntar por que certas áreas recebem proteção e outras convivem com serviços insuficientes.",
@@ -199,7 +201,7 @@ const REVISTA = {
           ],
           legenda: "Gráfico 4. Fonte: IBGE, Censos 2010 e 2022 [7 e pesquisa original]. Comparação descritiva entre levantamentos; alterações de identificação e cobertura devem ser consideradas, além da mudança populacional.",
         },
-        { t: "inter", texto: "Quando a água baixa a perda continua" },
+        { t: "inter", texto: "Quando a água baixa, a perda continua" },
         {
           t: "p",
           texto: "O material pesquisado pelo grupo destaca as enchentes de 2024 no Rio Grande do Sul. A escala do desastre importa, mas o período de reconstrução revela outra dimensão: o impacto continua quando a família não encontra moradia segura, perde trabalho ou já gastou suas economias em uma enchente anterior.",
@@ -218,7 +220,8 @@ const REVISTA = {
           t: "p",
           texto: "A experiência ajuda a explicar vulnerabilidade: estar disposto a reconstruir não basta quando faltam recursos e alternativas seguras. Políticas de solo e de habitação entram nessa discussão, como mostra a contribuição de Raquel Rolnik para pensar moradia e remoções. Reconstruir exige considerar onde as pessoas poderão viver e manter seus vínculos.",
         },
-        { t: "inter", texto: "No Xingu perder vegetação também é perder autonomia" },
+        { t: "imagem", src: "assets/fotos/rio-grande-do-sul.jpg", legenda: "Inundação no Rio Grande do Sul. Imagem contextual, não retrata necessariamente Júlia ou Roca Sales; confirmar local, data e crédito." },
+        { t: "inter", texto: "No Xingu, a autonomia depende da floresta" },
         {
           t: "p",
           texto: "Na aldeia Tanguro, do povo Kalapalo, a mudança na paisagem alcança práticas cotidianas. A reportagem de André Cabette Fábio, publicada por ((o))eco em outubro de 2025, relata uma floresta mais seca e inflamável, dificuldades na pesca e perdas de mandioca. O estudante Sikan Kalapalo descreve trechos de rio em que é necessário empurrar o barco e maior dependência de cestas básicas. “Hoje a gente está com escassez de alimentos. E as plantações não estão dando mais”, disse. [13]",
@@ -237,7 +240,8 @@ const REVISTA = {
           autor: "Sikan Kalapalo, estudante, aldeia Tanguro",
           credito: "Relatos: Sikan Kalapalo e Yunak Yawalapiti. André Cabette Fábio, Thomson Reuters Foundation/Context, publicado por ((o))eco em 20 out. 2025 [13].",
         },
-        { t: "inter", texto: "No Marajó a perda também leva documentos e memórias" },
+        { t: "imagem", src: "assets/fotos/xingu.jpg", legenda: "Vida junto às águas. Foto contextual fornecida para a revista; confirmar povo, aldeia e localidade antes de identificar como Xingu." },
+        { t: "inter", texto: "No Marajó, a erosão leva mais que casas" },
         {
           t: "p",
           texto: "Na Vila do Pesqueiro, em Soure, Ivanil Brito perdeu a casa pela erosão em fevereiro de 2024. A fotoreportagem de Alice Martins Morais e Matheus Melo registra perdas de animais, plantas, móveis, documentos e materiais universitários dos filhos. “Nunca pensei que veria algo assim, nem que teria tanto sofrimento”, declarou. [14]",
@@ -252,7 +256,8 @@ const REVISTA = {
           autor: "Ivanil Brito, Vila do Pesqueiro, Soure",
           credito: "Relato: Ivanil Brito. ((o))eco, Mudanças climáticas afetam comunidades do Marajó, 25 out. 2024 [14].",
         },
-        { t: "inter", texto: "O calor também alcança o corpo" },
+        { t: "imagem", src: "assets/fotos/marajo.jpg", legenda: "Erosão e escombros em comunidade costeira. Foto fornecida para a revista; confirmar local, autoria e autorização de uso. Não representa necessariamente a casa de Ivanil." },
+        { t: "inter", texto: "Na infância, o calor ameaça a nutrição" },
         {
           t: "p",
           texto: "Um estudo divulgado pelo Cidacs/Fiocruz em março de 2026 associou cada aumento de 1 °C acima de 26 °C a maior chance de baixo peso e desnutrição infantil. A análise reuniu registros de mais de 6 milhões de crianças de 12 a 59 meses, com informações de 2007 a 2017. Entre as crianças indígenas estudadas, 26,65% apresentavam atraso no crescimento; entre as crianças pretas, 9,32%. [9]",
@@ -273,11 +278,11 @@ const REVISTA = {
     },
     {
       numero: 3,
-      titulo: "Quem causa",
+      titulo: "As empresas, as emissões e o território",
       linhaFina: "Grandes empresas, cadeias produtivas e poder econômico",
       cor: "#b5472a",
       blocos: [
-        { t: "inter", texto: "Das fontes de emissão às decisões das empresas" },
+        { t: "inter", texto: "Por trás das emissões, decisões empresariais" },
         {
           t: "p",
           texto: "A crise climática é impulsionada por atividades concretas: extração e queima de combustíveis fósseis, retirada da vegetação e processos industriais. As grandes empresas participam dessas atividades como produtoras de combustíveis, operadoras de empreendimentos e integrantes de cadeias de fornecimento. Identificar responsabilidades exige acompanhar o que cada uma produz, transforma ou modifica no território.",
@@ -286,7 +291,7 @@ const REVISTA = {
           t: "p",
           texto: "No mundo, carvão, petróleo e gás são centrais para explicar o aquecimento. No Brasil, a mudança de uso da terra tem um peso especialmente elevado nas emissões brutas. São escalas diferentes: o predomínio global dos combustíveis fósseis não contradiz a importância do desmatamento no perfil brasileiro. [1; 2; 11]",
         },
-        { t: "inter", texto: "Combustíveis fósseis e empresas que sustentam essa cadeia" },
+        { t: "inter", texto: "Os gigantes do carvão, do petróleo e do gás" },
         {
           t: "p",
           texto: "Quando gasolina, diesel, carvão e gás natural são queimados em motores, instalações industriais e usinas, o carbono dos combustíveis é liberado como CO₂. A geração elétrica é apenas parte desse uso: transporte e produção industrial também dependem de energia. A ONU destaca essas atividades entre as causas das mudanças climáticas. [11]",
@@ -313,7 +318,7 @@ const REVISTA = {
           t: "p",
           texto: "Essa atribuição conecta a comercialização de combustíveis ao aquecimento, mas não demonstra que uma dessas empresas causou sozinha um incêndio ou uma enchente específica. A responsabilidade por um empreendimento e a contribuição para o clima global são perguntas relacionadas, com evidências diferentes.",
         },
-        { t: "inter", texto: "Transportes e indústria no Brasil" },
+        { t: "inter", texto: "As emissões que movem transportes e indústrias" },
         {
           t: "p",
           texto: "Segundo a EPE, em 2024 os transportes geraram 214,3 milhões de toneladas de CO₂e, dentro de um total de 431,3 milhões associado à matriz energética brasileira. O dado inclui o uso de energia no deslocamento de cargas e pessoas; não representa a participação dos transportes no conjunto de todas as emissões nacionais. [12]",
@@ -337,7 +342,7 @@ const REVISTA = {
           t: "p",
           texto: "Os processos industriais representaram cerca de 4% das emissões brutas brasileiras em 2024. Esse percentual não corresponde a toda a contribuição climática da indústria: parte das emissões industriais relacionadas aos combustíveis aparece no setor de energia. Por isso, uma parcela pequena nessa categoria não significa impacto industrial desprezível. [2]",
         },
-        { t: "inter", texto: "A retirada da vegetação modifica o clima e a vida local" },
+        { t: "inter", texto: "Quando a vegetação desaparece, o território muda" },
         {
           t: "p",
           texto: "Florestas e outras formações nativas armazenam carbono e participam da circulação de água. A derrubada, a queima e a decomposição da vegetação removida liberam carbono; a degradação também pode comprometer sua absorção futura. No Brasil, a mudança de uso da terra respondeu por cerca de 42% das emissões brutas em 2024. [1; 2]",
@@ -350,7 +355,7 @@ const REVISTA = {
           t: "p",
           texto: "Ameaçar a produção de alimentos também reduz a autonomia. Uma família que pescava e cultivava para se sustentar pode passar a depender de compras e de auxílio. Essas perdas não são inteiramente substituídas por indenizações, porque o território também guarda conhecimentos, relações de cuidado e práticas transmitidas entre gerações.",
         },
-        { t: "inter", texto: "Norte Energia e Belo Monte do desmate autorizado à disputa pela água" },
+        { t: "inter", texto: "Belo Monte e a disputa pelas águas do Xingu" },
         {
           t: "p",
           texto: "A Norte Energia é a concessionária da hidrelétrica de Belo Monte, no Pará. O estudo de Maíra Borges Fainguelernt sobre o licenciamento registra que uma autorização concedida pelo Ibama em 2011 permitia a supressão de 238,1 hectares, incluindo 64,5 hectares de Áreas de Preservação Permanente. O número se refere a uma autorização daquela etapa da obra, não ao desmatamento total do empreendimento. [15]",
@@ -371,7 +376,7 @@ const REVISTA = {
           t: "nota",
           texto: "Caso documentado: Norte Energia e Belo Monte. Autorização histórica: Fainguelernt, 2016 [15]. Impactos e cobrança: MPF, 18 jun. 2026 [16]. Decisão sobre vazão: MPF, 16 dez. 2025 [17].",
         },
-        { t: "inter", texto: "Belo Sun e a disputa por um projeto de mineração" },
+        { t: "inter", texto: "Belo Sun e o futuro em disputa na Volta Grande" },
         {
           t: "p",
           texto: "A Belo Sun pretende desenvolver o Projeto Volta Grande de mineração de ouro, também no Pará. Aqui, o debate envolve os riscos da instalação e quem deve participar da avaliação. Em abril de 2026, o MPF contestou a retomada da licença e apontou lacunas nas exigências socioambientais. Em reunião com o órgão, lideranças Xikrin e da comunidade de Marapanim alertaram para riscos e falhas na consulta às populações atingidas. Essas posições não equivalem a uma condenação definitiva da empresa. [18; 19]",
@@ -388,7 +393,7 @@ const REVISTA = {
           t: "nota",
           texto: "Caso documentado: Belo Sun. Posições do MPF e das lideranças em abril de 2026 [18; 19]; manifestação empresarial de maio [27]; conciliação registrada pelo TRF1 em junho [28]. Os fatos são apresentados com suas datas e não como um boletim da situação processual atual.",
         },
-        { t: "inter", texto: "Se há impactos por que a retirada pode ser autorizada" },
+        { t: "inter", texto: "O que uma autorização ambiental permite" },
         {
           t: "p",
           texto: "A legislação não proíbe toda mudança no uso do solo. O Código Florestal prevê autorização prévia para supressão de vegetação nativa destinada a uso alternativo do solo. Em Áreas de Preservação Permanente, as hipóteses são mais restritas, como utilidade pública, interesse social ou baixo impacto previstos na lei. Ter a propriedade ou estar inscrito no Cadastro Ambiental Rural não é, por si só, permissão para derrubar a vegetação. [21]",
@@ -401,7 +406,7 @@ const REVISTA = {
           t: "p",
           texto: "A proteção das comunidades é outra obrigação. A Convenção 169 da OIT prevê consulta aos povos interessados, por procedimentos adequados e por suas instituições representativas, quando medidas possam afetá-los diretamente. A consulta deve ocorrer de boa-fé e buscar acordo ou consentimento. Não se reduz a informar uma decisão pronta, nem deve ser confundida com uma audiência genérica. [22]",
         },
-        { t: "inter", texto: "Qual é a motivação econômica e política" },
+        { t: "inter", texto: "Os interesses que pesam nas decisões" },
         {
           t: "p",
           texto: "Empresas buscam viabilizar atividades que geram receita, como vender energia ou explorar minérios. Para governos, os argumentos podem envolver abastecimento, infraestrutura e desenvolvimento. No caso de Belo Monte, o Ministério de Minas e Energia justificou a autorização de enchimento em 2015 pela necessidade de energia renovável, custos e suporte ao desenvolvimento. Essa é uma justificativa oficial identificável, não uma suposição sobre intenções ocultas. [25]",
@@ -414,7 +419,7 @@ const REVISTA = {
           t: "p",
           texto: "Nossa leitura é que a decisão pública envolve uma disputa sobre quais benefícios e perdas recebem mais peso. Os ganhos de um projeto podem chegar a consumidores e investidores, enquanto seus efeitos se concentram nas comunidades do território. Isso ajuda a explicar por que conhecer um risco não leva automaticamente à rejeição de uma obra. Não justifica ignorar direitos: exige avaliar alternativas, cumprir condições e assegurar participação.",
         },
-        { t: "inter", texto: "Quando acontece ilegalmente a explicação é outra" },
+        { t: "inter", texto: "Onde a autorização termina e a ilegalidade começa" },
         {
           t: "p",
           texto: "Desmatamento sem autorização ou em desacordo com seus limites não se torna permitido porque uma autoridade sabe que ele existe. O TCU identificou dificuldades de coordenação, recursos e pessoal na fiscalização, além de problemas de gestão fundiária que favorecem a grilagem. São falhas de controle que ajudam a explicar a continuidade de danos ilegais. [24]",
@@ -423,7 +428,7 @@ const REVISTA = {
           t: "p",
           texto: "É preciso distinguir, portanto, intervenção autorizada, autorização questionada e atividade ilegal. A primeira exige avaliar se os controles protegem de fato o território; a segunda envolve contestação técnica ou judicial; a terceira exige fiscalização e responsabilização. Os casos desta matéria mostram por que o nome de uma empresa deve vir acompanhado de documentos, da intervenção específica e da situação em que ela foi identificada.",
         },
-        { t: "inter", texto: "Uma fonte renovável também precisa de avaliação" },
+        { t: "inter", texto: "Energia renovável também tem impactos" },
         {
           t: "p",
           texto: "Reservatórios hidrelétricos podem emitir metano pela decomposição de matéria orgânica. A quantidade varia conforme características e condições de cada reservatório; não foi encontrada nesta pesquisa uma medição que permita atribuir um valor específico a Belo Monte. O ponto é que renovável não significa ausência de emissões ou de efeitos territoriais. [26]",
@@ -440,7 +445,7 @@ const REVISTA = {
     },
     {
       numero: 4,
-      titulo: "Finalização",
+      titulo: "Quem precisa de proteção não pode esperar",
       linhaFina: "Enfrentar a crise com justiça",
       cor: "#2e2a28",
       blocos: [

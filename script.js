@@ -27,7 +27,7 @@ import { criarCenario } from "./cenario.js";
 //   (?semcapa na URL usa a primeira página do PDF como capa e a última como contracapa);
 // - texto (?texto na URL, ou sem PAGINAS_PDF): a diagramação automática de diagramacao.js.
 const parametros = new URLSearchParams(location.search);
-const usarPdf = typeof PAGINAS_PDF !== "undefined" && !parametros.has("texto");
+const usarPdf = typeof PAGINAS_PDF !== "undefined" && parametros.has("pdf") && !parametros.has("texto");
 await carregarFontes(); // a capa e a diagramação do texto usam as fontes da revista
 let paginas;
 if (usarPdf) {

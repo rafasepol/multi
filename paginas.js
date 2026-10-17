@@ -185,6 +185,23 @@ function desenharItem(ctx, it, x0, u, aoLink) {
       break;
     }
 
+    case "imagem": {
+      const px = x0 * u;
+      const py = it.y * u;
+      const larg = LARG_TEXTO * u;
+      const alt = it.alturaFoto * u;
+      const foto = imagensRevista.get(it.src);
+      ctx.fillStyle = "#e9e5dc";
+      ctx.fillRect(px, py, larg, alt);
+      if (foto && foto.complete && foto.naturalWidth) {
+        const escala = Math.max(larg / foto.naturalWidth, alt / foto.naturalHeight);
+        const sw = larg / escala, sh = alt / escala;
+        ctx.drawImage(foto, (foto.naturalWidth - sw) / 2, (foto.naturalHeight - sh) / 2, sw, sh, px, py, larg, alt);
+      }
+      linhasTexto(ctx, it.legenda, x0, it.y + it.alturaFoto + 1.4 * e, ESTILO.nota, e, u, TINTA_SUAVE);
+      break;
+    }
+
     case "grafico": {
       linhasTexto(ctx, it.titulo, x0, it.y, ESTILO.grafTitulo, e, u, TINTA);
       const xEixo = x0 + GRAF_ROTULO * e;
@@ -232,6 +249,18 @@ function desenharItem(ctx, it, x0, u, aoLink) {
 }
 
 // ---------- Página ----------
+
+const imagensRevista = new Map();
+
+function carregarImagem(src) {
+  if (imagensRevista.has(src)) return Promise.resolve(imagensRevista.get(src));
+  return new Promise((resolve) => {
+    const foto = new Image();
+    foto.onload = () => { imagensRevista.set(src, foto); resolve(foto); };
+    foto.onerror = () => resolve(null);
+    foto.src = src;
+  });
+}
 
 export function desenharPagina(p, numero, w, h, revista) {
   const canvas = document.createElement("canvas");
@@ -369,5 +398,17 @@ export function desenharPagina(p, numero, w, h, revista) {
   }
 
   ctx.restore();
+  if (p.tipo === "texto") {
+    const pendentes = p.itens.filter(it => it.k === "imagem" && !imagensRevista.has(it.src));
+    if (pendentes.length) {
+      const pronto = Promise.all(pendentes.map(it => carregarImagem(it.src))).then(() => {
+        ctx.save();
+        ctx.translate(ox, oy);
+        for (const it of p.itens.filter(it => it.k === "imagem")) desenharItem(ctx, it, x0, u, () => {});
+        ctx.restore();
+      });
+      return { canvas, links, pronto };
+    }
+  }
   return { canvas, links };
 }
