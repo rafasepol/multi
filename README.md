@@ -24,6 +24,12 @@ Depois abra <http://localhost:5500/> no navegador. Se parecer que nada mudou, re
 
 Com `?fps` no fim do endereço, aparecem os quadros por segundo.
 
+## Padrão visual
+
+- **Fontes:** só duas, Anton (títulos, números e aspas) e Inter (texto).
+- **Tamanhos:** escala fixa em `diagramacao.js` (`ESCALA_TEXTO` e `ESCALA_TITULO`). Um título que pede outro tamanho recebe o degrau mais próximo abaixo.
+- **Cores:** `paleta.js` — 4 principais (vermelho, vinho, laranja e âmbar, as duas últimas só no mapa) e neutros (preto, papel, creme, bege e cinza). O CSS repete os mesmos valores.
+
 ## Se o texto ou as fotos mudarem
 
 Edite `dados.js`: lá estão o texto, as fontes e o espelho das 18 páginas (quais blocos vão em cada página). As fotos ficam em `assets/fotos/`. Se algo não couber, o console do navegador (F12) avisa qual página passou do limite. A versão em texto muda junto.

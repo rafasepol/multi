@@ -1,6 +1,13 @@
 :root {
-  --fundo: #d8cfc0;
-  --tinta: #1d1d1f;
+  /* paleta da revista (paleta.js): 4 principais + neutros */
+  --vermelho: #d22a1e;
+  --vinho: #8f2a1f;
+  --preto: #1c1a18;
+  --papel: #f2ead9;
+  --creme: #f8f1e2;
+  --suave: #665e53;
+  --fundo: var(--papel);
+  --tinta: var(--preto);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,21 +68,21 @@ html, body {
 #indicador { min-width: 110px; text-align: center; font-size: 12px; font-weight: 500; }
 .controles button:focus-visible,
 .controles__texto:focus-visible,
-.pular:focus { outline: 2px solid #d22a1e; outline-offset: 2px; }
+.pular:focus { outline: 2px solid var(--vermelho); outline-offset: 2px; }
 
 /* link para a versão em texto, ao lado das setas */
 .controles__texto {
   margin-left: 2px;
   padding: 8px 12px;
   border-radius: 999px;
-  background: #d22a1e;
-  color: #fff;
+  background: var(--vermelho);
+  color: var(--creme);
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
 }
-.controles__texto:hover { background: #b31f15; }
+.controles__texto:hover { background: var(--vinho); }
 
 /* "pular para a versão em texto": invisível até receber o foco do teclado */
 .pular {
@@ -85,8 +92,8 @@ html, body {
   z-index: 20;
   padding: 10px 14px;
   border-radius: 8px;
-  background: #1d1d1f;
-  color: #fff;
+  background: var(--preto);
+  color: var(--creme);
   font-size: 14px;
   text-decoration: none;
   transform: translateY(-200%);
@@ -119,8 +126,8 @@ html, body {
   z-index: 10;
   width: min(300px, calc(100vw - 16px));
   padding: 12px 14px 10px;
-  background: #f8f1e2;
-  border-top: 6px solid #d22a1e;
+  background: var(--creme);
+  border-top: 6px solid var(--vermelho);
   box-shadow: 0 10px 30px rgba(0,0,0,.35);
   pointer-events: none;
 }
@@ -131,10 +138,10 @@ html, body {
   justify-content: space-between;
   gap: 10px;
 }
-.mapa-cartao__nome { font: 400 26px/1 "Anton", Impact, sans-serif; text-transform: uppercase; color: #1c1a18; }
-.mapa-cartao__parte { font: 400 30px/1 "Anton", Impact, sans-serif; color: #d22a1e; }
-.mapa-cartao__periodo { margin-top: 4px; font-size: 12px; color: #665e53; }
+.mapa-cartao__nome { font: 400 28px/1 "Anton", Impact, sans-serif; text-transform: uppercase; color: var(--preto); }
+.mapa-cartao__parte { font: 400 28px/1 "Anton", Impact, sans-serif; color: var(--vermelho); }
+.mapa-cartao__periodo { margin-top: 4px; font-size: 12px; color: var(--suave); }
 .mapa-cartao__grafico { display: block; width: 100%; height: auto; margin-top: 10px; }
-.mapa-cartao__area { margin-top: 8px; font-size: 13px; line-height: 1.4; color: #1c1a18; }
+.mapa-cartao__area { margin-top: 8px; font-size: 14px; line-height: 1.4; color: var(--preto); }
 .mapa-cartao__area[hidden] { display: none; }
-.mapa-cartao__fonte { margin-top: 6px; font-size: 10.5px; line-height: 1.35; font-style: italic; color: #665e53; }
+.mapa-cartao__fonte { margin-top: 6px; font-size: 12px; line-height: 1.35; font-style: italic; color: var(--suave); }

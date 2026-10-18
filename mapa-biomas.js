@@ -5,6 +5,8 @@
 // - dados.js (REVISTA.mapaFogo): os números de cada bioma.
 // Mudou um número em dados.js? O mapa muda junto, na página e no mapa 3D (mapa3d.js).
 
+import { COR, rgb } from "./paleta.js";
+
 const OESTE = -74.2;
 const LESTE = -34.5;
 const NORTE = 5.6;
@@ -16,14 +18,14 @@ const ALT_GRAUS = NORTE - SUL;
 // largura / altura do mapa
 export const PROPORCAO_MAPA = LARG_GRAUS / ALT_GRAUS;
 
-export const FUNDO_MAPA = "#140b07";
+export const FUNDO_MAPA = COR.preto;
 
-// escala de cor: da brasa escura (poucos focos) ao âmbar (muitos focos)
+// escala de cor, só com as cores principais da paleta: do vinho (poucos focos) ao âmbar (muitos)
 const ESCALA = [
-  [0, [74, 18, 10]],
-  [0.35, [170, 34, 18]],
-  [0.7, [236, 92, 22]],
-  [1, [255, 184, 52]],
+  [0, rgb(COR.vinho)],
+  [0.4, rgb(COR.vermelho)],
+  [0.75, rgb(COR.laranja)],
+  [1, rgb(COR.ambar)],
 ];
 
 function corDaEscala(t) {
@@ -117,7 +119,7 @@ export function desenharMapaBiomas(ctx, x, y, w, h, ativo = null) {
     const forma = d.geo.biomas[b.nome]?.forma;
     if (!forma) continue;
     caminho(ctx, forma, p);
-    ctx.strokeStyle = "rgba(20,11,7,.75)";
+    ctx.strokeStyle = "rgba(28,26,24,.75)";
     ctx.lineWidth = esc * 0.004;
     ctx.stroke();
   }
@@ -130,7 +132,7 @@ export function desenharMapaBiomas(ctx, x, y, w, h, ativo = null) {
     const forma = d.geo.biomas[ativo]?.forma;
     if (forma) {
       caminho(ctx, forma, p);
-      ctx.strokeStyle = "#f8f1e2";
+      ctx.strokeStyle = COR.creme;
       ctx.lineWidth = esc * 0.007;
       ctx.stroke();
     }
@@ -156,9 +158,9 @@ export function desenharMapaBiomas(ctx, x, y, w, h, ativo = null) {
     for (const l of linhas) {
       ctx.font = l.f;
       ctx.lineWidth = esc * 0.012;
-      ctx.strokeStyle = "rgba(20,11,7,.9)";
+      ctx.strokeStyle = "rgba(28,26,24,.9)";
       ctx.strokeText(l.t, cx, l.y);
-      ctx.fillStyle = "#f8f1e2";
+      ctx.fillStyle = COR.creme;
       ctx.fillText(l.t, cx, l.y);
     }
   }

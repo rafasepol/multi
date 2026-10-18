@@ -33,10 +33,13 @@
 // Texto curto em duas colunas: use um bloco `lado` com um parágrafo em cada coluna, para a
 // frase não ser partida no meio. Se algo não couber, o console do navegador avisa a página.
 
+// cores da paleta (as mesmas de paleta.js)
 const VERMELHO = "#d22a1e";
+const VINHO = "#8f2a1f";
 const PRETO = "#1c1a18";
 const CREME = "#f8f1e2";
 const BEGE = "#e5d9c0";
+const SUAVE = "#665e53";
 
 const FOTO = {
   // colagens escolhidas pela equipe
@@ -107,7 +110,7 @@ const REVISTA = {
               },
             ],
             [
-              { t: "numeros", colunas: 1, tam: 9, itens: [{ n: "1,1 °C", texto: "foi quanto a média global de 2011 a 2020 ficou acima da média de 1850 a 1900. [1]" }] },
+              { t: "numeros", colunas: 1, tam: 8.4, itens: [{ n: "1,1 °C", texto: "foi quanto a média global de 2011 a 2020 ficou acima da média de 1850 a 1900. [1]" }] },
             ],
           ],
         },
@@ -120,7 +123,7 @@ const REVISTA = {
       secao: "1 · Um planeta mais quente",
       blocos: [
         { t: "rotulo", texto: "Do aquecimento aos impactos" },
-        { t: "titulo", texto: "Quando o aquecimento vira cotidiano", tam: 5.4, antes: 1 },
+        { t: "titulo", texto: "Quando o aquecimento vira cotidiano", tam: 6, antes: 1 },
         {
           t: "texto", colunas: 1, antes: 1.4,
           p: [
@@ -142,7 +145,7 @@ const REVISTA = {
           legenda: "Gráfico 1. SEEG, coleção 13, ano-base 2024 [2]: 2,145 bilhões de toneladas de CO₂e, divididas por setor da economia.",
         },
         {
-          t: "lado", antes: 1.8, gap: 3,
+          t: "lado", antes: 1.6, gap: 3,
           colunas: [
             [{
               t: "texto", colunas: 1,
@@ -155,7 +158,7 @@ const REVISTA = {
           ],
         },
         {
-          t: "numeros", fundo: VERMELHO, antes: 2.2, tam: 4.6, resto: true,
+          t: "numeros", fundo: VERMELHO, antes: 1.8, tam: 3.6, resto: true,
           itens: [
             { n: "59% a 67%", texto: "é o corte nas emissões líquidas até 2035, em relação a 2005, prometido pelo Brasil na NDC. É meta, não resultado. [3]" },
             { n: "Mitigar + adaptar", texto: "Reduzir emissões não basta: também é preciso preparar casas, serviços e territórios para quem já sofre os efeitos." },
@@ -170,7 +173,7 @@ const REVISTA = {
       secao: "1 · Um planeta mais quente",
       blocos: [
         { t: "rotulo", texto: "Focos de calor por bioma" },
-        { t: "titulo", texto: "Fogo no Brasil", tam: 7.4, antes: 0.8 },
+        { t: "titulo", texto: "Fogo no Brasil", tam: 8.4, antes: 0.8 },
         {
           t: "lado", antes: 1.2, larguras: [1.32, 1], gap: 3,
           colunas: [
@@ -191,13 +194,13 @@ const REVISTA = {
             ],
           ],
         },
-        { t: "lead", est: "legenda", antes: 1, cor: "#665e53", texto: "Mapa da equipe (limites do IBGE; biomas aproximados). Cor mais clara: mais focos." },
+        { t: "lead", est: "legenda", antes: 1, cor: SUAVE, texto: "Mapa da equipe (limites do IBGE; biomas aproximados). Cor mais clara: mais focos." },
         {
           t: "lado", antes: 2.2, resto: true,
           colunas: [
             [{ t: "foto", src: FOTO.queimada, resto: true, min: 10, legenda: "Queimada em área de vegetação nativa." }],
             [{
-              t: "citacao", resto: true, tam: 3,
+              t: "citacao", resto: true, tam: 2.8,
               texto: "No dia seguinte, vi tudo acabado, queimado",
               autor: "Rosely, sobrevivente de um incêndio no Pantanal",
               credito: "O Globo, 27 jul. 2024 [6]",
@@ -238,7 +241,7 @@ const REVISTA = {
             }],
             [{
               t: "texto", colunas: 1,
-              p: ["E ela não é natural: é produzida por escolhas políticas, desigualdades históricas e pela forma como o território é ocupado. Separar os três fatores mostra o que dá para evitar. [1]"],
+              p: ["E ela não é natural: é produzida por escolhas políticas, desigualdades históricas e pela ocupação do território. [1] Para Émile Durkheim, um fato social se explica por outros fatos sociais: o risco desigual não é azar individual, é um padrão da sociedade."],
             }],
           ],
         },
@@ -251,7 +254,7 @@ const REVISTA = {
       secao: "2 · Clima e desigualdade",
       blocos: [
         { t: "rotulo", texto: "Quem enfrenta a crise com menos proteção" },
-        { t: "titulo", texto: "Quem perde mais", tam: 7, antes: 0.8 },
+        { t: "titulo", texto: "Quem perde mais", tam: 6, antes: 0.8 },
         {
           t: "lista", colunas: 2, antes: 1.1, est: "numTexto",
           itens: [
@@ -271,14 +274,14 @@ const REVISTA = {
           t: "lado", antes: 1.8, gap: 4,
           colunas: [
             [{
-              t: "grafico", rotulos: 0.4, tamTitulo: 1.9,
+              t: "grafico", rotulos: 0.4, tamTitulo: 1.8,
               titulo: "Renda por pessoa (2023)",
               max: 2500,
               barras: [["Sudeste", 2237, "R$ 2.237"], ["Centro-Oeste", 2202, "R$ 2.202"], ["Sul", 2167, "R$ 2.167"], ["Norte", 1302, "R$ 1.302"], ["Nordeste", 1146, "R$ 1.146"]],
               legenda: "Gráfico 2. IBGE, PNAD Contínua: rendimento domiciliar mensal por pessoa; média do Brasil, R$ 1.848 [7].",
             }],
             [{
-              t: "grafico", rotulos: 0.4, tamTitulo: 1.9,
+              t: "grafico", rotulos: 0.4, tamTitulo: 1.8,
               titulo: "Pessoas na pobreza (2024)",
               max: 35,
               barras: [["Pardos", 29.8, "29,8%"], ["Pretos", 25.8, "25,8%"], ["Brasil", 23.1, "23,1%"], ["Brancos", 15.1, "15,1%"]],
@@ -302,7 +305,7 @@ const REVISTA = {
         blocos: [
           { t: "rotulo", texto: "O calor também alcança o corpo", cor: CREME },
           {
-            t: "numeros", colunas: 1, tam: 7, antes: 2, corNumero: CREME, corTexto: CREME,
+            t: "numeros", colunas: 1, tam: 6, antes: 2, corNumero: CREME, corTexto: CREME,
             itens: [
               { n: "+10%", texto: "na chance de baixo peso infantil, associada ao calor acima de 26 °C [9]" },
               { n: "26,65%", texto: "das crianças indígenas estudadas tinham atraso no crescimento [9]" },
@@ -335,7 +338,7 @@ const REVISTA = {
         {
           t: "caixa", antes: 2.6, fundo: PRETO, resto: true,
           blocos: [
-            { t: "titulo", texto: "Racismo ambiental", tam: 3, cor: VERMELHO },
+            { t: "titulo", texto: "Racismo ambiental", tam: 2.8, cor: VERMELHO },
             {
               t: "texto", colunas: 1, cor: CREME, antes: 1.2,
               p: ["É a exposição desproporcional de grupos raciais ou étnicos a danos ambientais e à falta de proteção. O termo ganhou força com o sociólogo Robert Bullard, nos Estados Unidos; no Brasil, Henri Acselrad fala em injustiça ambiental. Não exige intenção explícita: práticas e instituições bastam para manter a desigualdade."],
@@ -350,18 +353,18 @@ const REVISTA = {
       modelo: "materia",
       secao: "2 · Histórias reais",
       blocos: [
-        { t: "titulo", texto: "Roca Sales (RS): a água baixa, a perda fica", tam: 3.4 },
+        { t: "titulo", texto: "Roca Sales (RS): a água baixa, a perda fica", tam: 3.6 },
         {
           t: "lado", antes: 1.3, larguras: [1, 1.8],
           colunas: [
-            [{ t: "citacao", resto: true, fundo: PRETO, tam: 2.3, texto: "Não tem onde morar", autor: "Júlia Almeida, 20 anos", credito: "Agência Brasil, 23 jun. 2024 [12]" }],
+            [{ t: "citacao", resto: true, fundo: PRETO, tam: 2.2, texto: "Não tem onde morar", autor: "Júlia Almeida, 20 anos", credito: "Agência Brasil, 23 jun. 2024 [12]" }],
             [{
               t: "texto", colunas: 1,
               p: ["Depois das enchentes de 2024, Júlia contou que ficou difícil achar moradia longe da água, e os aluguéis subiram. [12] Segundo o World Weather Attribution, o aquecimento global dobrou a chance de chuvas como aquelas e as deixou de 6% a 9% mais intensas. [13]"],
             }],
           ],
         },
-        { t: "titulo", texto: "Xingu (MT): a floresta em volta seca", tam: 3.4, antes: 2.4 },
+        { t: "titulo", texto: "Xingu (MT): a floresta em volta seca", tam: 3.6, antes: 2.4 },
         {
           t: "lado", antes: 1.3, larguras: [1.8, 1],
           colunas: [
@@ -369,14 +372,14 @@ const REVISTA = {
               t: "texto", colunas: 1,
               p: ["Na aldeia Tanguro, do povo Kalapalo, há trechos de rio em que é preciso empurrar o barco, e a mandioca rende menos. O território é cercado por pastos e soja; um estudo citado pela reportagem atribui ao desmatamento 74% da queda das chuvas na estação seca desde 1985. [14]"],
             }],
-            [{ t: "citacao", resto: true, tam: 2.3, texto: "Hoje a gente está com escassez de alimentos", autor: "Sikan Kalapalo, estudante", credito: "((o))eco, 20 out. 2025 [14]" }],
+            [{ t: "citacao", resto: true, tam: 2.2, texto: "Hoje a gente está com escassez de alimentos", autor: "Sikan Kalapalo, estudante", credito: "((o))eco, 20 out. 2025 [14]" }],
           ],
         },
-        { t: "titulo", texto: "Marajó (PA): a erosão levou a casa", tam: 3.4, antes: 2.4 },
+        { t: "titulo", texto: "Marajó (PA): a erosão levou a casa", tam: 3.6, antes: 2.4 },
         {
           t: "lado", antes: 1.3, larguras: [1, 1.8],
           colunas: [
-            [{ t: "citacao", resto: true, fundo: PRETO, tam: 2.3, texto: "Nunca pensei que veria algo assim", autor: "Ivanil Brito, Soure (PA)", credito: "((o))eco, 25 out. 2024 [15]" }],
+            [{ t: "citacao", resto: true, fundo: PRETO, tam: 2.2, texto: "Nunca pensei que veria algo assim", autor: "Ivanil Brito, Soure (PA)", credito: "((o))eco, 25 out. 2024 [15]" }],
             [{
               t: "texto", colunas: 1,
               p: ["Em fevereiro de 2024, a erosão levou em três dias a casa de Ivanil, na Vila do Pesqueiro: animais, móveis, documentos e os materiais da faculdade dos filhos. Outras quatro famílias também perderam a casa. O Serviço Geológico do Brasil tinha apontado o risco na vila cerca de dez anos antes. [15]"],
@@ -424,7 +427,7 @@ const REVISTA = {
         blocos: [
           { t: "rotulo", texto: "Em números", cor: CREME },
           {
-            t: "numeros", colunas: 1, tam: 7, antes: 2, corNumero: CREME, corTexto: CREME,
+            t: "numeros", colunas: 1, tam: 6, antes: 2, corNumero: CREME, corTexto: CREME,
             itens: [
               { n: "32", texto: "empresas ligadas a mais da metade do CO₂ mundial de combustíveis fósseis e cimento em 2024 [17]" },
               { n: "214,3 mi t", texto: "de CO₂e vieram dos transportes no Brasil em 2024, de 431,3 mi t da matriz energética [18]" },
@@ -443,7 +446,7 @@ const REVISTA = {
           ],
         },
         {
-          t: "grafico", antes: 2.2, tamTitulo: 1.9, rotulos: 0.42,
+          t: "grafico", antes: 2.2, tamTitulo: 1.8, rotulos: 0.42,
           titulo: "Cinco grandes produtores (2024)",
           eixo: "% do CO₂ global de combustíveis fósseis e cimento",
           max: 5,
@@ -468,7 +471,7 @@ const REVISTA = {
         { t: "rotulo", texto: "Norte Energia e Belo Monte" },
         { t: "titulo", texto: "Belo Monte e a disputa pelas águas do Xingu", tam: 4.6, antes: 0.8 },
         {
-          t: "numeros", fundo: VERMELHO, antes: 2, tam: 4.4,
+          t: "numeros", fundo: VERMELHO, antes: 2, tam: 4.6,
           itens: [
             { n: "238,1 ha", texto: "de vegetação com supressão autorizada pelo Ibama em 2011 numa etapa da obra; 64,5 ha em APPs [21]" },
             { n: "635", texto: "famílias da Volta Grande sem água potável adequada, segundo ação do MPF (jun. 2026) [22]" },
@@ -503,7 +506,7 @@ const REVISTA = {
           ],
         },
         {
-          t: "lead", est: "legenda", antes: 2.4, cor: "#665e53",
+          t: "lead", est: "legenda", antes: 2.4, cor: SUAVE,
           texto: "Situação dos processos em junho de 2026. Alegações do MPF não equivalem a condenação.",
         },
       ],
@@ -514,9 +517,9 @@ const REVISTA = {
       modelo: "materia",
       secao: "3 · Licenças e interesses",
       blocos: [
-        { t: "titulo", texto: "Autorizado, questionado ou ilegal?", tam: 5.2 },
+        { t: "titulo", texto: "Autorizado, questionado ou ilegal?", tam: 4.6 },
         {
-          t: "fluxo", antes: 2, sinais: ["→", "→"], cores: [PRETO, "#8f2a1f", VERMELHO],
+          t: "fluxo", antes: 2, sinais: ["→", "→"], cores: [PRETO, VINHO, VERMELHO],
           itens: [
             { titulo: "Autorizado", texto: "a lei permite suprimir vegetação com autorização prévia; APPs têm regras mais restritas [28; 29]" },
             { titulo: "Questionado", texto: "licenças, estudos e consultas contestados na Justiça" },
@@ -554,7 +557,7 @@ const REVISTA = {
           t: "lado", antes: 2.8, resto: true, gap: 3,
           colunas: [
             [{
-              t: "titulo", resto: true, fundo: PRETO, cor: CREME, tam: 3, pad: 2.6,
+              t: "titulo", resto: true, fundo: PRETO, cor: CREME, tam: 2.8, pad: 2.6,
               texto: "Renovável não quer dizer sem emissões nem sem efeitos",
             }],
             [{
@@ -569,14 +572,14 @@ const REVISTA = {
     // 14 — parte 4 (sem foto: a abertura usa uma frase grande no alto)
     {
       modelo: "abertura",
-      sumario: { titulo: "Quem precisa de proteção não pode esperar", sub: "Justiça climática e respostas" },
+      sumario: { titulo: "Quem precisa de proteção não pode esperar", sub: "Justiça climática" },
       numero: 4,
       titulo: "Quem precisa de proteção não pode esperar",
       linhaFina: "Enfrentar a crise com justiça",
       destaque: "Proteger quem mais perde também é política climática.",
-      tamDestaque: 5.6,
+      tamDestaque: 4.6,
       fotoAlt: 26,
-      tamTitulo: 4.4,
+      tamTitulo: 4.6,
       blocos: [
         {
           t: "texto", colunas: 1,
@@ -591,74 +594,54 @@ const REVISTA = {
           ],
         },
         {
-          t: "fluxo", antes: 2.4, cores: ["#8f2a1f", VERMELHO],
+          t: "fluxo", antes: 2.4, cores: [VINHO, VERMELHO],
           itens: [
             { titulo: "Igualdade", texto: "a mesma ajuda para todos, perdendo a casa ou não" },
             { titulo: "Equidade", texto: "ajuda conforme a perda e as condições de cada um" },
           ],
         },
         {
-          t: "titulo", antes: 2.4, resto: true, fundo: PRETO, cor: CREME, tam: 2.5, pad: 2.4,
+          t: "titulo", antes: 2.4, resto: true, fundo: PRETO, cor: CREME, tam: 2.2, pad: 2.4,
           texto: "Enfrentar a crise com justiça é reduzir o dano na origem e garantir que a proteção chegue a quem mais precisa.",
         },
       ],
     },
 
-    // 15
+    // 15 — propostas da equipe e conclusão
     {
       modelo: "materia",
-      secao: "4 · Respostas",
+      secao: "4 · Propostas e conclusão",
+      sumario: { titulo: "Propostas e conclusão", sub: "O que fazer com os dados" },
       blocos: [
-        { t: "rotulo", texto: "Da meta à rua" },
-        { t: "titulo", texto: "O que já existe e o que ainda falta", tam: 4.6, antes: 0.8 },
+        { t: "rotulo", texto: "Propostas da equipe" },
+        { t: "titulo", texto: "Do dado à proposta", tam: 4.6, antes: 0.8 },
         {
-          t: "numeros", antes: 1.6, tam: 5.4, colunas: 2,
+          t: "texto", colunas: 1, antes: 1.4,
+          p: ["O Brasil já tem um ponto de partida: o Plano Clima, aprovado em dezembro de 2025, traz 16 planos de adaptação e reconhece que a crise atinge mais os vulneráveis; a Lei 14.904/2024 dá as diretrizes desses planos. [35; 36] A partir dos dados desta revista, propomos:"],
+        },
+        {
+          t: "lista", colunas: 2, antes: 1.8, est: "numTexto", tamTitulo: 1.8,
           itens: [
-            { n: "16", texto: "planos de adaptação, por setor e tema, no Plano Clima aprovado em dezembro de 2025 [35]" },
-            { n: "312", texto: "metas de adaptação até 2035, com mais de 800 ações [35]" },
+            { titulo: "Adaptação onde a renda é menor", texto: "verba dos planos primeiro para favelas e comunidades, onde vivem 16,4 milhões de pessoas, 72,9% pretas ou pardas (pág. 8). [10]" },
+            { titulo: "Desmatamento na conta da cadeia", texto: "rastrear gado e soja até a origem: a agropecuária responde por cerca de dois terços das emissões do país (pág. 4). [2]" },
+            { titulo: "Prevenir antes de reconstruir", texto: "manter diques e drenagem e agir onde o risco já foi mapeado, como no Marajó (pág. 9). [13; 15]" },
+            { titulo: "Alerta que chegue a todos", texto: "levar o Defesa Civil Alerta a todo o país; até lá, o SMS 40199 avisa pelo CEP. [37]" },
+            { titulo: "Reconstruir sem expulsar", texto: "moradia nova perto do trabalho e da escola de quem perdeu a casa (pág. 8). [11]" },
+            { titulo: "Consulta antes da obra", texto: "ouvir os povos afetados antes de licenciar, como exige a Convenção 169 (pág. 13). [30]" },
           ],
         },
         {
-          t: "texto", colunas: 1, antes: 2.2,
-          p: [
-            "O Plano Clima reconhece que a crise atinge com mais força as populações vulneráveis e inclui o combate ao racismo entre as medidas de adaptação. [35] A Lei 14.904, de 2024, dá as diretrizes desses planos. [36]",
-            "O desafio é chegar à rua. No Marajó, o risco foi apontado dez anos antes da erosão; no RS, segundo a reportagem sobre o estudo de atribuição, cortes na manutenção do sistema contra cheias de Porto Alegre agravaram os impactos. [15; 13]",
-          ],
-        },
-        {
-          t: "lado", antes: 2.2, gap: 3, larguras: [1.25, 1], resto: true,
-          colunas: [
-            [{
-              t: "caixa", fundo: BEGE, resto: true,
-              blocos: [
-                { t: "rotulo", texto: "O que cobrar na sua cidade" },
-                {
-                  t: "lista", antes: 1, est: "numTexto", tamTitulo: 1.6,
-                  itens: [
-                    { titulo: "Plano de adaptação", texto: "com prazos, verba e prioridade para quem corre risco." },
-                    { titulo: "Mapa de risco público", texto: "para saber quais ruas alagam ou deslizam." },
-                    { titulo: "Alerta, rota e abrigo", texto: "combinados antes da próxima chuva." },
-                    { titulo: "Reconstruir sem expulsar", texto: "perto do trabalho e da escola de quem perdeu a casa." },
-                  ],
-                },
+          t: "caixa", antes: 2.6, fundo: PRETO, resto: true,
+          blocos: [
+            { t: "rotulo", texto: "Conclusão", cor: CREME },
+            { t: "titulo", texto: "Uma crise de renda, raça e território", tam: 2.8, cor: CREME, antes: 1 },
+            {
+              t: "texto", colunas: 1, cor: CREME, antes: 1.2,
+              p: [
+                "Os dados desta revista mostram um padrão. As emissões vêm de atividades concretas: os combustíveis fósseis no mundo e, no Brasil, sobretudo o desmatamento para pasto e lavoura. Os danos caem com mais força sobre quem tem menos renda, sobre a população preta, parda e indígena e sobre quem tem menos voz nas decisões.",
+                "Por isso, a crise climática brasileira não é só ambiental. Cortar as emissões na origem e proteger quem já sofre são partes da mesma resposta.",
               ],
-            }],
-            [{
-              t: "caixa", fundo: VERMELHO,
-              blocos: [
-                { t: "rotulo", texto: "Receba os alertas", cor: CREME },
-                {
-                  t: "texto", colunas: 1, est: "numTexto", cor: CREME, antes: 1.2,
-                  p: [
-                    "O Defesa Civil Alerta avisa todos os celulares de uma área em risco, sem cadastro, com som mesmo no modo silencioso. O sistema ainda está chegando a todo o país. [37]",
-                    "Para receber também por SMS, envie o seu CEP para 40199. [37]",
-                  ],
-                },
-              ],
-            }, {
-              t: "titulo", antes: 2.4, resto: true, fundo: PRETO, cor: CREME, tam: 2.7, pad: 2.6,
-              texto: "A crise já chegou. A proteção precisa chegar junto.",
-            }],
+            },
           ],
         },
       ],
@@ -712,15 +695,10 @@ const REVISTA = {
     ],
     notas: [
       {
-        titulo: "Referencial sociológico",
-        texto: ["Weber, Bourdieu, Kowarick, Rolnik, Bullard, Acselrad e Fraser aparecem pelos conceitos que ajudam a ler os casos (págs. 7, 8 e 14). As aplicações são interpretações da equipe, não citações literais; a leitura de Rolnik vem do artigo [11]."],
-      },
-      {
-        titulo: "Critérios de checagem",
+        titulo: "Referencial e checagem",
         texto: [
-          "Os relatos vêm de reportagens. Nenhuma das histórias da parte 2 é atribuída a uma empresa específica: a ligação com as emissões vem dos estudos citados. Os casos com empresas separam autorizações, decisões judiciais, alegações do MPF e posições das próprias empresas.",
-          "Usamos as emissões brutas do SEEG de 2024; o total da EPE (431,3 MtCO₂e, só energia) não foi somado a elas. Os focos de calor de 2024 vão até o início de dezembro, último recorte por bioma publicado na fonte [4].",
-          "O mapa da pág. 5 foi feito pela equipe: limites do país do IBGE e contornos aproximados dos biomas.",
+          "Durkheim, Weber, Bourdieu, Kowarick, Rolnik, Bullard, Acselrad e Fraser aparecem pelos conceitos aplicados aos casos (págs. 6, 7, 8 e 14); são interpretações da equipe, não citações literais.",
+          "Relatos vêm de reportagens. Casos com empresas separam autorizações, decisões judiciais, alegações do MPF e posições das empresas. Emissões: SEEG brutas de 2024. Focos de 2024: até o início de dezembro [4]. Mapa da pág. 5: limites do IBGE e biomas aproximados.",
         ],
       },
     ],

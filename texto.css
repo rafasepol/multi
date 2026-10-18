@@ -3,8 +3,9 @@
 :root {
   --papel: #f2ead9;
   --tinta: #1c1a18;
-  --suave: #5f574c;
-  --vermelho: #c0231a; /* um pouco mais escuro que o da revista: contraste AA sobre o papel */
+  --suave: #665e53;
+  --vermelho: #d22a1e; /* contraste 4,7:1 sobre o papel */
+  --vinho: #8f2a1f;
   --bege: #e5d9c0;
   --creme: #f8f1e2;
 }
@@ -95,7 +96,7 @@ sup.fonte a { text-decoration: none; }
 blockquote { margin: 28px 0; padding: 20px 22px; background: var(--tinta); color: var(--creme); }
 blockquote p { font: 400 26px/1.2 "Anton", Impact, sans-serif; text-transform: uppercase; margin: 0 0 12px; }
 blockquote footer { font-size: 14px; }
-blockquote a { color: #ffb3a8; }
+blockquote a { color: var(--creme); }
 
 .lista { padding: 0; list-style: none; margin: 20px 0; }
 .lista li { margin-bottom: 12px; padding-left: 22px; position: relative; }
@@ -109,18 +110,18 @@ blockquote a { color: #ffb3a8; }
 
 .caixa { background: var(--bege); padding: 18px 20px; margin: 24px 0; }
 .caixa.escura { background: var(--tinta); color: var(--creme); }
-.caixa.vermelha { background: #b31f15; color: var(--creme); }
-.caixa.escura a, .caixa.vermelha a { color: #ffd2cc; }
+.caixa.vermelha { background: var(--vinho); color: var(--creme); }
+.caixa.escura a, .caixa.vermelha a { color: var(--creme); }
 .caixa.escura .rotulo, .caixa.vermelha .rotulo { color: var(--creme); }
 .caixa > :first-child { margin-top: 0; }
 .destaque { font: 400 26px/1.2 "Anton", Impact, sans-serif; text-transform: uppercase; background: var(--tinta); color: var(--creme); padding: 18px 20px; margin: 24px 0; }
-.destaque.vermelho { background: #b31f15; }
+.destaque.vermelho { background: var(--vinho); }
 
 .inter { font: 400 22px/1.2 "Anton", Impact, sans-serif; text-transform: uppercase; color: var(--vermelho); margin: 24px 0 6px; }
 
 .mapa-tabela td:last-child, .mapa-tabela th:last-child { text-align: right; }
 .mapa-tabela { width: 100%; border-collapse: collapse; font-size: 15px; margin: 16px 0; }
-.mapa-tabela th, .mapa-tabela td { padding: 6px 4px; border-bottom: 1px solid #d6c9ae; text-align: left; vertical-align: top; }
+.mapa-tabela th, .mapa-tabela td { padding: 6px 4px; border-bottom: 1px solid var(--bege); text-align: left; vertical-align: top; }
 .mapa-tabela thead th { font-weight: 600; }
 
 .sumario ol { padding-left: 0; list-style: none; }
@@ -131,7 +132,7 @@ blockquote a { color: #ffb3a8; }
 .fontes li { margin-bottom: 10px; padding-left: 40px; position: relative; scroll-margin-top: 60px; }
 .fontes li .n { position: absolute; left: 0; font-weight: 600; color: var(--vermelho); }
 .fontes li a { word-break: break-all; font-size: 13px; }
-.fontes li:target { background: #fff3c4; }
+.fontes li:target { background: var(--bege); }
 
 .contracapa { margin-top: 56px; background: var(--vermelho); color: var(--creme); padding: 32px 24px; font: 400 30px/1.2 "Anton", Impact, sans-serif; text-transform: uppercase; text-align: center; }
 
