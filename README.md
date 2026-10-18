@@ -43,4 +43,4 @@ O mapa é desenhado pelo próprio site (`mapa-biomas.js`): cada bioma é pintado
 
 ### Antes de publicar
 
-As colagens e fotos ainda estão com os créditos em verificação (ver expediente, página 2). Confirme autor e permissão de cada imagem em `assets/fotos/` e coloque o crédito na legenda (`legenda` em `dados.js`).
+As colagens e fotos ainda estão com os créditos em verificação (página 2). As fotos da equipe ficam em `assets/equipe/` e a lista em `dados.js`, em `equipe` (`foto: null` deixa o círculo vazio). Confirme autor e permissão de cada imagem em `assets/fotos/` e coloque o crédito na legenda (`legenda` em `dados.js`).

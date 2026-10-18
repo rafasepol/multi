@@ -713,14 +713,38 @@ function lado(b, w, pag) {
   };
 }
 
+// equipe: um retrato redondo por integrante, com o nome embaixo (foto vazia = círculo liso)
+function equipe(b, w) {
+  const n = b.itens.length;
+  const gap = b.gap ?? 2;
+  const cw = (w - gap * (n - 1)) / n;
+  const d = Math.min(cw, b.diametro ?? cw);
+  const en = E.autor;
+  const nomes = b.itens.map((it) => quebrar(it.nome, en, cw));
+  const hNomes = Math.max(...nomes.map((l) => l.length)) * en.alt;
+  const h = d + 0.9 + hNomes;
+  return {
+    h,
+    gerar: (x, y) => {
+      const els = [];
+      b.itens.forEach((it, i) => {
+        const xc = x + i * (cw + gap);
+        els.push({ k: "retrato", x: xc + (cw - d) / 2, y, w: d, h: d, src: it.foto ?? null });
+        els.push(txt(xc, y + d + 0.9, nomes[i], en, COR.preto, "centro", cw));
+      });
+      return els;
+    },
+  };
+}
+
 const espaco = (b) => ({ h: b.h ?? 2, resto: b.resto, gerar: () => [] });
 
 const regra = (b) => ({ h: b.esp ?? 0.35, gerar: (x, y, w) => [ret(x, y, w, b.esp ?? 0.35, b.cor ?? COR.preto)] });
 
 // sumário: número da página num quadrado vermelho, título e linha fina
 function indice(b, w) {
-  const q = 8;
-  const et = display(2.5);
+  const q = 7;
+  const et = display(2.2);
   const es = E.numTexto;
   const lw = w - q - 2.6;
   const itens = b.itens.map((it) => {
@@ -729,9 +753,9 @@ function indice(b, w) {
     const ls = it.sub ? quebrar(it.sub, es, lw) : [];
     return { ...it, lt, ls, et: eti, h: Math.max(q, lt.length * eti.alt + (ls.length ? 0.3 + ls.length * es.alt : 0)) };
   });
-  const GAP_LINHA = 1.4;
+  const GAP_LINHA = 1.2;
   const h = itens.reduce((s, it) => s + it.h, 0) + GAP_LINHA * (itens.length - 1);
-  const en = display(4.2, 4.2);
+  const en = display(3.7, 3.7);
   return {
     h,
     gerar: (x, y, w2) => {
@@ -752,7 +776,7 @@ function indice(b, w) {
   };
 }
 
-const CRIAR = { rotulo, titulo, lead, texto: blocoTexto, foto, mapa, numeros, grafico, citacao, lista, fluxo, caixa, lado, espaco, regra, indice };
+const CRIAR = { rotulo, titulo, lead, texto: blocoTexto, foto, mapa, numeros, grafico, citacao, lista, fluxo, caixa, lado, espaco, regra, indice, equipe };
 
 function criar(b, w, pag) {
   const f = CRIAR[b.t];
@@ -886,25 +910,26 @@ function sumario(p, pag, R, entradas) {
   const { x0, x1 } = margens(pag);
   const ed = R.editorial;
   const blocos = [
-    { t: "titulo", texto: "Sumário", tam: 11, cor: COR.vermelho },
+    { t: "titulo", texto: "Sumário", tam: 8, cor: COR.vermelho },
     {
-      t: "lado", antes: 2, gap: 3.4, resto: true, larguras: [1.12, 1.18],
+      t: "lado", antes: 1.6, gap: 3.4, resto: true, larguras: [1.04, 1.26],
       colunas: [
         [{ t: "indice", itens: entradas }],
         [{
           t: "caixa", resto: true, fundo: COR.bege,
           blocos: [
             { t: "rotulo", texto: ed.titulo },
-            { t: "titulo", texto: ed.chamada, tam: 3, antes: 1.2 },
-            { t: "texto", p: ed.texto, colunas: 1, capitular: true, antes: 1.4 },
-            { t: "lead", texto: `— ${ed.assinatura}`, antes: 1.2, cor: COR.vermelho },
+            { t: "titulo", texto: ed.chamada, tam: 2.6, antes: 1 },
+            { t: "texto", p: ed.texto, colunas: 1, capitular: true, antes: 1.2 },
+            { t: "lead", texto: `— ${ed.assinatura}`, antes: 1, cor: COR.vermelho },
           ],
         }],
       ],
     },
-    { t: "regra", antes: 2.4 },
-    { t: "rotulo", texto: "Expediente", cor: COR.preto, antes: 1.4 },
-    { t: "lead", est: "numTexto", texto: R.expediente, antes: 0.8 },
+    { t: "regra", antes: 2 },
+    { t: "rotulo", texto: "Equipe", cor: COR.preto, antes: 1.3 },
+    { t: "equipe", itens: R.equipe ?? [], antes: 1.2, diametro: 9 },
+    { t: "lead", est: "legenda", texto: R.expediente, antes: 1.2 },
   ];
   els.push(...gerarPilha(blocos, { x: x0, y: 6, w: x1 - x0, h: BASE - 6 }, pag));
   numeroPagina(els, pag);

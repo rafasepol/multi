@@ -149,3 +149,10 @@ blockquote a { color: #ffb3a8; }
   .fluxo li { flex: none; }
   .fluxo li.sinal { justify-content: center; padding: 0; }
 }
+
+/* equipe: retratos redondos com o nome embaixo */
+.equipe ul { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 12px; padding: 0; margin: 12px 0 16px; list-style: none; }
+@media (min-width: 600px) { .equipe ul { grid-template-columns: repeat(6, 1fr); } }
+.equipe li { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.equipe img, .equipe .sem-foto { display: block; width: 100%; max-width: 104px; aspect-ratio: 1; border-radius: 50%; object-fit: cover; background: var(--bege); }
+.equipe .nome { font-size: 14px; font-weight: 600; line-height: 1.3; }

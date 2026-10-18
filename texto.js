@@ -162,7 +162,16 @@ R.paginas.forEach((p, i) => {
         el("h2", {}, ed.chamada),
         ed.texto.map((t) => el("p", {}, t)),
         el("p", { class: "lead" }, `— ${ed.assinatura}`),
-        el("p", { class: "legenda" }, `Expediente. ${R.expediente}`),
+      ),
+      el("section", { class: "pagina equipe", "aria-label": "Equipe" },
+        el("p", { class: "rotulo" }, "Equipe"),
+        el("ul", {}, (R.equipe ?? []).map((m) =>
+          el("li", {},
+            m.foto ? el("img", { src: m.foto, alt: m.nome, loading: "lazy" }) : el("span", { class: "sem-foto", "aria-hidden": "true" }),
+            el("span", { class: "nome" }, m.nome),
+          ),
+        )),
+        el("p", { class: "legenda" }, R.expediente),
       ),
     );
     return;

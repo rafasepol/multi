@@ -143,6 +143,30 @@ function desenharElemento(ctx, el, g, links) {
     case "foto":
       desenharFoto(ctx, el, g);
       break;
+    case "retrato": {
+      // círculo bege; com foto, a foto preenche o círculo
+      const r = caixaPx(el, g, false);
+      const cx = (r.x0 + r.x1) / 2;
+      const cy = (r.y0 + r.y1) / 2;
+      const raio = (r.x1 - r.x0) / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, raio, 0, Math.PI * 2);
+      ctx.fillStyle = COR.bege;
+      ctx.fill();
+      const reg = el.src ? fotos.get(el.src) : null;
+      if (reg?.ok) {
+        ctx.clip();
+        const img = reg.img;
+        const k = Math.max((2 * raio) / img.naturalWidth, (2 * raio) / img.naturalHeight);
+        const dw = img.naturalWidth * k;
+        const dh = img.naturalHeight * k;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
+      }
+      ctx.restore();
+      break;
+    }
     case "mapaBiomas": {
       const r = caixaPx(el, g, false);
       desenharMapaBiomas(ctx, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
@@ -210,7 +234,7 @@ export function desenharPagina(p, numero, w, h) {
   desenhar();
 
   // fotos ainda não carregadas: a página é redesenhada quando chegarem
-  const faltam = [...new Set(els.filter((el) => el.k === "foto" && el.src && !fotos.has(el.src)).map((el) => el.src))];
+  const faltam = [...new Set(els.filter((el) => (el.k === "foto" || el.k === "retrato") && el.src && !fotos.has(el.src)).map((el) => el.src))];
   if (faltam.length) return { canvas, links, pronto: Promise.all(faltam.map(carregarFoto)).then(desenhar) };
   return { canvas, links };
 }

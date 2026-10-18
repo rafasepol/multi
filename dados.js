@@ -50,9 +50,16 @@ const FOTO = {
 
 const REVISTA = {
   edicao: "Germinare Tech • 2º F • Outubro de 2026",
-  expediente:
-    "Pesquisa e redação: Emanuelly Mendes, Guilherme Norcia, Matheus Botana, Rafael Lopes, Rafael Takematsu e Sophia Castro. " +
-    "Imagens: seleção da equipe (créditos em verificação).",
+  // integrantes do grupo, na ordem em que aparecem; foto: null deixa o círculo vazio
+  equipe: [
+    { nome: "Rafael Lopes", foto: "assets/equipe/rafael-lopes.jpg" },
+    { nome: "Matheus Botana", foto: "assets/equipe/matheus-botana.jpg" },
+    { nome: "Guilherme Senatore", foto: "assets/equipe/guilherme-senatore.jpg" },
+    { nome: "Emanuelly Mendes", foto: "assets/equipe/emanuelly-mendes.jpg" },
+    { nome: "Sophia Castro", foto: null },
+    { nome: "Rafael Manzato", foto: null },
+  ],
+  expediente: "Pesquisa, redação e design: a equipe. Imagens: seleção da equipe (créditos em verificação).",
   capa: {
     foto: FOTO.mascara,
     foco: [0.5, 0],
@@ -203,7 +210,7 @@ const REVISTA = {
     // 6 — parte 2
     {
       modelo: "abertura",
-      sumario: { titulo: "Quando o clima encontra a desigualdade", sub: "Vulnerabilidade, território e histórias reais" },
+      sumario: { titulo: "Quando o clima encontra a desigualdade", sub: "Território e histórias reais" },
       numero: 2,
       titulo: "Quando o clima encontra a desigualdade",
       linhaFina: "Vulnerabilidade, território e histórias reais",
@@ -382,7 +389,7 @@ const REVISTA = {
     // 10 — parte 3
     {
       modelo: "abertura",
-      sumario: { titulo: "As empresas, as emissões e o território", sub: "Cadeias produtivas e poder econômico" },
+      sumario: { titulo: "As empresas, as emissões e o território", sub: "Cadeias produtivas e poder" },
       numero: 3,
       titulo: "As empresas, as emissões e o território",
       linhaFina: "Grandes empresas, cadeias produtivas e poder econômico",
@@ -562,7 +569,7 @@ const REVISTA = {
     // 14 — parte 4 (sem foto: a abertura usa uma frase grande no alto)
     {
       modelo: "abertura",
-      sumario: { titulo: "Quem precisa de proteção não pode esperar", sub: "Justiça climática e o que já existe" },
+      sumario: { titulo: "Quem precisa de proteção não pode esperar", sub: "Justiça climática e respostas" },
       numero: 4,
       titulo: "Quem precisa de proteção não pode esperar",
       linhaFina: "Enfrentar a crise com justiça",
