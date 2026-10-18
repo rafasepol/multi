@@ -7,7 +7,7 @@
 // fundos e fotos que encostam na borda da página "sangram" até a borda da textura.
 
 import { LARG, ALT, COR, MARCA, MARCA_FOLGA, cssFonte, estiloMarca, baseLinha } from "./diagramacao.js";
-import { desenharPaginaPdf } from "./pdfpaginas.js";
+import { desenharMapaBiomas } from "./mapa-biomas.js";
 
 export async function carregarFontes() {
   const carregadas = Promise.all([
@@ -143,6 +143,11 @@ function desenharElemento(ctx, el, g, links) {
     case "foto":
       desenharFoto(ctx, el, g);
       break;
+    case "mapaBiomas": {
+      const r = caixaPx(el, g, false);
+      desenharMapaBiomas(ctx, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+      break;
+    }
     case "texto": {
       const est = el.est;
       const base = baseLinha(est);
@@ -191,13 +196,6 @@ export function desenharPagina(p, numero, w, h) {
   const ctx = canvas.getContext("2d");
   ctx.textBaseline = "alphabetic";
   const links = [];
-
-  // página vinda de um PDF: a imagem é carregada depois; `pronto` avisa quando terminou
-  if (p.tipo === "pdf") {
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, 0, w, h);
-    return { canvas, links, pronto: desenharPaginaPdf(p, canvas, links) };
-  }
 
   const u = Math.min(w / LARG, h / ALT); // unidade de projeto, em pixels
   const g = { u, w, h, ox: (w - LARG * u) / 2, oy: (h - ALT * u) / 2 };

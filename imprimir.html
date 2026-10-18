@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clima em desequilíbrio, vidas desiguais — para imprimir</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* Cada página da revista vira uma folha de 16 × 20 cm (a proporção do projeto, 80 × 100).
+       Para gerar o PDF: abra esta página, espere "pronto" e use Imprimir → Salvar como PDF
+       (margens: nenhuma; gráficos de fundo: ligados). */
+    @page { size: 160mm 200mm; margin: 0; }
+    html, body { margin: 0; background: #6f665a; font: 14px/1.4 system-ui, sans-serif; }
+    #aviso { position: fixed; top: 8px; left: 8px; padding: 6px 10px; border-radius: 6px; background: #1c1a18; color: #fff; }
+    .folha { display: block; width: 160mm; height: 200mm; margin: 12px auto; background: #f2ead9; }
+    .folha img { display: block; width: 100%; height: 100%; }
+    @media print {
+      html, body { background: none; }
+      #aviso { display: none; }
+      .folha { margin: 0; break-after: page; }
+    }
+  </style>
+</head>
+<body>
+  <p id="aviso">Montando as páginas…</p>
+  <script src="biomas-mapa.js"></script>
+  <script src="dados.js"></script>
+  <script type="module">
+    import { carregarFontes, desenharPagina } from "./paginas.js";
+    import { diagramar } from "./diagramacao.js";
+
+    await carregarFontes();
+    const paginas = diagramar(REVISTA);
+    for (let i = 0; i < paginas.length; i++) {
+      const { canvas, pronto } = desenharPagina(paginas[i], i + 1, 1400, 1750);
+      if (pronto) await pronto;
+      const img = new Image();
+      img.alt = `Página ${i + 1}`;
+      img.src = canvas.toDataURL("image/jpeg", 0.86);
+      await img.decode();
+      const folha = document.createElement("div");
+      folha.className = "folha";
+      folha.append(img);
+      document.body.append(folha);
+    }
+    document.getElementById("aviso").textContent = "Pronto: use Imprimir → Salvar como PDF";
+    document.body.dataset.pronto = "1";
+  </script>
+</body>
+</html>

@@ -8,6 +8,8 @@
 // Tudo é medido numa unidade de projeto "u": a página tem LARG × ALT = 80u × 100u.
 // Como a medida não depende da janela, as quebras de linha são sempre as mesmas.
 
+import { PROPORCAO_MAPA } from "./mapa-biomas.js";
+
 export const LARG = 80;
 export const ALT = 100;
 
@@ -50,8 +52,10 @@ const E = {
   aspas: { fam: SERIF, peso: 800, tam: 9, alt: 9 },
 };
 
-// Anton (títulos e números): caixa alta, linhas bem juntas
-export function display(tam, alt = tam * 1.04) {
+// Anton (títulos e números): caixa alta, linhas juntas. Abaixo de 1,15 os acentos de uma
+// linha (Á, Ã, É...) encostam nas letras da linha de cima.
+export const ENTRELINHA = 1.15;
+export function display(tam, alt = tam * ENTRELINHA) {
   return { fam: DISPLAY, peso: 400, tam, alt, alta: true, base: 0.86 };
 }
 
@@ -110,9 +114,10 @@ function tokens(texto) {
       if (!tok && toks.length) tok = toks[toks.length - 1];
       juntar({ t: parte, m: true });
     } else {
-      for (const s of parte.split(/(\s+)/)) {
+      // só espaços comuns quebram a linha: o espaço sem quebra (como em "26 °C") não
+      for (const s of parte.split(/([ \t\n]+)/)) {
         if (!s) continue;
-        if (/^\s+$/.test(s)) tok = null;
+        if (/^[ \t\n]+$/.test(s)) tok = null;
         else juntar({ t: s, m: false });
       }
     }
@@ -212,6 +217,69 @@ function caberLinha(texto, tam, larg, criar = display) {
 
 const linhaUnica = (t) => [[{ t, m: false }]];
 
+// ---------- Acentos que encostam ----------
+// Na Anton em caixa alta, as letras têm 0,86 do tamanho, os acentos sobem até 1,11 e o Ç,
+// a vírgula e o Q descem abaixo da linha. Se um deles fica bem em cima de uma letra da linha
+// de baixo, os dois se tocam. entrelinhaSegura() afasta as linhas só o necessário.
+
+const SOBE = /[ÁÀÂÃÉÊÍÓÔÕÚÜ]/;
+const DESCE = { "Ç": 0.31, ",": 0.12, ";": 0.12, Q: 0.1 };
+const MAIUSCULA = 0.86;
+const ACENTO = 1.11;
+const FOLGA_ACENTO = 0.14; // respiro mínimo entre o que desce e o que sobe
+
+// posição horizontal (u) de cada letra de uma linha já quebrada
+function letras(linha, est) {
+  const saida = [];
+  let x = 0;
+  for (const r of linha) {
+    if (r.m) {
+      x += larguraMarca(r.t, est);
+      continue;
+    }
+    let antes = 0;
+    for (let i = 0; i < r.t.length; i++) {
+      const depois = largura(r.t.slice(0, i + 1), est);
+      saida.push({ ch: r.t[i], x0: x + antes, x1: x + depois });
+      antes = depois;
+    }
+    x += largura(r.t, est);
+  }
+  return saida;
+}
+
+export function entrelinhaSegura(linhas, est, w = 0, alinhar = "esq") {
+  if (!est.alta || linhas.length < 2) return est;
+  const desloc = (l) => {
+    if (alinhar === "esq") return 0;
+    const lw = larguraLinha(l, est);
+    return alinhar === "dir" ? w - lw : (w - lw) / 2;
+  };
+  // trecho horizontal (fração da largura da letra) ocupado pelo que desce de cada letra
+  const parteQueDesce = { "Ç": [0.2, 0.8], Q: [0.5, 1], ",": [0, 1], ";": [0, 1] };
+  const linhasDeLetras = linhas.map((l) => {
+    const d = desloc(l);
+    return letras(l, est).map((c) => ({ ...c, x0: c.x0 + d, x1: c.x1 + d }));
+  });
+  const trecho = (c, [a, b]) => [c.x0 + (c.x1 - c.x0) * a, c.x0 + (c.x1 - c.x0) * b];
+  const cruza = ([a0, a1], [b0, b1]) => a0 < b1 && b0 < a1;
+  let alt = est.alt;
+  for (let k = 0; k + 1 < linhasDeLetras.length; k++) {
+    for (const de of linhasDeLetras[k]) {
+      const desce = DESCE[de.ch];
+      if (!desce) continue;
+      const baixo = trecho(de, parteQueDesce[de.ch]);
+      for (const ac of linhasDeLetras[k + 1]) {
+        if (ac.ch === " ") continue;
+        // o corpo da letra (quase toda a largura) e, se houver, o acento (no meio dela)
+        if (cruza(baixo, trecho(ac, [0.06, 0.94]))) alt = Math.max(alt, (MAIUSCULA + desce + FOLGA_ACENTO) * est.tam);
+        if (SOBE.test(ac.ch) && cruza(baixo, trecho(ac, [0.2, 0.8]))) alt = Math.max(alt, (ACENTO + desce + FOLGA_ACENTO) * est.tam);
+      }
+    }
+  }
+  return alt > est.alt ? { ...est, alt } : est;
+}
+
 // ---------- Elementos ----------
 
 const ret = (x, y, w, h, cor) => ({ k: "ret", x, y, w, h, cor });
@@ -243,8 +311,8 @@ function titulo(b, w) {
   const pad = b.fundo ? (b.pad ?? 2.4) : 0;
   const iw = w - 2 * pad;
   const tam = caberPalavra(b.texto, b.tam ?? 7, iw);
-  const est = display(tam, tam * (b.entrelinha ?? 1.02));
-  const linhas = quebrar(b.texto, est, iw);
+  const linhas = quebrar(b.texto, display(tam, tam * (b.entrelinha ?? ENTRELINHA)), iw);
+  const est = entrelinhaSegura(linhas, display(tam, tam * (b.entrelinha ?? ENTRELINHA)), iw, b.alinhar);
   const h = linhas.length * est.alt + 2 * pad;
   return {
     h,
@@ -283,8 +351,8 @@ function blocoTexto(b, w) {
 
   b.p.forEach((par, ip) => {
     if (typeof par === "object") {
-      const ei = E.inter;
-      const li = quebrar(par.inter, ei, cw);
+      const li = quebrar(par.inter, E.inter, cw);
+      const ei = entrelinhaSegura(li, E.inter, cw);
       interPendente = { h: li.length * ei.alt + 0.5, linhas: li.map((l, k) => ({ dy: k * ei.alt, dx: 0, linha: l, est: ei, cor: corInter })) };
       return;
     }
@@ -397,14 +465,14 @@ function foto(b, w) {
   return { h: hf + hl, gerar };
 }
 
-// mapa interativo: na página é uma foto; script.js põe por cima o mapa 3D (mapa3d.js).
-// A altura segue a proporção da imagem, para o mapa 3D cobrir a foto sem cortar nada.
+// mapa "Fogo no Brasil": desenhado na página por mapa-biomas.js; script.js põe por cima o
+// mapa 3D (mapa3d.js), com o mesmo desenho e a mesma proporção, para cobrir o impresso.
 function mapa(b, w) {
-  const h = w / b.proporcao;
+  const h = w / PROPORCAO_MAPA;
   return {
     h,
     gerar: (x, y, w2) => [
-      { k: "foto", x, y, w: w2, h, src: b.src, fundo: "#0d0806" },
+      { k: "mapaBiomas", x, y, w: w2, h },
       { k: "interativo", id: b.id, x, y, w: w2, h },
     ],
   };
@@ -456,8 +524,8 @@ function numeros(b, w) {
 // gráfico de barras horizontais (barras: [rótulo, valor, texto exibido]; max = fim do eixo)
 function grafico(b, w) {
   const cor = b.cor ?? COR.vermelho;
-  const et = display(b.tamTitulo ?? 2.2);
-  const tit = quebrar(b.titulo, et, w);
+  const tit = quebrar(b.titulo, display(b.tamTitulo ?? 2.2), w);
+  const et = entrelinhaSegura(tit, display(b.tamTitulo ?? 2.2), w);
   const lw = w * (b.rotulos ?? 0.36);
   const er = E.grafRotulo;
   const ev = display(1.8, 1.8);
@@ -511,8 +579,8 @@ function citacao(b, w) {
   const pad = 2.6;
   const iw = w - 2 * pad;
   const tq = caberPalavra(b.texto, b.tam ?? 3.4, iw);
-  const eq = display(tq, tq * 1.08);
-  const lq = quebrar(b.texto, eq, iw);
+  const lq = quebrar(b.texto, display(tq), iw);
+  const eq = entrelinhaSegura(lq, display(tq), iw);
   const la = b.autor ? quebrar(b.autor, E.autor, iw) : [];
   const lc = b.credito ? quebrar(b.credito, E.legenda, iw) : [];
   let y = pad + 4.2;
@@ -539,13 +607,13 @@ function lista(b, w) {
   const gap = b.gap ?? 2.6;
   const cw = (w - gap * (n - 1)) / n;
   const tt = b.tamTitulo ?? 2.0;
-  const et = display(tt, tt * 1.05);
   const ec = E[b.est ?? "corpo"];
   const recuo = 2.6;
   const cels = b.itens.map((it) => {
-    const lt = quebrar(it.titulo, et, cw - recuo);
+    const lt = quebrar(it.titulo, display(tt), cw - recuo);
+    const et = entrelinhaSegura(lt, display(tt), cw - recuo);
     const lc = it.texto ? quebrar(it.texto, ec, cw - recuo) : [];
-    return { lt, lc, h: lt.length * et.alt + (lc.length ? 0.3 + lc.length * ec.alt : 0) };
+    return { lt, lc, et, h: lt.length * et.alt + (lc.length ? 0.3 + lc.length * ec.alt : 0) };
   });
   const linhas = [];
   for (let i = 0; i < cels.length; i += n) linhas.push(cels.slice(i, i + n));
@@ -560,9 +628,9 @@ function lista(b, w) {
       linhas.forEach((l, il) => {
         l.forEach((c, ic) => {
           const xc = x + ic * (cw + gap);
-          els.push({ k: "estrela", x: xc + 0.9, y: yy + et.alt * 0.48, r: 0.95, cor: b.corEstrela ?? COR.vermelho });
-          els.push(txt(xc + recuo, yy, c.lt, et, b.corTitulo ?? COR.preto));
-          if (c.lc.length) els.push(txt(xc + recuo, yy + c.lt.length * et.alt + 0.3, c.lc, ec, b.cor ?? COR.preto));
+          els.push({ k: "estrela", x: xc + 0.9, y: yy + c.et.alt * 0.48, r: 0.95, cor: b.corEstrela ?? COR.vermelho });
+          els.push(txt(xc + recuo, yy, c.lt, c.et, b.corTitulo ?? COR.preto));
+          if (c.lc.length) els.push(txt(xc + recuo, yy + c.lt.length * c.et.alt + 0.3, c.lc, ec, b.cor ?? COR.preto));
         });
         yy += hs[il] + GAP_LINHA;
       });
@@ -581,12 +649,12 @@ function fluxo(b, w) {
   const iw = cw - 2 * pad;
   let tam = b.tamTitulo ?? 2.4;
   for (const it of b.itens) tam = Math.min(tam, caberPalavra(it.titulo, tam, iw));
-  const et = display(tam, tam * 1.05);
   const ex = E.numTexto;
   const cels = b.itens.map((it) => ({
-    lt: quebrar(it.titulo, et, iw),
+    lt: quebrar(it.titulo, display(tam), iw),
     lx: it.texto ? quebrar(it.texto, ex, iw) : [],
   }));
+  const et = cels.reduce((e, c) => entrelinhaSegura(c.lt, e, iw), display(tam));
   const h = Math.max(...cels.map((c) => pad + c.lt.length * et.alt + (c.lx.length ? 0.4 + c.lx.length * ex.alt : 0) + pad));
   const cores = b.cores ?? b.itens.map((_, i) => (i === n - 1 && sinais.includes("=") ? COR.preto : COR.vermelho));
   const es = display(4, 4);
@@ -652,13 +720,14 @@ const regra = (b) => ({ h: b.esp ?? 0.35, gerar: (x, y, w) => [ret(x, y, w, b.es
 // sumário: número da página num quadrado vermelho, título e linha fina
 function indice(b, w) {
   const q = 8;
-  const et = display(2.5, 2.75);
+  const et = display(2.5);
   const es = E.numTexto;
   const lw = w - q - 2.6;
   const itens = b.itens.map((it) => {
     const lt = quebrar(it.titulo, et, lw);
+    const eti = entrelinhaSegura(lt, et, lw);
     const ls = it.sub ? quebrar(it.sub, es, lw) : [];
-    return { ...it, lt, ls, h: Math.max(q, lt.length * et.alt + (ls.length ? 0.3 + ls.length * es.alt : 0)) };
+    return { ...it, lt, ls, et: eti, h: Math.max(q, lt.length * eti.alt + (ls.length ? 0.3 + ls.length * es.alt : 0)) };
   });
   const GAP_LINHA = 1.4;
   const h = itens.reduce((s, it) => s + it.h, 0) + GAP_LINHA * (itens.length - 1);
@@ -671,10 +740,10 @@ function indice(b, w) {
       for (const it of itens) {
         els.push(ret(x, yy, q, q, COR.vermelho));
         els.push(txt(x, yy + (q - en.alt) / 2, linhaUnica(String(it.pagina).padStart(2, "0")), en, COR.creme, "centro", q));
-        const ht = it.lt.length * et.alt + (it.ls.length ? 0.3 + it.ls.length * es.alt : 0);
+        const ht = it.lt.length * it.et.alt + (it.ls.length ? 0.3 + it.ls.length * es.alt : 0);
         const yt = yy + (it.h - ht) / 2;
-        els.push(txt(x + q + 2.6, yt, it.lt, et, COR.preto));
-        if (it.ls.length) els.push(txt(x + q + 2.6, yt + it.lt.length * et.alt + 0.3, it.ls, es, COR.suave));
+        els.push(txt(x + q + 2.6, yt, it.lt, it.et, COR.preto));
+        if (it.ls.length) els.push(txt(x + q + 2.6, yt + it.lt.length * it.et.alt + 0.3, it.ls, es, COR.suave));
         els.push({ k: "link", x, y: yy, w: w2, h: it.h, ir: it.pagina });
         yy += it.h + GAP_LINHA;
       }
@@ -764,22 +833,34 @@ function materia(p, pag) {
   return { els, fundo: p.fundo };
 }
 
-// abertura de parte: foto sangrando no alto, faixa colorida com número e título, e o
-// começo da matéria embaixo
+// abertura de parte: foto sangrando no alto (ou, sem foto, uma frase grande sobre fundo
+// escuro), faixa colorida com número e título, e o começo da matéria embaixo
 function abertura(p, pag) {
   const els = [];
   const { x0, x1 } = margens(pag);
   const w = x1 - x0;
   const fa = p.fotoAlt ?? 48;
-  els.push({ k: "foto", x: 0, y: 0, w: LARG, h: fa, src: p.foto, foco: p.foco, mesclar: p.mesclar });
+  if (p.foto) {
+    els.push({ k: "foto", x: 0, y: 0, w: LARG, h: fa, src: p.foto, foco: p.foco, mesclar: p.mesclar });
+  } else {
+    els.push(ret(0, 0, LARG, fa, p.fundoTopo ?? COR.preto));
+    if (p.destaque) {
+      const td = caberPalavra(p.destaque, p.tamDestaque ?? 6, w);
+      const ld = quebrar(p.destaque, display(td), w);
+      const ed = entrelinhaSegura(ld, display(td), w);
+      const hd = ld.length * ed.alt;
+      els.push(ret(x0, (fa - hd) / 2 - 2.4, 10, 0.5, COR.vermelho));
+      els.push(txt(x0, (fa - hd) / 2, ld, ed, p.corDestaque ?? COR.creme));
+    }
+  }
   const pad = 2.6;
   const en = display(12, 10.5);
   const num = String(p.numero).padStart(2, "0");
   const wn = largura(num, en) + 2.4;
   const tw = w - wn;
   const tt = caberPalavra(p.titulo, p.tamTitulo ?? 5.4, tw);
-  const et = display(tt, tt * 1.0);
-  const lt = quebrar(p.titulo, et, tw);
+  const lt = quebrar(p.titulo, display(tt), tw);
+  const et = entrelinhaSegura(lt, display(tt), tw);
   const lf = quebrar(p.linhaFina, E.lead, tw);
   const hTexto = lt.length * et.alt + 0.8 + lf.length * E.lead.alt;
   const hb = pad + Math.max(en.alt, hTexto) + pad;
@@ -807,7 +888,7 @@ function sumario(p, pag, R, entradas) {
   const blocos = [
     { t: "titulo", texto: "Sumário", tam: 11, cor: COR.vermelho },
     {
-      t: "lado", antes: 2, gap: 3.4, resto: true, larguras: [1, 1.3],
+      t: "lado", antes: 2, gap: 3.4, resto: true, larguras: [1.12, 1.18],
       colunas: [
         [{ t: "indice", itens: entradas }],
         [{
@@ -932,7 +1013,7 @@ function tentarFontes(f, pags, esc, forcar) {
   });
 }
 
-// capa e contracapa (o modo PDF de script.js também usa as duas, em volta do PDF)
+// capa e contracapa
 function montarCapa(R) {
   const c = R.capa;
   const avisos = { avisos: [] };
@@ -961,8 +1042,8 @@ function montarContracapa(R) {
   const m = 8;
   const w = LARG - 2 * m;
   const tf = caberPalavra(c.texto, 4.4, w);
-  const ef = display(tf, tf * 1.08);
-  const lf = quebrar(c.texto, ef, w);
+  const lf = quebrar(c.texto, display(tf), w);
+  const ef = entrelinhaSegura(lf, display(tf), w, "centro");
   const hf = lf.length * ef.alt;
   const y = (ALT - (3 + hf)) / 2;
   els.push(ret(LARG / 2 - 6, y, 12, 0.5, COR.preto));
@@ -970,9 +1051,6 @@ function montarContracapa(R) {
   els.push(txt(m, ALT - 9, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme, "centro", w));
   return { tipo: "pagina", fundo: COR.vermelho, els };
 }
-
-export const paginaCapa = montarCapa;
-export const paginaContracapa = montarContracapa;
 
 // ---------- Montagem da revista ----------
 
