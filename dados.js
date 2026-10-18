@@ -49,7 +49,6 @@ const FOTO = {
 };
 
 const REVISTA = {
-  titulo: "Horizonte",
   edicao: "Germinare Tech • 2º F • Setembro de 2026",
   expediente: "Pesquisa e redação: Emanuelly Mendes, Guilherme Norcia, Matheus Botana, Rafael Lopes, Rafael Takematsu e Sophia Castro. Fotos e colagens: créditos a confirmar.",
   capa: {
