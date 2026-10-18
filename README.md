@@ -28,7 +28,11 @@ Sem nada no endereço, abre a revista diagramada: 18 páginas (o máximo), monta
 
 Edite `dados.js`: lá estão o texto e o espelho das 18 páginas (quais blocos vão em cada página). As fotos ficam em `assets/fotos/`. Se algo não couber, o console do navegador (F12) avisa qual página passou do limite.
 
-Imagens que a revista espera em `assets/fotos/`: `colagem-mascara.jpg` (capa), `colagem-fabrica.jpg` (parte 1), `ipam-fogo-no-brasil.jpg` (página "Fogo no Brasil") e `colagem-cigarro.jpg` (parte 3). Enquanto uma faltar, a página mostra um bloco com o nome do arquivo.
+Se uma imagem de `assets/fotos/` faltar, a página mostra um bloco com o nome do arquivo.
+
+### Mapa interativo ("Fogo no Brasil", página 5)
+
+Ao passar o mouse no mapa, ele sai da página em 3D (`mapa3d.js`); sobre cada bioma aparece o gráfico de focos de calor do IPAM. Os biomas (nome, percentual, contorno aproximado e recorte do gráfico em `ipam-fogo-no-brasil.jpg`) ficam em `dados.js`, em `mapaFogo`.
 
 ### Versão antiga em PDF (`?pdf`)
 

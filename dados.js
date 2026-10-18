@@ -39,6 +39,7 @@ const FOTO = {
   fabrica: "assets/fotos/colagem-fabrica.jpg",
   cigarro: "assets/fotos/colagem-cigarro.jpg",
   ipam: "assets/fotos/ipam-fogo-no-brasil.jpg",
+  mapaFogo: "assets/fotos/mapa-fogo.jpg",
   // fotos documentais
   ribeirinha: "assets/fotos/abertura.jpg",
   pantanal: "assets/fotos/pantanal.jpg",
@@ -147,35 +148,44 @@ const REVISTA = {
       ],
     },
 
-    // 5
+    // 5 — o mapa é interativo: o mapa 3D de mapa3d.js aparece por cima (dados em REVISTA.mapaFogo)
     {
       modelo: "materia",
       secao: "1 · Um planeta mais quente",
       blocos: [
-        { t: "rotulo", texto: "Um relato que aproxima o problema" },
-        { t: "titulo", texto: "Fogo no Brasil", tam: 8, antes: 0.8 },
+        { t: "rotulo", texto: "Focos de calor por bioma" },
+        { t: "titulo", texto: "Fogo no Brasil", tam: 7.4, antes: 0.8 },
         {
-          t: "foto", src: FOTO.ipam, h: 37, conter: true, antes: 1.4,
-          legenda: "Focos de calor por bioma, de janeiro a setembro de 2020. Infográfico: IPAM — Instituto de Pesquisa Ambiental da Amazônia.",
-        },
-        {
-          t: "lado", antes: 2.4, resto: true,
+          t: "lado", antes: 1.2, larguras: [1.32, 1], gap: 3,
           colunas: [
+            [{ t: "mapa", id: "fogo", src: FOTO.mapaFogo, proporcao: 560 / 590 }],
             [
+              { t: "rotulo", texto: "Passe o mouse no mapa" },
               {
-                t: "citacao", resto: true,
-                texto: "No dia seguinte, vi tudo acabado, queimado",
-                autor: "Rosely, sobrevivente de um incêndio no Pantanal",
-                credito: "O Globo, 27 jul. 2024 [3]",
+                t: "lead", est: "numTexto", antes: 0.8,
+                texto: "Cada bioma mostra os focos de calor de 2010 a 2020.",
+              },
+              {
+                t: "grafico", antes: 2.4, tamTitulo: 1.8, rotulos: 0.46,
+                titulo: "% dos focos no Brasil (jan.–set. 2020)",
+                max: 50,
+                barras: [["Amazônia", 45.7, "45,7"], ["Cerrado", 30.2, "30,2"], ["Pantanal", 10.9, "10,9"], ["Mata Atlântica", 8.7, "8,7"], ["Caatinga", 3.6, "3,6"], ["Pampa", 0.9, "0,9"]],
+                legenda: "IPAM [29]. Contornos aproximados.",
               },
             ],
-            [
-              { t: "foto", src: FOTO.pantanal, h: 12, legenda: "Queimada em paisagem natural. Local e crédito a confirmar." },
-              {
-                t: "texto", colunas: 1, antes: 1.6,
-                p: ["O relato mostra a perda concreta de um lugar de vida. Sozinho, ele não identifica quem causou o fogo nem a responsabilidade de uma empresa. [3]"],
-              },
-            ],
+          ],
+        },
+        { t: "lead", est: "legenda", antes: 1, cor: "#665e53", texto: "Mapa: arte “Pátria queimada, Brasil 2024”, crédito a confirmar." },
+        {
+          t: "lado", antes: 1.8, resto: true,
+          colunas: [
+            [{ t: "foto", src: FOTO.pantanal, resto: true, min: 10, legenda: "Queimada em paisagem natural. Local e crédito a confirmar." }],
+            [{
+              t: "citacao", resto: true, tam: 3,
+              texto: "No dia seguinte, vi tudo acabado, queimado",
+              autor: "Rosely, sobrevivente de um incêndio no Pantanal",
+              credito: "O Globo, 27 jul. 2024 [3]. O relato não identifica quem causou o fogo.",
+            }],
           ],
         },
       ],
@@ -595,6 +605,7 @@ const REVISTA = {
       { n: 26, texto: "Observatório do Clima / SEEG. Redução das emissões de metano no Brasil. 2024.", url: "https://seeg.eco.br/wp-content/uploads/2024/03/SEEG-METANO.pdf" },
       { n: 27, texto: "Belo Sun. Nota sobre licenciamento faseado do Projeto Volta Grande. 21 maio 2026.", url: "https://belosun.com.br/nota/" },
       { n: 28, texto: "TRF1. Conciliação sobre licença ambiental da Belo Sun. 26 jun. 2026.", url: "https://www.trf1.jus.br/trf1/noticias/conciliacao-do-trf1-promove-acordo-entre-partes-sobre-licenca-ambiental-de-mineradora-no-para-" },
+      { n: 29, texto: "IPAM — Instituto de Pesquisa Ambiental da Amazônia. Fogo no Brasil: focos de calor por bioma, 2010 a 2020 (infográfico). Link a confirmar." },
     ],
     notas: [
       {
@@ -608,6 +619,45 @@ const REVISTA = {
           "Usamos as emissões brutas do SEEG de 2024; o total da EPE (431,3 MtCO₂e) não foi somado a elas. Dados sem estudo identificado — contagens de desastres, mortes por calor, 74% de redução de chuvas — não entraram. Os marcos da Belo Sun têm datas e não indicam desfecho judicial.",
           "O infográfico do IPAM mostra focos de calor de 2020 e não se compara diretamente às séries de emissões.",
         ],
+      },
+    ],
+  },
+
+  // Mapa interativo da página "Fogo no Brasil" (mapa3d.js).
+  // calibracao: onde ficam, na imagem do mapa (0–1), os extremos do Brasil (oeste, leste,
+  // norte e sul, em graus). area: contorno aproximado de cada bioma, em [longitude, latitude].
+  // recorte: [x, y, largura, altura] do gráfico de cada bioma no infográfico do IPAM.
+  // A ordem importa: biomas pequenos primeiro, para o mouse achar o certo nas bordas.
+  mapaFogo: {
+    mapa: FOTO.mapaFogo,
+    grafico: FOTO.ipam,
+    calibracao: { oeste: -73.99, leste: -34.79, norte: 5.27, sul: -33.75, x0: 0.0339, x1: 0.9696, y0: 0.0322, y1: 0.9695 },
+    periodo: "dos focos de calor no Brasil de janeiro a setembro de 2020",
+    fonte: "Focos de calor por ano, de 2010 a 2020 (em claro, de outubro a dezembro). Fonte: IPAM [29].",
+    biomas: [
+      {
+        nome: "Pantanal", parte: "10,9%", recorte: [0, 604, 387, 242],
+        area: [[-58.3, -15.9], [-56.6, -16], [-55.4, -17.5], [-55.3, -19.5], [-56.2, -21], [-57.4, -22.2], [-58.3, -20.3], [-57.9, -18]],
+      },
+      {
+        nome: "Pampa", parte: "0,9%", recorte: [930, 604, 416, 242],
+        area: [[-56.5, -28], [-55.6, -28.8], [-54.5, -29.2], [-53, -29.6], [-51.5, -29.9], [-50, -29.9], [-49.6, -29.7], [-50.5, -31.5], [-52, -33], [-53.3, -34.2], [-54.5, -33], [-56.5, -32], [-58.2, -31], [-58.5, -29.5]],
+      },
+      {
+        nome: "Caatinga", parte: "3,6%", recorte: [930, 80, 416, 268],
+        area: [[-42.5, -2.8], [-41.5, -2.5], [-40, -2.5], [-38.5, -3.2], [-37, -4.5], [-35.9, -5.2], [-35.8, -6.5], [-36, -8], [-36.8, -9.3], [-37.8, -10.6], [-38.8, -12], [-39.7, -13.5], [-40.6, -15.2], [-42, -16.2], [-43.6, -16], [-44.2, -14.5], [-44, -12], [-43, -10], [-42, -8.5], [-42.8, -6.5], [-42.2, -4]],
+      },
+      {
+        nome: "Mata Atlântica", parte: "8,7%", recorte: [945, 340, 401, 266],
+        area: [[-35.9, -5.2], [-34.5, -5], [-34.3, -7.2], [-34.8, -9], [-36.5, -11], [-38, -13], [-38.6, -15.5], [-39.2, -18], [-40, -20.5], [-41, -22.5], [-43, -23.6], [-45.5, -24.5], [-48, -26], [-48.3, -28.5], [-49.6, -29.7], [-50, -29.9], [-51.5, -29.9], [-53, -29.6], [-54.5, -29.2], [-55.6, -28.8], [-56.5, -28], [-55, -27], [-54.6, -25.6], [-54.3, -24], [-55.6, -22.6], [-54, -22.8], [-52, -22.5], [-50, -22.3], [-47.5, -22.2], [-45.5, -21.2], [-43.8, -20], [-43.2, -18], [-43.6, -16], [-42, -16.2], [-40.6, -15.2], [-39.7, -13.5], [-38.8, -12], [-37.8, -10.6], [-36.8, -9.3], [-36, -8], [-35.8, -6.5]],
+      },
+      {
+        nome: "Cerrado", parte: "30,2%", recorte: [0, 362, 387, 226],
+        area: [[-44.3, -2.6], [-42.5, -2.8], [-42.2, -4], [-42.8, -6.5], [-42, -8.5], [-43, -10], [-44, -12], [-44.2, -14.5], [-43.6, -16], [-43.2, -18], [-43.8, -20], [-45.5, -21.2], [-47.5, -22.2], [-50, -22.3], [-52, -22.5], [-54, -22.8], [-55.6, -22.6], [-57.4, -22.2], [-56.2, -21], [-55.3, -19.5], [-55.4, -17.5], [-56.6, -16], [-58.3, -15.9], [-59.5, -15], [-60.2, -14], [-58.5, -14], [-56, -13.5], [-54, -13], [-52, -12.5], [-50.5, -11], [-49.5, -8.5], [-48, -6], [-46, -4.5]],
+      },
+      {
+        nome: "Amazônia", parte: "45,7%", recorte: [0, 105, 393, 237],
+        area: [[-44.3, -2.6], [-46, -0.7], [-48.5, 0.2], [-50, 1], [-50.5, 2.8], [-51.5, 4.7], [-52.8, 6], [-56, 6.5], [-60, 6.5], [-64, 5.5], [-67, 3.5], [-70.5, 2.5], [-74.5, -1], [-75, -7], [-74.5, -10], [-70, -11.5], [-66, -11], [-65, -12.5], [-62, -14.2], [-60.2, -14], [-58.5, -14], [-56, -13.5], [-54, -13], [-52, -12.5], [-50.5, -11], [-49.5, -8.5], [-48, -6], [-46, -4.5]],
       },
     ],
   },

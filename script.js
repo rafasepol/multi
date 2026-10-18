@@ -15,11 +15,12 @@
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
 import { carregarFontes, desenharPagina } from "./paginas.js";
-import { diagramar, paginaCapa, paginaContracapa } from "./diagramacao.js";
+import { diagramar, paginaCapa, paginaContracapa, LARG, ALT } from "./diagramacao.js";
 import { paginasDoPdf } from "./pdfpaginas.js";
 import { carregarShader } from "./carregar.js";
 import { criarCamera } from "./camera.js";
 import { criarCenario } from "./cenario.js";
+import { criarMapa3D } from "./mapa3d.js";
 
 // Duas formas de montar as páginas (sempre em número par):
 // - revista (padrão): as 18 páginas planejadas em dados.js e montadas por diagramacao.js;
@@ -149,6 +150,46 @@ function criarFolha(i) {
 }
 
 for (let i = 0; i < paginas.length / 2; i++) folhas.push(criarFolha(i));
+
+// ---------- Mapa interativo ----------
+
+// página com o mapa 3D (bloco "mapa" em dados.js) e o retângulo dele, em u
+const mapaNaPagina = (() => {
+  for (let i = 0; i < paginas.length; i++) {
+    const el = paginas[i].els?.find((e) => e.k === "interativo");
+    if (el) return { pagina: i, el };
+  }
+  return null;
+})();
+const mapa = mapaNaPagina && typeof REVISTA !== "undefined" && REVISTA.mapaFogo
+  ? await criarMapa3D({ scene, camera, canvas, luzPagina, cfg: REVISTA.mapaFogo }).catch((erro) => {
+      console.warn("[mapa]", erro);
+      return null;
+    })
+  : null;
+
+// O mapa 3D só aparece com a revista aberta e parada na página dele; fica exatamente
+// por cima do mapa impresso (mesma conta de paginas.js: a página de projeto LARG × ALT
+// fica centralizada na folha).
+function atualizarMapa(dt) {
+  if (!mapa) return;
+  const { pagina, el } = mapaNaPagina;
+  const a = atual();
+  const direita = pagina === a * 2;
+  const naTela = direita || pagina === a * 2 - 1;
+  const parado = !arrasto && folhas.every((f) => !f.dobra);
+  const s = Math.min(largura / LARG, ALTURA / ALT);
+  const x0 = (direita ? 0 : -largura) + (largura - LARG * s) / 2 + el.x * s;
+  const yTopo = ALTURA / 2 - ((ALTURA - ALT * s) / 2 + el.y * s);
+  mapa.atualizar(dt, {
+    visivel: naTela && parado && cam.totalmenteAberta() && texturas.has(pagina),
+    cx: x0 + (el.w * s) / 2,
+    cy: yTopo - (el.h * s) / 2,
+    w: el.w * s,
+    h: el.h * s,
+    z: alturaBase(folhas[pagina >> 1]),
+  });
+}
 
 // Coordenadas "locais" de uma dobra: a folha sempre começa à direita (x de 0 a largura).
 // Para folhas que voltam (deitadas à esquerda), o x é espelhado.
@@ -570,6 +611,8 @@ function folhaDoLado(p) {
 }
 
 canvas.addEventListener("pointerdown", (e) => {
+  // no mapa interativo a página não vira: o clique (ou toque) deixa o mapa no alto
+  if (mapa && mapa.tocar(e.clientX, e.clientY, e.pointerType !== "mouse")) return;
   const p = pontoDoEvento(e);
   if (!dentroDaRevista(p)) return; // clicou fora da revista (na grama)
   const f = folhaDoLado(p);
@@ -609,6 +652,13 @@ canvas.addEventListener("pointermove", (e) => {
     arrasto.clientY = e.clientY;
     if (Math.hypot(e.clientX - arrasto.x0, e.clientY - arrasto.y0) > 6) arrasto.moveu = true;
     atualizarAlvoArrasto();
+    return;
+  }
+
+  const noMapa = !!mapa && mapa.apontar(e.clientX, e.clientY);
+  canvas.classList.toggle("mapa", noMapa);
+  if (noMapa) {
+    canvas.classList.remove("fora", "link");
     return;
   }
 
@@ -662,7 +712,11 @@ function soltar(e) {
 
 canvas.addEventListener("pointerup", soltar);
 canvas.addEventListener("pointercancel", soltar);
-canvas.addEventListener("pointerleave", () => cenario.definirMouse(null));
+canvas.addEventListener("pointerleave", () => {
+  cenario.definirMouse(null);
+  mapa?.sair();
+  canvas.classList.remove("mapa");
+});
 
 // ---------- Loop ----------
 
@@ -706,6 +760,7 @@ function atualizarTudo(dt) {
 
   folhas.forEach(deformar);
   atualizarSombra();
+  atualizarMapa(dt);
   // o vinco aparece junto com a câmera indo para a leitura (fechada não tem vinco)
   vinco.vinco.value = cam.abertura();
 
@@ -757,7 +812,7 @@ quadro();
 
 // usado para testes no console
 window.revista = {
-  folhas, paginas, texturas, proxima, anterior, irPara, atual, cam, cenario, links, ALTURA,
+  folhas, paginas, texturas, proxima, anterior, irPara, atual, cam, cenario, links, mapa, ALTURA,
   largura: () => largura,
   // congela/descongela o tempo (o desenho continua)
   pausar(valor = true) {

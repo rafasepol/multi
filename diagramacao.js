@@ -397,6 +397,19 @@ function foto(b, w) {
   return { h: hf + hl, gerar };
 }
 
+// mapa interativo: na página é uma foto; script.js põe por cima o mapa 3D (mapa3d.js).
+// A altura segue a proporção da imagem, para o mapa 3D cobrir a foto sem cortar nada.
+function mapa(b, w) {
+  const h = w / b.proporcao;
+  return {
+    h,
+    gerar: (x, y, w2) => [
+      { k: "foto", x, y, w: w2, h, src: b.src, fundo: "#0d0806" },
+      { k: "interativo", id: b.id, x, y, w: w2, h },
+    ],
+  };
+}
+
 // números grandes com uma explicação curta embaixo de cada um
 function numeros(b, w) {
   const n = b.colunas ?? b.itens.length;
@@ -668,7 +681,7 @@ function indice(b, w) {
   };
 }
 
-const CRIAR = { rotulo, titulo, lead, texto: blocoTexto, foto, numeros, grafico, citacao, lista, fluxo, caixa, lado, espaco, regra, indice };
+const CRIAR = { rotulo, titulo, lead, texto: blocoTexto, foto, mapa, numeros, grafico, citacao, lista, fluxo, caixa, lado, espaco, regra, indice };
 
 function criar(b, w, pag) {
   const f = CRIAR[b.t];
@@ -860,16 +873,19 @@ function tentarFontes(f, pags, esc, forcar) {
   const unidades = [];
   for (const it of f.itens) {
     const lt = quebrar(it.texto, ef, cw - recuo);
-    const lu = quebrarPorCaractere(it.url, eu, (cw - recuo) * FOLGA).map((t) => linhaUnica(t)[0]);
+    // fonte sem endereço: só o texto, sem link
+    const lu = it.url ? quebrarPorCaractere(it.url, eu, (cw - recuo) * FOLGA).map((t) => linhaUnica(t)[0]) : [];
     const yU = lt.length * ef.alt + 0.2;
-    const h = yU + lu.length * eu.alt;
+    const h = lu.length ? yU + lu.length * eu.alt : lt.length * ef.alt;
     unidades.push({
       h, antes: 1.0,
       gerar: (x, y, w) => [
         txt(x, y, linhaUnica(`[${it.n}]`), en, COR.vermelho),
         txt(x + recuo, y, lt, ef, COR.preto),
-        txt(x + recuo, y + yU, lu, eu, COR.suave),
-        { k: "link", x: x + recuo, y, w: w - recuo, h, url: it.url },
+        ...(lu.length ? [
+          txt(x + recuo, y + yU, lu, eu, COR.suave),
+          { k: "link", x: x + recuo, y, w: w - recuo, h, url: it.url },
+        ] : []),
       ],
     });
   }
