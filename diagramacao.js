@@ -923,16 +923,17 @@ function tentarFontes(f, pags, esc, forcar) {
 function montarCapa(R) {
   const c = R.capa;
   const avisos = { avisos: [] };
-  const els = [{ k: "foto", x: 0, y: 0, w: LARG, h: ALT, src: c.foto, foco: c.foco }];
   const m = 5;
   const tm = caberLinha(R.titulo, 22, LARG - 2 * m);
   const em = display(tm, tm * 0.95);
   const hTopo = 3 + em.alt + 0.8 + E.rotulo.alt + 2.6;
+  // a foto começa abaixo da faixa com o nome, para não esconder o alto da imagem
+  const els = [{ k: "foto", x: 0, y: hTopo, w: LARG, h: ALT - hTopo, src: c.foto, foco: c.foco }];
   els.push(ret(0, 0, LARG, hTopo, COR.vermelho));
   els.push(txt(m, 3, linhaUnica(R.titulo.toUpperCase()), em, COR.creme));
   els.push(txt(m, 3 + em.alt + 0.8, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme));
   const blocos = [
-    { t: "titulo", texto: c.chamada, tam: 6.2, cor: COR.creme },
+    { t: "titulo", texto: c.chamada, tam: 5.6, cor: COR.creme },
     { t: "lead", texto: c.subtitulo, cor: COR.cremeSuave, antes: 1.4 },
     { t: "fluxo", itens: c.destaques.map((d) => ({ titulo: d })), tamTitulo: 1.9, antes: 2.2 },
   ];

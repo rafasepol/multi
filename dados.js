@@ -53,7 +53,7 @@ const REVISTA = {
   expediente: "Pesquisa e redação: Emanuelly Mendes, Guilherme Norcia, Matheus Botana, Rafael Lopes, Rafael Takematsu e Sophia Castro. Fotos e colagens: créditos a confirmar.",
   capa: {
     foto: FOTO.mascara,
-    foco: [0.5, 0.35],
+    foco: [0.5, 0],
     chamada: "Clima em desequilíbrio, vidas desiguais",
     subtitulo: "Como as emissões, as decisões das grandes empresas e a desigualdade se cruzam na crise climática brasileira.",
     destaques: ["Quem sofre", "Quem causa", "Justiça climática"],
@@ -385,7 +385,7 @@ const REVISTA = {
       titulo: "As empresas, as emissões e o território",
       linhaFina: "Grandes empresas, cadeias produtivas e poder econômico",
       foto: FOTO.cigarro,
-      foco: [0.5, 0.42],
+      foco: [0.5, 0.3],
       fotoAlt: 47,
       cor: PRETO,
       legenda: "Colagem: crédito a confirmar.",
