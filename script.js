@@ -22,10 +22,10 @@ import { criarCamera } from "./camera.js";
 import { criarCenario } from "./cenario.js";
 
 // Duas formas de montar as páginas (sempre em número par):
-// - PDF: PAGINAS_PDF (paginas/paginas-pdf.js) lista as páginas do PDF como imagens; cada
-//   página do PDF é uma página da revista, entre a capa e a contracapa desenhadas à parte
-//   (?semcapa na URL usa a primeira página do PDF como capa e a última como contracapa);
-// - texto (?texto na URL, ou sem PAGINAS_PDF): a diagramação automática de diagramacao.js.
+// - revista (padrão): as 18 páginas planejadas em dados.js e montadas por diagramacao.js;
+// - PDF (?pdf na URL): PAGINAS_PDF (paginas/paginas-pdf.js) lista as páginas do PDF antigo
+//   como imagens, entre a capa e a contracapa desenhadas à parte
+//   (?pdf&semcapa usa a primeira página do PDF como capa e a última como contracapa).
 const parametros = new URLSearchParams(location.search);
 const usarPdf = typeof PAGINAS_PDF !== "undefined" && parametros.has("pdf") && !parametros.has("texto");
 await carregarFontes(); // a capa e a diagramação do texto usam as fontes da revista
@@ -103,7 +103,7 @@ const texPapel = (() => {
   const c = document.createElement("canvas");
   c.width = c.height = 4;
   const g = c.getContext("2d");
-  g.fillStyle = "#fbf8f2";
+  g.fillStyle = "#f2ead9";
   g.fillRect(0, 0, 4, 4);
   return new THREE.CanvasTexture(c);
 })();
