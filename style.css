@@ -27,6 +27,7 @@ html, body {
 #cena.arrastando { cursor: grabbing; }
 #cena.link { cursor: pointer; }
 #cena.fora { cursor: default; } /* fora da revista (na grama) */
+#cena.mapa { cursor: crosshair; } /* sobre o mapa interativo */
 
 /* Controles sobre a lombada */
 .controles {
@@ -71,3 +72,29 @@ html, body {
   font: 600 12px/1 ui-monospace, monospace;
   pointer-events: none;
 }
+
+/* Cartão do mapa interativo (mapa3d.js): segue o mouse sobre cada bioma */
+.mapa-cartao {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  width: 300px;
+  padding: 12px 14px 10px;
+  background: #f8f1e2;
+  border-top: 6px solid #d22a1e;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  pointer-events: none;
+}
+.mapa-cartao[hidden] { display: none; }
+.mapa-cartao__topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.mapa-cartao__nome { font: 400 26px/1 "Anton", Impact, sans-serif; text-transform: uppercase; color: #1c1a18; }
+.mapa-cartao__parte { font: 400 30px/1 "Anton", Impact, sans-serif; color: #d22a1e; }
+.mapa-cartao__periodo { margin-top: 4px; font-size: 12px; color: #665e53; }
+.mapa-cartao__grafico { display: block; width: 100%; height: auto; margin-top: 8px; background: #fff; }
+.mapa-cartao__fonte { margin-top: 6px; font-size: 10.5px; line-height: 1.35; font-style: italic; color: #665e53; }
