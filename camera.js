@@ -1,8 +1,9 @@
 // Câmera da revista.
 //
-// Três posições:
+// Posições:
 // - capa:       revista fechada, câmera inclinada e girada (revista "jogada" na grama);
-// - aberta:     vista de cima, reta, com as páginas preenchendo a tela inteira;
+// - aberta:     vista de cima, reta, com as duas páginas abertas cabendo na tela;
+// - esquerda / direita: vista de cima de uma página só (tela em pé, como no celular);
 // - contracapa: espelho da capa, centrada na contracapa.
 //
 // A troca de posição é uma transição suave (sempre parte de onde a câmera está).
@@ -12,7 +13,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.m
 
 const INCLINACAO_FECHADA = THREE.MathUtils.degToRad(30); // câmera inclinada com a revista fechada
 const GIRO_FECHADA = THREE.MathUtils.degToRad(7);        // revista caída "torta" na grama
-const OCUPACAO_FECHADA = 0.72; // fração da altura da tela ocupada pela revista fechada
+const OCUPACAO_FECHADA = 0.72; // fração da tela ocupada pela revista fechada
+const FOLGA_ABERTA = 1;        // 1 = as páginas encostam na borda da tela que limita
 const DURACAO = 1.4;           // segundos de transição entre as posições
 
 // curva de aceleração: começa e termina devagar
@@ -57,6 +59,7 @@ export function criarCamera({ fov, altura }) {
   let atual = null;
   let t = 1;
 
+  // largura = largura de UMA página no mundo (a proporção da página é fixa)
   function ajustar(largura, aspecto) {
     camera.aspect = aspecto;
     camera.updateProjectionMatrix();
@@ -64,9 +67,14 @@ export function criarCamera({ fov, altura }) {
     rascunho.updateProjectionMatrix();
 
     const tan = Math.tan(THREE.MathUtils.degToRad(fov / 2));
-    const distAberta = altura / 2 / tan; // altura da página = altura da tela
-    const distFechada = altura / OCUPACAO_FECHADA / 2 / tan;
+    // distância em que um retângulo w × h cabe inteiro na tela
+    const caber = (w, h) => Math.max(h / 2 / tan, w / 2 / (tan * aspecto));
+    const distAberta = caber(2 * largura, altura) * FOLGA_ABERTA;
+    const distPagina = caber(largura, altura) * FOLGA_ABERTA;
+    const distFechada = caber(largura / OCUPACAO_FECHADA, altura / OCUPACAO_FECHADA);
     poses.aberta = { alvoX: 0, distancia: distAberta, inclinacao: 0, giro: 0 };
+    poses.esquerda = { alvoX: -largura / 2, distancia: distPagina, inclinacao: 0, giro: 0 };
+    poses.direita = { alvoX: largura / 2, distancia: distPagina, inclinacao: 0, giro: 0 };
     poses.capa = { alvoX: largura / 2, distancia: distFechada, inclinacao: INCLINACAO_FECHADA, giro: -GIRO_FECHADA };
     poses.contracapa = { alvoX: -largura / 2, distancia: distFechada, inclinacao: INCLINACAO_FECHADA, giro: GIRO_FECHADA };
 
@@ -98,8 +106,9 @@ export function criarCamera({ fov, altura }) {
     return 1 - THREE.MathUtils.clamp(atual.inclinacao / INCLINACAO_FECHADA, 0, 1);
   }
 
+  // vista de leitura (de cima), já parada
   function totalmenteAberta() {
-    return destino === "aberta" && t >= 1;
+    return (destino === "aberta" || destino === "esquerda" || destino === "direita") && t >= 1;
   }
 
   // ponto do plano da revista (z = 0) sob uma posição da tela

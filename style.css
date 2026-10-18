@@ -59,6 +59,44 @@ html, body {
 .controles button:hover:not(:disabled) { transform: scale(1.08); }
 .controles button:disabled { opacity: .25; cursor: default; }
 #indicador { min-width: 110px; text-align: center; font-size: 12px; font-weight: 500; }
+.controles button:focus-visible,
+.controles__texto:focus-visible,
+.pular:focus { outline: 2px solid #d22a1e; outline-offset: 2px; }
+
+/* link para a versão em texto, ao lado das setas */
+.controles__texto {
+  margin-left: 2px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #d22a1e;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.controles__texto:hover { background: #b31f15; }
+
+/* "pular para a versão em texto": invisível até receber o foco do teclado */
+.pular {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 20;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #1d1d1f;
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+.pular:focus { transform: none; }
+
+@media (max-width: 420px) {
+  .controles { gap: 8px; bottom: max(12px, env(safe-area-inset-bottom)); }
+  #indicador { min-width: 92px; font-size: 11px; }
+}
 
 /* Contador de quadros por segundo (abra com ?fps na URL) */
 .fps {
@@ -79,7 +117,7 @@ html, body {
   left: 0;
   top: 0;
   z-index: 10;
-  width: 300px;
+  width: min(300px, calc(100vw - 16px));
   padding: 12px 14px 10px;
   background: #f8f1e2;
   border-top: 6px solid #d22a1e;
@@ -96,5 +134,7 @@ html, body {
 .mapa-cartao__nome { font: 400 26px/1 "Anton", Impact, sans-serif; text-transform: uppercase; color: #1c1a18; }
 .mapa-cartao__parte { font: 400 30px/1 "Anton", Impact, sans-serif; color: #d22a1e; }
 .mapa-cartao__periodo { margin-top: 4px; font-size: 12px; color: #665e53; }
-.mapa-cartao__grafico { display: block; width: 100%; height: auto; margin-top: 8px; background: #fff; }
+.mapa-cartao__grafico { display: block; width: 100%; height: auto; margin-top: 10px; }
+.mapa-cartao__area { margin-top: 8px; font-size: 13px; line-height: 1.4; color: #1c1a18; }
+.mapa-cartao__area[hidden] { display: none; }
 .mapa-cartao__fonte { margin-top: 6px; font-size: 10.5px; line-height: 1.35; font-style: italic; color: #665e53; }

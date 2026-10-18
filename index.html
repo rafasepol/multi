@@ -3,23 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Revista</title>
+  <title>Clima em desequilíbrio, vidas desiguais — Revista</title>
+  <meta name="description" content="Revista do 2º F (Germinare Tech) sobre mudanças climáticas e justiça climática no Brasil.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Inter:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- leitores de tela e celulares: a mesma revista em texto -->
+  <a class="pular" href="texto.html">Ler a revista em texto (versão acessível)</a>
+
   <!-- O livro é renderizado em WebGL e ocupa a tela inteira -->
-  <canvas id="cena" aria-label="Revista — arraste as páginas para folhear"></canvas>
+  <canvas id="cena" aria-label="Revista em 3D: arraste as páginas para folhear. A versão em texto está no link “Ler em texto”."></canvas>
 
   <nav class="controles" aria-label="Navegação da revista">
     <button id="btnAnterior" aria-label="Página anterior">&#8592;</button>
-    <span id="indicador">Carregando…</span>
+    <span id="indicador" aria-live="polite">Carregando…</span>
     <button id="btnProximo" aria-label="Próxima página">&#8594;</button>
+    <a class="controles__texto" href="texto.html">Ler em texto</a>
   </nav>
 
-  <script src="paginas/paginas-pdf.js"></script>
+  <script src="biomas-mapa.js"></script>
   <script src="dados.js"></script>
   <script type="module" src="script.js"></script>
 </body>

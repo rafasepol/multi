@@ -1,46 +1,22 @@
 // Mapa interativo da página "Fogo no Brasil".
 //
-// Na página, o mapa é só uma foto (bloco "mapa" de diagramacao.js). Com a revista aberta
-// nessa página, este módulo põe por cima uma placa 3D com a mesma imagem, no mesmo lugar:
-// parada, ela é igual ao papel; com o mouse em cima, ela sobe, inclina e ganha espessura.
-// O bioma sob o mouse acende (os outros apagam) e aparece um cartão com a participação
-// dele nos focos de calor e o gráfico do IPAM. Os dados ficam em dados.js (REVISTA.mapaFogo).
+// Na página, o mapa é desenhado junto com o papel (bloco "mapa" de diagramacao.js). Com a
+// revista aberta nessa página, este módulo põe por cima uma placa 3D com o mesmo desenho, no
+// mesmo lugar: parada, ela é igual ao papel; com o mouse em cima (ou ao tocar), ela sobe,
+// inclina e ganha espessura. O bioma sob o ponteiro acende (os outros apagam) e aparece um
+// cartão com os números dele. O desenho vem de mapa-biomas.js; os números, de dados.js
+// (REVISTA.mapaFogo).
 //
 // script.js chama atualizar() todo quadro, com a posição do mapa no mundo, e repassa o
 // ponteiro em apontar() (mouse andando), tocar() (clique ou toque) e sair().
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
+import { desenharMapaBiomas, biomaEm, coresDosBiomas, PROPORCAO_MAPA } from "./mapa-biomas.js";
 
 const SUBIDA = 0.2;      // quanto o mapa sobe (unidades do mundo; a página tem 2 de altura)
 const INCLINACAO = 0.34; // quanto ele inclina, em radianos (a borda de baixo vem para a frente)
 const ESPESSURA = 0.045; // espessura da placa quando está no alto
 const VELOCIDADE = 7;    // quão rápido sobe e desce (maior = mais rápido)
-
-function carregarImagem(src) {
-  return new Promise((ok, erro) => {
-    const img = new Image();
-    img.onload = () => ok(img);
-    img.onerror = () => erro(new Error(`não carregou ${src}`));
-    img.src = src;
-  });
-}
-
-// [longitude, latitude] -> ponto 0–1 na imagem do mapa
-function projetar(c, [lon, lat]) {
-  const fx = (lon - c.oeste) / (c.leste - c.oeste);
-  const fy = (c.norte - lat) / (c.norte - c.sul);
-  return [c.x0 + fx * (c.x1 - c.x0), c.y0 + fy * (c.y1 - c.y0)];
-}
-
-function dentro([x, y], poli) {
-  let d = false;
-  for (let i = 0, j = poli.length - 1; i < poli.length; j = i++) {
-    const [xi, yi] = poli[i];
-    const [xj, yj] = poli[j];
-    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) d = !d;
-  }
-  return d;
-}
 
 const VERTICE = `
 varying vec2 vUv;
@@ -50,13 +26,10 @@ void main() {
 }`;
 
 export async function criarMapa3D({ scene, camera, canvas, luzPagina, cfg }) {
-  const [imgMapa, imgGrafico] = await Promise.all([carregarImagem(cfg.mapa), carregarImagem(cfg.grafico)]);
-  const biomas = cfg.biomas.map((b) => ({ ...b, poli: b.area.map((p) => projetar(cfg.calibracao, p)) }));
-
-  // ---------- Textura: o mapa, com o bioma sob o mouse aceso ----------
+  // ---------- Textura: o mapa, com o bioma sob o ponteiro aceso ----------
 
   const W = 1024;
-  const H = Math.round((W * imgMapa.naturalHeight) / imgMapa.naturalWidth);
+  const H = Math.round(W / PROPORCAO_MAPA);
   const tela = document.createElement("canvas");
   tela.width = W;
   tela.height = H;
@@ -64,38 +37,8 @@ export async function criarMapa3D({ scene, camera, canvas, luzPagina, cfg }) {
   const textura = new THREE.CanvasTexture(tela);
   textura.anisotropy = 8;
 
-  // só as partes acesas do mapa (o fundo escuro fica transparente): assim o destaque
-  // de um bioma não acende o mar nem os países vizinhos que caem dentro do contorno
-  const brilho = document.createElement("canvas");
-  brilho.width = W;
-  brilho.height = H;
-  const gb = brilho.getContext("2d");
-  gb.drawImage(imgMapa, 0, 0, W, H);
-  const px = gb.getImageData(0, 0, W, H);
-  for (let i = 0; i < px.data.length; i += 4) {
-    const l = 0.3 * px.data[i] + 0.59 * px.data[i + 1] + 0.11 * px.data[i + 2];
-    px.data[i + 3] = Math.max(0, Math.min(255, (l - 35) * 4));
-  }
-  gb.putImageData(px, 0, 0);
-
   function desenharTextura(ativo) {
-    g.globalCompositeOperation = "source-over";
-    g.globalAlpha = 1;
-    g.drawImage(imgMapa, 0, 0, W, H);
-    if (ativo) {
-      g.fillStyle = "rgba(10,6,4,.62)"; // apaga o resto do mapa
-      g.fillRect(0, 0, W, H);
-      g.save();
-      g.beginPath();
-      ativo.poli.forEach(([x, y], i) => (i ? g.lineTo(x * W, y * H) : g.moveTo(x * W, y * H)));
-      g.closePath();
-      g.clip();
-      g.drawImage(brilho, 0, 0); // o bioma volta à cor original...
-      g.globalCompositeOperation = "lighter";
-      g.globalAlpha = 0.5;
-      g.drawImage(brilho, 0, 0); // ...e acende um pouco mais
-      g.restore();
-    }
+    desenharMapaBiomas(g, 0, 0, W, H, ativo?.nome ?? null);
     textura.needsUpdate = true;
   }
   desenharTextura(null);
@@ -150,22 +93,55 @@ export async function criarMapa3D({ scene, camera, canvas, luzPagina, cfg }) {
   sombra.visible = false;
   scene.add(sombra);
 
-  // ---------- Cartão com o gráfico do bioma ----------
+  // ---------- Cartão com os números do bioma ----------
 
   const cartao = document.createElement("div");
   cartao.className = "mapa-cartao";
   cartao.hidden = true;
+  cartao.setAttribute("role", "status");
   cartao.innerHTML = `
     <div class="mapa-cartao__topo"><span class="mapa-cartao__nome"></span><span class="mapa-cartao__parte"></span></div>
     <p class="mapa-cartao__periodo"></p>
-    <canvas class="mapa-cartao__grafico"></canvas>
+    <canvas class="mapa-cartao__grafico" width="560" height="250"></canvas>
+    <p class="mapa-cartao__area"></p>
     <p class="mapa-cartao__fonte"></p>`;
   document.body.appendChild(cartao);
   const elNome = cartao.querySelector(".mapa-cartao__nome");
   const elParte = cartao.querySelector(".mapa-cartao__parte");
   const elGrafico = cartao.querySelector(".mapa-cartao__grafico");
+  const elArea = cartao.querySelector(".mapa-cartao__area");
   cartao.querySelector(".mapa-cartao__periodo").textContent = cfg.periodo;
   cartao.querySelector(".mapa-cartao__fonte").textContent = cfg.fonte;
+
+  // barras com os focos de todos os biomas; a do bioma em destaque fica acesa
+  function desenharGrafico(ativo) {
+    const c = elGrafico.getContext("2d");
+    const w = elGrafico.width;
+    const h = elGrafico.height;
+    const cores = coresDosBiomas();
+    const lista = [...cfg.biomas].sort((a, b) => b.focos - a.focos);
+    const max = Math.max(...lista.map((b) => b.focos));
+    const linha = h / lista.length;
+    const lw = 170;
+    const fmt = (n) => n.toLocaleString("pt-BR");
+    c.clearRect(0, 0, w, h);
+    c.textBaseline = "middle";
+    lista.forEach((b, i) => {
+      const y = i * linha;
+      const eh = b === ativo;
+      c.font = `${eh ? 600 : 400} 22px "Inter", system-ui, sans-serif`;
+      c.fillStyle = eh ? "#1c1a18" : "#8a8073";
+      c.textAlign = "right";
+      c.fillText(b.nome, lw - 12, y + linha / 2);
+      const bw = Math.max(3, ((w - lw - 110) * b.focos) / max);
+      c.fillStyle = eh ? cores[b.nome] : "#d9cdb6";
+      c.fillRect(lw, y + linha * 0.2, bw, linha * 0.6);
+      c.textAlign = "left";
+      c.font = `${eh ? 600 : 400} 21px "Inter", system-ui, sans-serif`;
+      c.fillStyle = eh ? "#1c1a18" : "#8a8073";
+      c.fillText(fmt(b.focos), lw + bw + 8, y + linha / 2);
+    });
+  }
 
   // ---------- Estado ----------
 
@@ -185,11 +161,10 @@ export async function criarMapa3D({ scene, camera, canvas, luzPagina, cfg }) {
       return;
     }
     elNome.textContent = b.nome;
-    elParte.textContent = b.parte;
-    const [x, y, w, h] = b.recorte;
-    elGrafico.width = w;
-    elGrafico.height = h;
-    elGrafico.getContext("2d").drawImage(imgGrafico, x, y, w, h, 0, 0, w, h);
+    elParte.textContent = `${b.parte.toLocaleString("pt-BR")}%`;
+    elArea.textContent = b.area ?? "";
+    elArea.hidden = !b.area;
+    desenharGrafico(b);
     cartao.hidden = false;
     posicionarCartao();
   }
@@ -249,8 +224,7 @@ export async function criarMapa3D({ scene, camera, canvas, luzPagina, cfg }) {
       noPapel = Math.abs(ponto.x - pos.cx) <= pos.w / 2 && Math.abs(ponto.y - pos.cy) <= pos.h / 2;
     }
     sobre = !!hit || noPapel;
-    const uv = hit ? [hit.uv.x, 1 - hit.uv.y] : null;
-    definirAtivo(uv ? biomas.find((b) => dentro(uv, b.poli)) ?? null : null);
+    definirAtivo(hit ? biomaEm(hit.uv.x, 1 - hit.uv.y) : null);
     return sobre;
   }
 

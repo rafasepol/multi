@@ -10,33 +10,21 @@
 // - Ao soltar: se o mouse passou do meio do livro, a página termina de virar;
 //   senão, ela volta. O movimento até o fim é feito por uma mola amortecida.
 // - Fechada (capa ou contracapa), a câmera mostra a revista inclinada no meio da tela;
-//   aberta, a câmera fica de cima e as páginas ocupam a tela inteira (camera.js).
+//   aberta, a câmera fica de cima com as duas páginas inteiras na tela (camera.js).
+//   Com a tela em pé (celular), a leitura mostra uma página por vez.
 //   A câmera só muda de posição quando uma virada é confirmada.
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
 import { carregarFontes, desenharPagina } from "./paginas.js";
-import { diagramar, paginaCapa, paginaContracapa, LARG, ALT } from "./diagramacao.js";
-import { paginasDoPdf } from "./pdfpaginas.js";
+import { diagramar, LARG, ALT } from "./diagramacao.js";
 import { carregarShader } from "./carregar.js";
 import { criarCamera } from "./camera.js";
 import { criarCenario } from "./cenario.js";
 import { criarMapa3D } from "./mapa3d.js";
 
-// Duas formas de montar as páginas (sempre em número par):
-// - revista (padrão): as 18 páginas planejadas em dados.js e montadas por diagramacao.js;
-// - PDF (?pdf na URL): PAGINAS_PDF (paginas/paginas-pdf.js) lista as páginas do PDF antigo
-//   como imagens, entre a capa e a contracapa desenhadas à parte
-//   (?pdf&semcapa usa a primeira página do PDF como capa e a última como contracapa).
-const parametros = new URLSearchParams(location.search);
-const usarPdf = typeof PAGINAS_PDF !== "undefined" && parametros.has("pdf") && !parametros.has("texto");
+// As 18 páginas são planejadas em dados.js e montadas por diagramacao.js.
 await carregarFontes(); // a capa e a diagramação do texto usam as fontes da revista
-let paginas;
-if (usarPdf) {
-  paginas = paginasDoPdf(PAGINAS_PDF);
-  if (!parametros.has("semcapa")) paginas = [paginaCapa(REVISTA), ...paginas, paginaContracapa(REVISTA)];
-} else {
-  paginas = diagramar(REVISTA);
-}
+const paginas = diagramar(REVISTA);
 
 // ---------- Parâmetros ----------
 
@@ -68,7 +56,13 @@ const scene = new THREE.Scene();
 const cam = criarCamera({ fov: FOV, altura: ALTURA });
 const camera = cam.camera;
 
-let largura = 1; // largura de UMA página no mundo (depende da proporção da tela)
+// largura de UMA página no mundo: a página tem sempre a proporção do projeto (80 × 100)
+const largura = (ALTURA * LARG) / ALT;
+
+// Tela em pé (celular): a leitura mostra uma página por vez, e `foco` diz qual delas
+const LIMITE_RETRATO = 1.1; // largura/altura da tela abaixo da qual vale o modo de uma página
+let foco = "dir";
+const modoRetrato = () => window.innerWidth / window.innerHeight < LIMITE_RETRATO;
 
 // Shaders das páginas (GLSL), em arquivos próprios na pasta shaders/
 const [vertexShader, fragmentShader] = await Promise.all([
@@ -348,12 +342,13 @@ const FOLHAS_LONGE = 3;  // além disso a textura é liberada
 const texturas = new Map(); // índice da página -> THREE.CanvasTexture
 let tamTextura = null;      // { w, h } do último desenho
 
+// a textura tem o tamanho com que a página aparece na tela (no máximo 2048 de altura)
 function tamanhoDaTextura() {
   const dpr = Math.min(window.devicePixelRatio, 2);
-  const w = (window.innerWidth / 2) * dpr;
-  const h = window.innerHeight * dpr;
-  const k = Math.min(1, 2048 / Math.max(w, h));
-  return { w: Math.round(w * k), h: Math.round(h * k) };
+  const porPagina = modoRetrato() ? 1 : 2;
+  const hTela = Math.min(window.innerHeight, window.innerWidth / porPagina / (LARG / ALT));
+  const h = Math.min(2048, Math.max(1024, hTela * dpr));
+  return { w: Math.round((h * LARG) / ALT), h: Math.round(h) };
 }
 
 function uniformeDaPagina(idx) {
@@ -369,11 +364,11 @@ function desenharTextura(idx) {
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   texturas.set(idx, tex);
   uniformeDaPagina(idx).value = tex;
-  // página de PDF: o desenho termina depois; a textura é reenviada à GPU quando acabar
+  // fotos ainda carregando: a página é redesenhada e reenviada à GPU quando chegarem
   if (pronto) {
     pronto
       .then(() => { if (texturas.get(idx) === tex) tex.needsUpdate = true; })
-      .catch((erro) => console.warn(`[pdf] página ${idx + 1}:`, erro));
+      .catch((erro) => console.warn(`[página ${idx + 1}]`, erro));
   }
 }
 
@@ -422,7 +417,6 @@ function ajustar() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(w, h, false);
   const aspecto = w / h;
-  largura = (ALTURA * aspecto) / 2; // as duas páginas abertas preenchem a largura da tela
   cam.ajustar(largura, aspecto);
   // tamanho de um pixel da tela por unidade de distância (a grama não fica mais fina que isso)
   const pixel = (2 * Math.tan(THREE.MathUtils.degToRad(FOV / 2))) / (h * renderer.getPixelRatio());
@@ -430,9 +424,11 @@ function ajustar() {
   sombraDobra.dobraLargura.value = largura * 0.3;
 }
 
-// área do chão que a câmera enxerga com a revista fechada (capa e contracapa), com folga
+// área do chão que a câmera enxerga em todas as posições, com folga
 function areaDoCenario() {
-  const pontos = [...cam.cantosNoChao("capa"), ...cam.cantosNoChao("contracapa")].filter(Boolean);
+  const pontos = ["capa", "contracapa", "aberta", "esquerda", "direita"]
+    .flatMap((nome) => cam.cantosNoChao(nome))
+    .filter(Boolean);
   const xs = pontos.map((p) => p.x);
   const ys = pontos.map((p) => p.y);
   const x0 = Math.min(...xs), x1 = Math.max(...xs);
@@ -444,6 +440,7 @@ function areaDoCenario() {
 let timerTextura;
 window.addEventListener("resize", () => {
   ajustar();
+  atualizarUI();
   clearTimeout(timerTextura);
   timerTextura = setTimeout(criarTexturas, 200);
 });
@@ -451,6 +448,7 @@ window.addEventListener("resize", () => {
 // ---------- Física ----------
 
 let arrasto = null; // { folha, moveu, inicio, x0, y0, clientX, clientY }
+let toqueEsquerda = null; // modo de uma página: toque na página da esquerda { inicio, x0, y0 }
 
 function passoFisica(f, dt) {
   const d = f.dobra;
@@ -524,6 +522,7 @@ function estadoDaCamera() {
   const a = atual();
   if (a === 0) return "capa";
   if (a === folhas.length) return "contracapa";
+  if (modoRetrato()) return foco === "esq" ? "esquerda" : "direita";
   return "aberta";
 }
 
@@ -533,6 +532,7 @@ function atualizarUI() {
   btnProximo.disabled = a === folhas.length;
   if (a === 0) indicador.textContent = "Capa";
   else if (a === folhas.length) indicador.textContent = "Contracapa";
+  else if (modoRetrato()) indicador.textContent = `Página ${foco === "esq" ? a * 2 : a * 2 + 1} de ${paginas.length}`;
   else indicador.textContent = `Páginas ${a * 2}–${a * 2 + 1} de ${paginas.length}`;
 }
 
@@ -554,18 +554,42 @@ function virarAuto(f, paraEsquerda, yCanto = -ALTURA / 2) {
   atualizarUI();
 }
 
-function proxima() { virarAuto(folhas[atual()], true); }
-function anterior() { virarAuto(folhas[atual() - 1], false); }
+// No modo de uma página (tela em pé), avançar primeiro passa da página da esquerda para a da
+// direita; só depois a folha vira. Voltar faz o caminho contrário.
+const abertaNoMeio = () => atual() > 0 && atual() < folhas.length;
 
+function proxima() {
+  if (modoRetrato() && abertaNoMeio() && foco === "esq") {
+    foco = "dir";
+    atualizarUI();
+    return;
+  }
+  foco = "esq";
+  virarAuto(folhas[atual()], true);
+}
+
+function anterior() {
+  if (modoRetrato() && abertaNoMeio() && foco === "dir") {
+    foco = "esq";
+    atualizarUI();
+    return;
+  }
+  foco = "dir";
+  virarAuto(folhas[atual() - 1], false);
+}
+
+// pagina: número da página (1 = capa)
 function irPara(pagina) {
   const alvo = Math.min(Math.floor(pagina / 2), folhas.length);
   const a = atual();
   const dir = Math.sign(alvo - a);
-  for (let k = 0; k < Math.abs(alvo - a); k++) {
+  const n = Math.abs(alvo - a);
+  for (let k = 0; k < n; k++) {
     const f = folhas[dir > 0 ? a + k : a - 1 - k];
     f.destino = dir > 0;
     setTimeout(() => virarAuto(f, dir > 0), k * 220);
   }
+  foco = pagina % 2 === 0 ? "esq" : "dir"; // páginas pares ficam à esquerda
   atualizarUI();
 }
 
@@ -744,6 +768,12 @@ canvas.addEventListener("pointerdown", (e) => {
   if (mapa && mapa.tocar(e.clientX, e.clientY, e.pointerType !== "mouse")) return;
   const p = pontoDoEvento(e);
   if (!dentroDaRevista(p)) return; // clicou fora da revista (na grama)
+  // tela em pé, lendo a página da esquerda: tocar avança para a da direita (ou segue um
+  // link do sumário) e arrastar para o lado passa de página, sem puxar a folha de trás
+  if (modoRetrato() && abertaNoMeio() && foco === "esq" && p.x < 0) {
+    toqueEsquerda = { inicio: p, x0: e.clientX, y0: e.clientY };
+    return;
+  }
   const f = folhaDoLado(p);
   if (!f) return;
 
@@ -800,9 +830,25 @@ canvas.addEventListener("pointermove", (e) => {
 });
 
 function soltar(e) {
+  if (toqueEsquerda) {
+    const { inicio, x0, y0 } = toqueEsquerda;
+    toqueEsquerda = null;
+    const dx = e.clientX - x0;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - y0)) {
+      if (dx < 0) proxima();
+      else anterior();
+      return;
+    }
+    const l = linkEm(inicio);
+    if (l?.url) window.open(l.url, "_blank", "noopener");
+    else if (l) irPara(l.ir);
+    else proxima();
+    return;
+  }
   if (!arrasto) return;
   const { folha: f, moveu, inicio } = arrasto;
   const d = f.dobra;
+  const arrasto0 = arrasto;
   arrasto = null;
   canvas.classList.remove("arrastando");
 
@@ -822,6 +868,7 @@ function soltar(e) {
       d.M = { ...canto };
       d.V = { x: 0, y: 0 };
     }
+    foco = f.virada ? "dir" : "esq";
     virarAuto(f, !f.virada, d.P0.y);
     return;
   }
@@ -833,6 +880,13 @@ function soltar(e) {
     d.T = { x: -d.P0.x, y: d.P0.y };
     d.arco = 0;
     f.destino = !f.virada;
+    foco = f.destino ? "esq" : "dir"; // depois de virar, lê-se a página que acabou de chegar
+  } else if (modoRetrato() && abertaNoMeio() && foco === "dir" && e.clientX - arrasto0.x0 > 40) {
+    // tela em pé, na página da direita: arrastar para a direita volta para a da esquerda
+    d.modo = "voltar";
+    d.T = { ...d.P0 };
+    f.destino = f.virada;
+    anterior();
   } else {
     d.modo = "voltar";
     d.T = { ...d.P0 };
@@ -844,6 +898,7 @@ function soltar(e) {
 canvas.addEventListener("pointerup", soltar);
 canvas.addEventListener("pointercancel", soltar);
 canvas.addEventListener("pointerleave", () => {
+  toqueEsquerda = null;
   cenario.definirMouse(null);
   mapa?.sair();
   canvas.classList.remove("mapa");
@@ -874,8 +929,21 @@ function papelSobreOChao() {
 
 // O cenário só aparece com a câmera fora da posição de leitura, ou quando a
 // primeira/última folha está sendo virada (o chão aparece por baixo dela).
+// Na leitura, as páginas só cobrem a tela inteira quando a tela tem a mesma proporção delas;
+// senão sobra chão dos lados (ou em cima e embaixo) e o cenário continua à vista.
+function paginasCobremATela() {
+  const aspecto = window.innerWidth / window.innerHeight;
+  const paginasNaTela = modoRetrato() ? LARG / ALT : (2 * LARG) / ALT;
+  return Math.abs(aspecto - paginasNaTela) / paginasNaTela < 0.01;
+}
+
 function cenarioVisivel() {
-  return !cam.totalmenteAberta() || !!folhas[0].dobra || !!folhas[folhas.length - 1].dobra;
+  return (
+    !cam.totalmenteAberta() ||
+    !paginasCobremATela() ||
+    !!folhas[0].dobra ||
+    !!folhas[folhas.length - 1].dobra
+  );
 }
 
 // Avança a simulação (câmera, física e dobras) em dt segundos
