@@ -594,14 +594,143 @@ function atualizarAlvoArrasto() {
   if (p) d.T = paraLocal(d, p);
 }
 
-// link do sumário sob o ponteiro, se houver
-function linkEm(p) {
+// página (índice), e posição 0–1 nela (v = 0 em cima) sob o ponto p da revista
+function posicaoNaPagina(p) {
   const a = atual();
-  let idx, u;
-  if (p.x >= 0) { idx = a * 2; u = p.x / largura; }
-  else { idx = a * 2 - 1; u = (p.x + largura) / largura; }
-  const v = 1 - (p.y / ALTURA + 0.5); // 0 em cima
-  return (links[idx] || []).find((l) => u >= l.x0 && u <= l.x1 && v >= l.y0 && v <= l.y1);
+  const direita = p.x >= 0;
+  return {
+    idx: direita ? a * 2 : a * 2 - 1,
+    u: direita ? p.x / largura : (p.x + largura) / largura,
+    v: 1 - (p.y / ALTURA + 0.5),
+  };
+}
+
+function achar(p, filtro) {
+  const { idx, u, v } = posicaoNaPagina(p);
+  const l = (links[idx] || []).find((l) => filtro(l) && u >= l.x0 && u <= l.x1 && v >= l.y0 && v <= l.y1);
+  return l && { idx, l };
+}
+
+// link do sumário sob o ponteiro, se houver (as barras de gráfico não são links)
+function linkEm(p) {
+  return achar(p, (l) => !l.barra)?.l;
+}
+
+// ---------- Barras de gráfico em 3D ----------
+
+// Ao passar o mouse numa linha de gráfico, a barra sobe da página como um bloco.
+const BARRA_SOBE = 0.07;     // altura que a barra alcança (mundo 3D; a página tem altura 2)
+const BARRA_CRESCE = 0.14;   // quanto a barra engorda ao subir (fração da espessura)
+const BARRA_MOLA = 230;      // força da mola (maior = sobe mais rápido)
+const BARRA_AMORTEC = 0.5;   // < 1 dá um leve "pulinho" ao chegar em cima
+
+// sombra suave embaixo da barra (retângulo borrado)
+const texSombraBarra = (() => {
+  const c = document.createElement("canvas");
+  c.width = 128; c.height = 32;
+  const g = c.getContext("2d");
+  g.filter = "blur(5px)";
+  g.fillStyle = "#000";
+  g.fillRect(14, 8, 100, 16);
+  return new THREE.CanvasTexture(c);
+})();
+const geoCaixa = new THREE.BoxGeometry(1, 1, 1).translate(0, 0, 0.5); // base em z = 0
+const geoPlano = new THREE.PlaneGeometry(1, 1);
+
+// cada face com um tom: a luz vem de cima à esquerda (as faces escuras ficam longe dela)
+function materiaisDaBarra(cor) {
+  const base = new THREE.Color(cor);
+  const tom = (k) => new THREE.MeshBasicMaterial({ color: base.clone().multiplyScalar(k) });
+  const topo = new THREE.MeshBasicMaterial({ color: base.clone().multiplyScalar(1.12) });
+  // ordem do BoxGeometry: +x, -x, +y, -y, +z, -z
+  return [tom(0.62), tom(0.85), tom(0.75), tom(0.45), topo, tom(0.5)];
+}
+
+const barras3d = []; // { chave, idx, x0, x1, y0, y1, cor, grupo, caixa, sombra, t, v, alvo }
+let hoverBarra = null; // chave da barra sob o mouse
+
+function criarBarra3d(idx, b, chave) {
+  const mats = materiaisDaBarra(b.cor);
+  const caixa = new THREE.Mesh(geoCaixa, mats);
+  const matSombra = new THREE.MeshBasicMaterial({
+    map: texSombraBarra, transparent: true, depthWrite: false, opacity: 0,
+  });
+  const sombra = new THREE.Mesh(geoPlano, matSombra);
+  const grupo = new THREE.Group();
+  grupo.frustumCulled = false;
+  grupo.add(sombra, caixa);
+  scene.add(grupo);
+  const item = { chave, idx, ...b, grupo, caixa, sombra, matSombra, mats, t: 0, v: 0, alvo: 1 };
+  barras3d.push(item);
+  return item;
+}
+
+function removerBarra3d(item) {
+  scene.remove(item.grupo);
+  item.mats.forEach((m) => m.dispose());
+  item.matSombra.dispose();
+  barras3d.splice(barras3d.indexOf(item), 1);
+}
+
+// barra sob o ponteiro (a linha inteira do gráfico conta)
+function barraEm(p) {
+  const r = achar(p, (l) => !!l.barra);
+  if (!r) return null;
+  const b = r.l.barra;
+  return { idx: r.idx, b, chave: `${r.idx}:${b.x0.toFixed(4)}:${b.y0.toFixed(4)}` };
+}
+
+function definirHoverBarra(alvo) {
+  const chave = alvo ? alvo.chave : null;
+  if (chave === hoverBarra) return;
+  hoverBarra = chave;
+  if (alvo && !barras3d.some((i) => i.chave === chave)) criarBarra3d(alvo.idx, alvo.b, chave);
+}
+
+function atualizarBarras3d(dt) {
+  // só desenha quando as páginas estão paradas; virar a folha desce a barra
+  const parado = !arrasto && folhas.every((f) => !f.dobra);
+  for (const item of [...barras3d]) {
+    const a = atual();
+    const naTela = item.idx === a * 2 || item.idx === a * 2 - 1;
+    const ativa = parado && naTela && item.chave === hoverBarra;
+    item.alvo = ativa ? 1 : 0;
+    // mola amortecida em passos pequenos
+    const k = BARRA_MOLA;
+    const c = 2 * Math.sqrt(k) * BARRA_AMORTEC;
+    const passos = Math.max(1, Math.ceil(dt / (1 / 240)));
+    for (let s = 0; s < passos; s++) {
+      item.v += (k * (item.alvo - item.t) - c * item.v) * (dt / passos);
+      item.t += item.v * (dt / passos);
+    }
+    if (item.alvo === 0 && Math.abs(item.t) < 0.002 && Math.abs(item.v) < 0.02) {
+      removerBarra3d(item);
+      continue;
+    }
+
+    const t = Math.max(item.t, 0);
+    const dir = item.idx % 2 === 0;
+    const f = folhas[item.idx >> 1];
+    const z = alturaBase(f) + 0.0004;
+    // retângulo da barra (0–1 na página) -> mundo
+    const gx = (u) => (dir ? u * largura : (u - 1) * largura);
+    const gy = (v) => (0.5 - v) * ALTURA;
+    const larg = (item.x1 - item.x0) * largura;
+    const alt = (item.y1 - item.y0) * ALTURA;
+    const cx = (gx(item.x0) + gx(item.x1)) / 2;
+    const cy = (gy(item.y0) + gy(item.y1)) / 2;
+    const engorda = 1 + BARRA_CRESCE * t;
+    const altura = Math.max(BARRA_SOBE * t, 0.00005);
+    // a perspectiva aumenta o que chega perto da câmera: encolhe a barra em direção ao
+    // centro da câmera para o topo cair exatamente sobre a barra desenhada (sem cobrir o valor)
+    const cam3 = camera.position;
+    const encolhe = THREE.MathUtils.clamp(1 - altura / Math.max(cam3.z - z, 0.5), 0.6, 1);
+    item.grupo.position.set(cam3.x + (cx - cam3.x) * encolhe, cam3.y + (cy - cam3.y) * encolhe, z);
+    item.caixa.scale.set(larg * encolhe, alt * engorda * encolhe, altura);
+    item.sombra.position.set((cx - item.grupo.position.x) + 0.012 * t, (cy - item.grupo.position.y) - 0.016 * t, 0.00005);
+    item.sombra.scale.set(larg * 1.3 + 0.03 * t, alt * 2.4 + 0.03 * t, 1);
+    item.matSombra.opacity = 0.4 * Math.min(1, t);
+  }
 }
 
 // folha que pode ser puxada do lado onde está o ponteiro
@@ -659,6 +788,7 @@ canvas.addEventListener("pointermove", (e) => {
   canvas.classList.toggle("mapa", noMapa);
   if (noMapa) {
     canvas.classList.remove("fora", "link");
+    definirHoverBarra(null);
     return;
   }
 
@@ -666,6 +796,7 @@ canvas.addEventListener("pointermove", (e) => {
   const sobrePagina = dentroDaRevista(p) && !!folhaDoLado(p);
   canvas.classList.toggle("fora", !sobrePagina);
   canvas.classList.toggle("link", sobrePagina && !!linkEm(p));
+  definirHoverBarra(sobrePagina ? barraEm(p) : null);
 });
 
 function soltar(e) {
@@ -716,6 +847,7 @@ canvas.addEventListener("pointerleave", () => {
   cenario.definirMouse(null);
   mapa?.sair();
   canvas.classList.remove("mapa");
+  definirHoverBarra(null);
 });
 
 // ---------- Loop ----------
@@ -761,6 +893,7 @@ function atualizarTudo(dt) {
   folhas.forEach(deformar);
   atualizarSombra();
   atualizarMapa(dt);
+  atualizarBarras3d(dt);
   // o vinco aparece junto com a câmera indo para a leitura (fechada não tem vinco)
   vinco.vinco.value = cam.abertura();
 
@@ -812,7 +945,7 @@ quadro();
 
 // usado para testes no console
 window.revista = {
-  folhas, paginas, texturas, proxima, anterior, irPara, atual, cam, cenario, links, mapa, ALTURA,
+  folhas, paginas, texturas, proxima, anterior, irPara, atual, cam, cenario, links, mapa, barras3d, ALTURA,
   largura: () => largura,
   // congela/descongela o tempo (o desenho continua)
   pausar(valor = true) {

@@ -491,6 +491,8 @@ function grafico(b, w) {
         const bl = Math.max(0.3, r.frac * bmax);
         const esp = Math.min(2.2, r.h - 0.9);
         els.push(ret(xe, top + (r.h - esp) / 2, bl, esp, cor));
+        // área de passar o mouse (a linha toda); a barra sobe em 3D em script.js
+        els.push({ k: "barra", x, y: top, w: lw + bl + folgaValor, h: r.h, bx: xe, by: top + (r.h - esp) / 2, bw: bl, bh: esp, cor });
         els.push(txt(xe + bl + 0.8, top + (r.h - ev.alt) / 2, linhaUnica(r.rotV), ev, COR.preto));
       }
       els.push(ret(xe - 0.08, yy + y0, 0.16, yFim - y0, COR.preto));
@@ -719,14 +721,9 @@ function gerarPilha(blocos, r, pag) {
 
 // ---------- Partes fixas de cada página ----------
 
-// etiqueta vermelha com o nome da revista e, ao lado, a seção
+// seção da página, no alto
 function cabecalho(els, secao, x) {
-  const en = display(1.6, 2.8);
-  const nome = "HORIZONTE";
-  const wn = largura(nome, en) + 2;
-  els.push(ret(x, 4.2, wn, 2.8, COR.vermelho));
-  els.push(txt(x + 1, 4.2, linhaUnica(nome), en, COR.creme));
-  if (secao) els.push(txt(x + wn + 1.4, 4.2 + (2.8 - E.rotulo.alt) / 2 + 0.1, linhaUnica(secao.toUpperCase()), E.rotulo, COR.vermelho));
+  if (secao) els.push(txt(x, 4.2 + (2.8 - E.rotulo.alt) / 2 + 0.1, linhaUnica(secao.toUpperCase()), E.rotulo, COR.vermelho));
 }
 
 function numeroPagina(els, pag, cor = COR.preto) {
@@ -940,14 +937,11 @@ function montarCapa(R) {
   const c = R.capa;
   const avisos = { avisos: [] };
   const m = 5;
-  const tm = caberLinha(R.titulo, 22, LARG - 2 * m);
-  const em = display(tm, tm * 0.95);
-  const hTopo = 3 + em.alt + 0.8 + E.rotulo.alt + 2.6;
-  // a foto começa abaixo da faixa com o nome, para não esconder o alto da imagem
+  const hTopo = 3 + E.rotulo.alt + 2.6;
+  // a foto começa abaixo da faixa com a edição, para não esconder o alto da imagem
   const els = [{ k: "foto", x: 0, y: hTopo, w: LARG, h: ALT - hTopo, src: c.foto, foco: c.foco }];
   els.push(ret(0, 0, LARG, hTopo, COR.vermelho));
-  els.push(txt(m, 3, linhaUnica(R.titulo.toUpperCase()), em, COR.creme));
-  els.push(txt(m, 3 + em.alt + 0.8, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme));
+  els.push(txt(m, 3, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme));
   const blocos = [
     { t: "titulo", texto: c.chamada, tam: 5.6, cor: COR.creme },
     { t: "lead", texto: c.subtitulo, cor: COR.cremeSuave, antes: 1.4 },
@@ -966,16 +960,13 @@ function montarContracapa(R) {
   const els = [ret(0, 0, LARG, ALT, COR.vermelho)];
   const m = 8;
   const w = LARG - 2 * m;
-  const tm = caberLinha(R.titulo, 16, w);
-  const em = display(tm, tm);
   const tf = caberPalavra(c.texto, 4.4, w);
   const ef = display(tf, tf * 1.08);
   const lf = quebrar(c.texto, ef, w);
   const hf = lf.length * ef.alt;
-  const y = (ALT - (em.alt + 5 + hf)) / 2;
-  els.push(txt(m, y, linhaUnica(R.titulo.toUpperCase()), em, COR.creme, "centro", w));
-  els.push(ret(LARG / 2 - 6, y + em.alt + 2.2, 12, 0.5, COR.preto));
-  els.push(txt(m, y + em.alt + 5, lf, ef, COR.preto, "centro", w));
+  const y = (ALT - (3 + hf)) / 2;
+  els.push(ret(LARG / 2 - 6, y, 12, 0.5, COR.preto));
+  els.push(txt(m, y + 3, lf, ef, COR.preto, "centro", w));
   els.push(txt(m, ALT - 9, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme, "centro", w));
   return { tipo: "pagina", fundo: COR.vermelho, els };
 }

@@ -159,6 +159,17 @@ function desenharElemento(ctx, el, g, links) {
       ctx.fillStyle = el.cor;
       estrela(ctx, g.ox + el.x * g.u, g.oy + el.y * g.u, el.r * g.u);
       break;
+    case "barra": {
+      // gráfico: não desenha nada (a barra é um "ret"); só marca onde o mouse faz a barra subir em 3D
+      const n = (x, y, w, h) => ({
+        x0: (g.ox + x * g.u) / g.w,
+        y0: (g.oy + y * g.u) / g.h,
+        x1: (g.ox + (x + w) * g.u) / g.w,
+        y1: (g.oy + (y + h) * g.u) / g.h,
+      });
+      links.push({ ...n(el.x, el.y, el.w, el.h), barra: { ...n(el.bx, el.by, el.bw, el.bh), cor: el.cor } });
+      break;
+    }
     case "link":
       links.push({
         x0: (g.ox + el.x * g.u) / g.w,
