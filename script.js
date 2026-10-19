@@ -16,7 +16,7 @@
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
 import { carregarFontes, desenharPagina } from "./paginas.js";
-import { diagramar, LARG, ALT } from "./diagramacao.js";
+import { diagramar, LARG, ALT, COR } from "./diagramacao.js";
 import { carregarShader } from "./carregar.js";
 import { criarCamera } from "./camera.js";
 import { criarCenario } from "./cenario.js";
@@ -635,9 +635,9 @@ function achar(p, filtro) {
   return l && { idx, l };
 }
 
-// link do sumário sob o ponteiro, se houver (as barras de gráfico não são links)
+// link do sumário sob o ponteiro, se houver (barras de gráfico e placas não são links)
 function linkEm(p) {
-  return achar(p, (l) => !l.barra)?.l;
+  return achar(p, (l) => !l.barra && !l.placa)?.l;
 }
 
 // ---------- Barras de gráfico em 3D ----------
@@ -757,6 +757,166 @@ function atualizarBarras3d(dt) {
   }
 }
 
+// ---------- Placas: pedaços da página que saltam em 3D ----------
+
+// Números, fluxos, citações, fotos e retratos da equipe: com o mouse em cima, o pedaço da
+// página sobe como um cartão, inclina na direção do ponteiro e deixa uma sombra no papel.
+// O cartão mostra a própria textura da página, então é sempre igual ao que está impresso.
+const PLACA_SOBE = 0.085;    // altura que o cartão alcança (a página tem altura 2)
+const PLACA_INCLINA = 0.22;  // inclinação máxima (radianos) na direção do ponteiro
+const PLACA_CRESCE = 0.035;  // quanto o cartão aumenta ao subir
+const PLACA_MOLA = 170;
+const PLACA_AMORTEC = 0.62;
+
+const VERTICE_PLACA = `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+const FRAGMENTO_PLACA = `
+uniform sampler2D pagina;
+uniform vec4 rect;      // x0, y0, x1, y1 na página (0–1, y = 0 em cima)
+uniform float redondo;
+uniform vec3 uLuzPagina;
+varying vec2 vUv;
+void main() {
+  if (redondo > 0.5 && length(vUv - 0.5) > 0.5) discard;
+  vec2 st = vec2(mix(rect.x, rect.z, vUv.x), 1.0 - mix(rect.y, rect.w, 1.0 - vUv.y));
+  gl_FragColor = vec4(texture2D(pagina, st).rgb * uLuzPagina, 1.0);
+}`;
+
+// sombra redonda (para os retratos)
+const texSombraRedonda = (() => {
+  const c = document.createElement("canvas");
+  c.width = c.height = 64;
+  const g = c.getContext("2d");
+  const gr = g.createRadialGradient(32, 32, 10, 32, 32, 32);
+  gr.addColorStop(0, "rgba(0,0,0,1)");
+  gr.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = gr;
+  g.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+})();
+const geoCilindro = new THREE.CylinderGeometry(0.5, 0.5, 1, 48, 1, true).rotateX(Math.PI / 2).translate(0, 0, 0.5);
+const corLados = new THREE.Color(COR.preto);
+
+const placas3d = []; // { chave, idx, x0, y0, x1, y1, redondo, grupo, pivo, topo, lados, sombra, t, v }
+let hoverPlaca = null;  // chave da placa sob o mouse
+let ponteiroPlaca = { u: 0.5, v: 0.5 }; // posição do ponteiro dentro da placa (0–1)
+
+function criarPlaca3d(alvo) {
+  const { idx, l, chave } = alvo;
+  const redondo = !!l.placa.redondo;
+  const matTopo = new THREE.ShaderMaterial({
+    uniforms: {
+      pagina: { value: texturas.get(idx) ?? texPapel },
+      rect: { value: new THREE.Vector4(l.x0, l.y0, l.x1, l.y1) },
+      redondo: { value: redondo ? 1 : 0 },
+      uLuzPagina: luzPagina,
+    },
+    vertexShader: VERTICE_PLACA,
+    fragmentShader: FRAGMENTO_PLACA,
+  });
+  const topo = new THREE.Mesh(geoPlano, matTopo);
+  const matLados = new THREE.MeshBasicMaterial({ color: corLados, side: THREE.DoubleSide });
+  const lados = new THREE.Mesh(redondo ? geoCilindro : geoCaixa, matLados);
+  const matSombra = new THREE.MeshBasicMaterial({
+    map: redondo ? texSombraRedonda : texSombraBarra, transparent: true, depthWrite: false, opacity: 0,
+  });
+  const sombra = new THREE.Mesh(geoPlano, matSombra);
+  const pivo = new THREE.Group();
+  pivo.add(lados, topo);
+  const grupo = new THREE.Group();
+  grupo.add(sombra, pivo);
+  scene.add(grupo);
+  const item = { chave, idx, x0: l.x0, y0: l.y0, x1: l.x1, y1: l.y1, redondo, grupo, pivo, topo, lados, sombra, mats: [matTopo, matLados, matSombra], t: 0, v: 0 };
+  placas3d.push(item);
+  return item;
+}
+
+function removerPlaca3d(item) {
+  scene.remove(item.grupo);
+  item.mats.forEach((m) => m.dispose());
+  placas3d.splice(placas3d.indexOf(item), 1);
+}
+
+// placa sob o ponteiro e a posição do ponteiro dentro dela
+function placaEm(p) {
+  const r = achar(p, (l) => !!l.placa);
+  if (!r) return null;
+  const { u, v } = posicaoNaPagina(p);
+  const l = r.l;
+  return {
+    idx: r.idx,
+    l,
+    chave: `${r.idx}:${l.x0.toFixed(4)}:${l.y0.toFixed(4)}`,
+    u: (u - l.x0) / (l.x1 - l.x0),
+    v: (v - l.y0) / (l.y1 - l.y0),
+  };
+}
+
+function definirHoverPlaca(alvo) {
+  if (alvo) ponteiroPlaca = { u: alvo.u, v: alvo.v };
+  const chave = alvo ? alvo.chave : null;
+  if (chave === hoverPlaca) return;
+  hoverPlaca = chave;
+  if (alvo && !placas3d.some((i) => i.chave === chave)) criarPlaca3d(alvo);
+}
+
+function atualizarPlacas3d(dt) {
+  const parado = !arrasto && folhas.every((f) => !f.dobra) && cam.totalmenteAberta();
+  const a = atual();
+  for (const item of [...placas3d]) {
+    const naTela = item.idx === a * 2 || item.idx === a * 2 - 1;
+    const tex = texturas.get(item.idx);
+    // virando a página (ou a página saiu da tela): o cartão some na hora
+    if (!parado || !naTela || !tex) {
+      removerPlaca3d(item);
+      continue;
+    }
+    item.topo.material.uniforms.pagina.value = tex;
+    const ativa = item.chave === hoverPlaca;
+    const alvo = ativa ? 1 : 0;
+    const k = PLACA_MOLA;
+    const c = 2 * Math.sqrt(k) * PLACA_AMORTEC;
+    const passos = Math.max(1, Math.ceil(dt / (1 / 240)));
+    for (let s = 0; s < passos; s++) {
+      item.v += (k * (alvo - item.t) - c * item.v) * (dt / passos);
+      item.t += item.v * (dt / passos);
+    }
+    if (!ativa && Math.abs(item.t) < 0.002 && Math.abs(item.v) < 0.02) {
+      removerPlaca3d(item);
+      continue;
+    }
+
+    const t = Math.max(item.t, 0);
+    const dir = item.idx % 2 === 0;
+    const z = alturaBase(folhas[item.idx >> 1]) + 0.0004;
+    const gx = (u) => (dir ? u * largura : (u - 1) * largura);
+    const gy = (v) => (0.5 - v) * ALTURA;
+    const larg = (item.x1 - item.x0) * largura;
+    const alt = (item.y1 - item.y0) * ALTURA;
+    const altura = Math.max(PLACA_SOBE * t, 0.00005);
+    const cresce = 1 + PLACA_CRESCE * t;
+
+    item.grupo.position.set((gx(item.x0) + gx(item.x1)) / 2, (gy(item.y0) + gy(item.y1)) / 2, z);
+    item.pivo.position.set(0, 0, altura);
+    // inclina na direção do ponteiro (só o cartão em destaque segue o mouse)
+    const pu = ativa ? ponteiroPlaca.u - 0.5 : 0;
+    const pv = ativa ? ponteiroPlaca.v - 0.5 : 0;
+    item.pivo.rotation.set(pv * PLACA_INCLINA * t, pu * PLACA_INCLINA * t, 0);
+    item.pivo.scale.set(cresce, cresce, 1);
+    item.topo.position.z = 0.0001;
+    item.topo.scale.set(larg, alt, 1);
+    item.lados.position.z = -altura;
+    item.lados.scale.set(larg, alt, altura);
+    item.sombra.position.set(0.012 * t, -0.022 * t, 0.0002);
+    item.sombra.scale.set(larg * (item.redondo ? 1.35 : 1.3) + 0.04 * t, alt * (item.redondo ? 1.35 : 1.6) + 0.04 * t, 1);
+    item.mats[2].opacity = 0.5 * Math.min(1, t);
+  }
+}
+
 // folha que pode ser puxada do lado onde está o ponteiro
 function folhaDoLado(p) {
   const a = atual();
@@ -819,6 +979,7 @@ canvas.addEventListener("pointermove", (e) => {
   if (noMapa) {
     canvas.classList.remove("fora", "link");
     definirHoverBarra(null);
+    definirHoverPlaca(null);
     return;
   }
 
@@ -826,7 +987,9 @@ canvas.addEventListener("pointermove", (e) => {
   const sobrePagina = dentroDaRevista(p) && !!folhaDoLado(p);
   canvas.classList.toggle("fora", !sobrePagina);
   canvas.classList.toggle("link", sobrePagina && !!linkEm(p));
-  definirHoverBarra(sobrePagina ? barraEm(p) : null);
+  const barra = sobrePagina ? barraEm(p) : null;
+  definirHoverBarra(barra);
+  definirHoverPlaca(sobrePagina && !barra ? placaEm(p) : null);
 });
 
 function soltar(e) {
@@ -903,6 +1066,7 @@ canvas.addEventListener("pointerleave", () => {
   mapa?.sair();
   canvas.classList.remove("mapa");
   definirHoverBarra(null);
+  definirHoverPlaca(null);
 });
 
 // ---------- Loop ----------
@@ -962,6 +1126,7 @@ function atualizarTudo(dt) {
   atualizarSombra();
   atualizarMapa(dt);
   atualizarBarras3d(dt);
+  atualizarPlacas3d(dt);
   // o vinco aparece junto com a câmera indo para a leitura (fechada não tem vinco)
   vinco.vinco.value = cam.abertura();
 
@@ -1013,7 +1178,7 @@ quadro();
 
 // usado para testes no console
 window.revista = {
-  folhas, paginas, texturas, proxima, anterior, irPara, atual, cam, cenario, links, mapa, barras3d, ALTURA,
+  folhas, paginas, texturas, proxima, anterior, irPara, atual, cam, cenario, links, mapa, barras3d, placas3d, ALTURA,
   largura: () => largura,
   // congela/descongela o tempo (o desenho continua)
   pausar(valor = true) {

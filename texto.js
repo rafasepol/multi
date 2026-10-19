@@ -144,7 +144,10 @@ raiz.append(
     el("p", { class: "edicao" }, R.edicao),
     el("h1", {}, c.chamada),
     el("p", { class: "sub" }, c.subtitulo),
-    el("img", { src: c.foto, alt: "Colagem da capa: homem com máscara de gás diante de uma floresta em chamas." }),
+    el("figure", {},
+      el("img", { src: c.foto, alt: "Mulheres Kayapó com pintura vermelha no rosto seguram a faixa “Sem justiça climática, não há direitos indígenas. Sem a floresta, não há futuro”, diante de um globo inflável." }),
+      c.credito ? el("figcaption", {}, c.credito) : null,
+    ),
   ),
 );
 

@@ -42,11 +42,12 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 - [x] **Paleta com até 5 cores principais, além de neutros**: 4 principais (vermelho, vinho, laranja, âmbar) + neutros, em `paleta.js`.
 - [ ] **Imagens em boa resolução, sem distorção**: nenhuma é distorcida, mas `rio-grande-do-sul.jpg` e `colagem-fabrica.jpg` têm só 690 px de largura — trocar pelos originais em resolução maior.
 - [x] **Navegação entre capa, sumário e matérias**: setas, teclado, arrastar as páginas e toque no celular.
+- [x] **Interatividade**: mapa do fogo em 3D (pág. 5), barras dos gráficos que sobem e cartões que saltam da página ao passar o mouse (números, fluxos, citações, fotos e retratos da equipe).
 - [x] **Sumário com links internos**: cada item leva à sua seção (na revista 3D e na versão em texto).
 
 ### Pendências da equipe
 
-- [ ] **Créditos das imagens**: confirmar autor e permissão das colagens e fotos em `assets/fotos/` e colocar nas legendas.
+- [ ] **Créditos das imagens**: a foto da capa já tem crédito (Mirna Wabi-Sabi, Unsplash License); falta confirmar autor e permissão das colagens e das outras fotos em `assets/fotos/` e colocar nas legendas.
 - [x] **Fotos da equipe** (pág. 2): os seis integrantes, em ordem alfabética.
 - [ ] **Vídeo em inglês** (5 a 7 min), simulando a apresentação do Brasil na ONU.
 - [ ] **Apresentação da revista** (até 10 min).

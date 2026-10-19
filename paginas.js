@@ -114,6 +114,7 @@ function desenharFoto(ctx, el, g) {
   const ih = img.naturalHeight;
   ctx.save();
   if (el.mesclar) ctx.globalCompositeOperation = el.mesclar;
+  if (el.filtro) ctx.filter = el.filtro;
   ctx.imageSmoothingQuality = "high";
   if (el.conter) {
     const k = Math.min(W / iw, H / ih);
@@ -175,12 +176,30 @@ function desenharElemento(ctx, el, g, links) {
       const est = el.est;
       const base = baseLinha(est);
       const corMarca = el.cor === COR.preto || el.cor === COR.suave ? COR.vermelho : el.cor;
+      // texto girado (capa): gira em volta do canto de cima à esquerda do bloco
+      const ox = g.ox + el.x * g.u;
+      const oy = g.oy + el.y * g.u;
+      ctx.save();
+      ctx.translate(ox, oy);
+      if (el.rot) ctx.rotate((el.rot * Math.PI) / 180);
       el.linhas.forEach((l, i) => {
-        let x = el.x;
+        let x = 0;
         if (el.alinhar === "dir") x += el.w - el.ws[i];
         else if (el.alinhar === "centro") x += (el.w - el.ws[i]) / 2;
-        trechos(ctx, l, g.ox + x * g.u, g.oy + (el.y + i * est.alt + base) * g.u, est, g.u, el.cor, corMarca);
+        trechos(ctx, l, x * g.u, (i * est.alt + base) * g.u, est, g.u, el.cor, corMarca);
       });
+      ctx.restore();
+      break;
+    }
+    case "poli": {
+      // polígono em u; pontos na borda da página sangram até a borda da textura
+      const px = (x) => (x <= 0.01 ? 0 : x >= LARG - 0.01 ? g.w : g.ox + x * g.u);
+      const py = (y) => (y <= 0.01 ? 0 : y >= ALT - 0.01 ? g.h : g.oy + y * g.u);
+      ctx.beginPath();
+      el.pts.forEach(([x, y], i) => (i ? ctx.lineTo(px(x), py(y)) : ctx.moveTo(px(x), py(y))));
+      ctx.closePath();
+      ctx.fillStyle = el.cor;
+      ctx.fill();
       break;
     }
     case "estrela":
@@ -196,6 +215,12 @@ function desenharElemento(ctx, el, g, links) {
         y1: (g.oy + (y + h) * g.u) / g.h,
       });
       links.push({ ...n(el.x, el.y, el.w, el.h), barra: { ...n(el.bx, el.by, el.bw, el.bh), cor: el.cor } });
+      break;
+    }
+    case "placa": {
+      // não desenha nada: marca o pedaço da página que sobe em 3D (script.js)
+      const r = caixaPx(el, g, false);
+      links.push({ x0: r.x0 / g.w, y0: r.y0 / g.h, x1: r.x1 / g.w, y1: r.y1 / g.h, placa: { redondo: !!el.redondo } });
       break;
     }
     case "link":

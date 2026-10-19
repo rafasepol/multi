@@ -42,8 +42,9 @@ const BEGE = "#e5d9c0";
 const SUAVE = "#665e53";
 
 const FOTO = {
+  // capa: protesto indígena na COP30 (Mirna Wabi-Sabi, Unsplash License)
+  cop30: "assets/fotos/capa-cop30.jpg",
   // colagens escolhidas pela equipe
-  mascara: "assets/fotos/colagem-mascara.jpg",
   fabrica: "assets/fotos/colagem-fabrica.jpg",
   cigarro: "assets/fotos/colagem-cigarro.jpg",
   // fotos de contexto (sem pessoas identificáveis)
@@ -63,11 +64,12 @@ const REVISTA = {
     { nome: "Sophia Castro", foto: "assets/equipe/sophia-castro.jpg" },
   ],
   capa: {
-    foto: FOTO.mascara,
-    foco: [0.5, 0],
-    chamada: "Clima em desequilíbrio, vidas desiguais",
-    subtitulo: "Como as emissões, as decisões das grandes empresas e a desigualdade se cruzam na crise climática brasileira.",
+    foto: FOTO.cop30,
+    foco: [0.42, 0.7],
+    chamada: "A crise\ntem dono.",
+    subtitulo: "Quem lucra com o fogo e a fumaça não paga a conta. Quem paga mora na beira do rio, na encosta, na aldeia.",
     destaques: ["Quem sofre", "Quem causa", "Justiça climática"],
+    credito: "Mulheres Kayapó em protesto na COP30, Belém (PA), 2025. Foto: Mirna Wabi-Sabi / Unsplash.",
   },
   editorial: {
     titulo: "Editorial",
