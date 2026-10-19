@@ -6,13 +6,12 @@
 // de projeto u (a página tem 80u × 100u). A página de projeto fica centralizada na textura;
 // fundos e fotos que encostam na borda da página "sangram" até a borda da textura.
 
-import { LARG, ALT, COR, MARCA, MARCA_FOLGA, cssFonte, estiloMarca, baseLinha } from "./diagramacao.js";
+import { LARG, ALT, COR, TAM_MARCA, MARCA_FOLGA, cssFonte, estiloMarca, baseLinha } from "./diagramacao.js";
 import { desenharMapaBiomas } from "./mapa-biomas.js";
 
 export async function carregarFontes() {
   const carregadas = Promise.all([
     document.fonts.load(`400 40px "Anton"`),
-    document.fonts.load(`800 40px "Playfair Display"`),
     document.fonts.load(`400 20px "Inter"`),
     document.fonts.load(`600 20px "Inter"`),
     document.fonts.load(`italic 400 20px "Inter"`),
@@ -64,7 +63,7 @@ function trechos(ctx, linha, x, yBase, est, u, cor, corMarca) {
   for (const r of linha) {
     if (r.m) {
       const m = estiloMarca(est);
-      ctx.font = cssFonte(m, m.tam * MARCA * u);
+      ctx.font = cssFonte(m, TAM_MARCA * u);
       ctx.fillStyle = corMarca;
       x += MARCA_FOLGA * u;
       ctx.fillText(r.t, x, yBase - est.tam * 0.3 * u);
@@ -99,10 +98,10 @@ function desenharFoto(ctx, el, g) {
   }
   if (!reg || !reg.ok) {
     // ainda carregando, ou o arquivo não existe: um bloco no lugar da foto
-    ctx.fillStyle = "#cdbfa5";
+    ctx.fillStyle = COR.bege;
     ctx.fillRect(r.x0, r.y0, W, H);
     if (reg) {
-      ctx.fillStyle = "#6b5f4e";
+      ctx.fillStyle = COR.suave;
       ctx.font = `600 ${Math.max(10, 1.4 * g.u)}px "Inter", sans-serif`;
       ctx.textAlign = "center";
       ctx.fillText(`imagem: ${el.src.split("/").pop()}`, (r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2);
@@ -143,6 +142,30 @@ function desenharElemento(ctx, el, g, links) {
     case "foto":
       desenharFoto(ctx, el, g);
       break;
+    case "retrato": {
+      // círculo bege; com foto, a foto preenche o círculo
+      const r = caixaPx(el, g, false);
+      const cx = (r.x0 + r.x1) / 2;
+      const cy = (r.y0 + r.y1) / 2;
+      const raio = (r.x1 - r.x0) / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, raio, 0, Math.PI * 2);
+      ctx.fillStyle = COR.bege;
+      ctx.fill();
+      const reg = el.src ? fotos.get(el.src) : null;
+      if (reg?.ok) {
+        ctx.clip();
+        const img = reg.img;
+        const k = Math.max((2 * raio) / img.naturalWidth, (2 * raio) / img.naturalHeight);
+        const dw = img.naturalWidth * k;
+        const dh = img.naturalHeight * k;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
+      }
+      ctx.restore();
+      break;
+    }
     case "mapaBiomas": {
       const r = caixaPx(el, g, false);
       desenharMapaBiomas(ctx, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
@@ -210,7 +233,7 @@ export function desenharPagina(p, numero, w, h) {
   desenhar();
 
   // fotos ainda não carregadas: a página é redesenhada quando chegarem
-  const faltam = [...new Set(els.filter((el) => el.k === "foto" && el.src && !fotos.has(el.src)).map((el) => el.src))];
+  const faltam = [...new Set(els.filter((el) => (el.k === "foto" || el.k === "retrato") && el.src && !fotos.has(el.src)).map((el) => el.src))];
   if (faltam.length) return { canvas, links, pronto: Promise.all(faltam.map(carregarFoto)).then(desenhar) };
   return { canvas, links };
 }

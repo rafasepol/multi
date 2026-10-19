@@ -12,6 +12,7 @@
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
 import { desenharMapaBiomas, biomaEm, coresDosBiomas, PROPORCAO_MAPA } from "./mapa-biomas.js";
+import { COR } from "./paleta.js";
 
 const SUBIDA = 0.2;      // quanto o mapa sobe (unidades do mundo; a página tem 2 de altura)
 const INCLINACAO = 0.34; // quanto ele inclina, em radianos (a borda de baixo vem para a frente)
@@ -65,7 +66,7 @@ export async function criarMapa3D({ scene, camera, canvas, luzPagina, cfg }) {
   grupo.add(frente);
 
   // lados da placa: a espessura aparece quando ela inclina
-  const lados = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x3a120b }));
+  const lados = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: COR.preto }));
   grupo.add(lados);
 
   // sombra no papel embaixo da placa (também esconde o mapa impresso enquanto ela está no alto)
@@ -130,15 +131,15 @@ export async function criarMapa3D({ scene, camera, canvas, luzPagina, cfg }) {
       const y = i * linha;
       const eh = b === ativo;
       c.font = `${eh ? 600 : 400} 22px "Inter", system-ui, sans-serif`;
-      c.fillStyle = eh ? "#1c1a18" : "#8a8073";
+      c.fillStyle = eh ? COR.preto : COR.suave;
       c.textAlign = "right";
       c.fillText(b.nome, lw - 12, y + linha / 2);
       const bw = Math.max(3, ((w - lw - 110) * b.focos) / max);
-      c.fillStyle = eh ? cores[b.nome] : "#d9cdb6";
+      c.fillStyle = eh ? cores[b.nome] : COR.bege;
       c.fillRect(lw, y + linha * 0.2, bw, linha * 0.6);
       c.textAlign = "left";
       c.font = `${eh ? 600 : 400} 21px "Inter", system-ui, sans-serif`;
-      c.fillStyle = eh ? "#1c1a18" : "#8a8073";
+      c.fillStyle = eh ? COR.preto : COR.suave;
       c.fillText(fmt(b.focos), lw + bw + 8, y + linha / 2);
     });
   }

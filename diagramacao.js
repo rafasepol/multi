@@ -9,6 +9,7 @@
 // Como a medida não depende da janela, as quebras de linha são sempre as mesmas.
 
 import { PROPORCAO_MAPA } from "./mapa-biomas.js";
+import { COR } from "./paleta.js";
 
 export const LARG = 80;
 export const ALT = 100;
@@ -16,19 +17,23 @@ export const ALT = 100;
 // A revista inteira (capa e contracapa incluídas) tem no máximo este número de páginas
 export const MAX_PAGINAS = 18;
 
+// Duas famílias: Anton (títulos, números e aspas) e Inter (texto)
 export const DISPLAY = '"Anton", Impact, "Arial Narrow", sans-serif';
 export const SANS = '"Inter", system-ui, sans-serif';
-export const SERIF = '"Playfair Display", Georgia, serif';
 
-export const COR = {
-  papel: "#f2ead9",
-  vermelho: "#d22a1e",
-  preto: "#1c1a18",
-  suave: "#665e53",
-  creme: "#f8f1e2",
-  cremeSuave: "rgba(248,241,226,.82)",
-  bege: "#e5d9c0",
-};
+// Escala tipográfica fixa (em u; a página tem 80u × 100u). Todo texto da revista usa um
+// destes tamanhos: os títulos pedem um tamanho e recebem o degrau mais próximo abaixo.
+export const ESCALA_TEXTO = [0.95, 1.1, 1.25, 1.5, 1.7];
+export const ESCALA_TITULO = [1.8, 2.2, 2.8, 3.6, 4.6, 6, 8.4, 12];
+
+// maior degrau da escala de títulos que não passa de `t`
+export function degrau(t) {
+  let d = ESCALA_TITULO[0];
+  for (const x of ESCALA_TITULO) if (x <= t + 1e-6) d = x;
+  return d;
+}
+
+export { COR };
 
 // A margem de dentro (lombada) é maior que a de fora
 const MARGEM_DENTRO = 7;
@@ -43,24 +48,26 @@ const E = {
   corpo: { fam: SANS, peso: 400, tam: 1.5, alt: 2.3 },
   lead: { fam: SANS, peso: 600, tam: 1.7, alt: 2.45 },
   inter: { fam: DISPLAY, peso: 400, tam: 2.2, alt: 2.6, alta: true, base: 0.86 },
-  rotulo: { fam: SANS, peso: 600, tam: 1.15, alt: 1.6, alta: true },
-  legenda: { fam: SANS, peso: 400, tam: 1.12, alt: 1.6, italico: true },
+  rotulo: { fam: SANS, peso: 600, tam: 1.1, alt: 1.6, alta: true },
+  legenda: { fam: SANS, peso: 400, tam: 1.1, alt: 1.6, italico: true },
   numTexto: { fam: SANS, peso: 400, tam: 1.25, alt: 1.75 },
-  autor: { fam: SANS, peso: 600, tam: 1.2, alt: 1.75 },
+  autor: { fam: SANS, peso: 600, tam: 1.25, alt: 1.75 },
   grafRotulo: { fam: SANS, peso: 400, tam: 1.25, alt: 1.7 },
-  grafEixo: { fam: SANS, peso: 400, tam: 1.05, alt: 1.5 },
-  aspas: { fam: SERIF, peso: 800, tam: 9, alt: 9 },
+  grafEixo: { fam: SANS, peso: 400, tam: 1.1, alt: 1.5 },
+  aspas: { fam: DISPLAY, peso: 400, tam: 6, alt: 6, base: 0.86 },
 };
 
 // Anton (títulos e números): caixa alta, linhas juntas. Abaixo de 1,15 os acentos de uma
 // linha (Á, Ã, É...) encostam nas letras da linha de cima.
 export const ENTRELINHA = 1.15;
-export function display(tam, alt = tam * ENTRELINHA) {
-  return { fam: DISPLAY, peso: 400, tam, alt, alta: true, base: 0.86 };
+// o tamanho vira um degrau da escala; uma altura de linha dada acompanha a mesma proporção
+export function display(tam, alt) {
+  const t = degrau(tam);
+  return { fam: DISPLAY, peso: 400, tam: t, alt: alt == null ? t * ENTRELINHA : (alt * t) / tam, alta: true, base: 0.86 };
 }
 
-// Marcadores de fonte como [1; 2]: menores, ligeiramente elevados
-export const MARCA = 0.72;
+// Marcadores de fonte como [1; 2]: sempre no menor degrau da escala, ligeiramente elevados
+export const TAM_MARCA = ESCALA_TEXTO[0];
 export const MARCA_FOLGA = 0.3;
 
 // o desenho final pode medir um pouco diferente da medida; essa sobra evita estourar
@@ -141,7 +148,7 @@ function paraTrechos(toks) {
 }
 
 function larguraMarca(t, est) {
-  return MARCA_FOLGA + largura(t, { ...estiloMarca(est), tam: est.tam * MARCA });
+  return MARCA_FOLGA + largura(t, { ...estiloMarca(est), tam: TAM_MARCA });
 }
 
 // largura de uma linha já quebrada (lista de trechos)
@@ -201,18 +208,21 @@ function quebrar(texto, est, larg) {
   return linhas;
 }
 
-// maior tamanho de letra (até `tam`) em que a palavra mais larga de `texto` cabe em `larg`
-function caberPalavra(texto, tam, larg, criar = display) {
+// degraus da escala de títulos, do maior ao menor, que não passam de `tam`
+const degrausAte = (tam) => ESCALA_TITULO.filter((x) => x <= degrau(tam) + 1e-6).reverse();
+
+// maior degrau (até `tam`) em que a palavra mais larga de `texto` cabe em `larg`
+function caberPalavra(texto, tam, larg) {
   const palavras = texto.toUpperCase().split(/\s+/);
-  const maior = (t) => Math.max(...palavras.map((p) => largura(p, criar(t))));
-  while (tam > 1 && maior(tam) > larg * FOLGA) tam *= 0.96;
-  return tam;
+  const maior = (t) => Math.max(...palavras.map((p) => largura(p, display(t))));
+  const lista = degrausAte(tam);
+  return lista.find((t) => maior(t) <= larg * FOLGA) ?? lista[lista.length - 1];
 }
 
-// maior tamanho de letra (até `tam`) em que `texto` inteiro cabe numa linha de `larg`
-function caberLinha(texto, tam, larg, criar = display) {
-  while (tam > 1 && largura(texto.toUpperCase(), criar(tam)) > larg * FOLGA) tam *= 0.96;
-  return tam;
+// maior degrau (até `tam`) em que `texto` inteiro cabe numa linha de `larg`
+function caberLinha(texto, tam, larg) {
+  const lista = degrausAte(tam);
+  return lista.find((t) => largura(texto.toUpperCase(), display(t)) <= larg * FOLGA) ?? lista[lista.length - 1];
 }
 
 const linhaUnica = (t) => [[{ t, m: false }]];
@@ -362,8 +372,8 @@ function blocoTexto(b, w) {
     if (ip === 0 && b.capitular) {
       const letra = texto[0];
       texto = texto.slice(1);
-      const tamC = (2 * est.alt + baseLinha(est)) / 0.73;
-      const ec = display(tamC, tamC);
+      // a capitular ocupa três linhas: com o corpo de 1,5u, isso dá o degrau 8,4 da escala
+      const ec = display(8.4, 8.4);
       const wc = largura(letra, ec) + 0.9;
       larg = (k) => (k < 3 ? cw - wc : cw);
       capitular = { letra, est: ec, w: wc };
@@ -593,7 +603,7 @@ function citacao(b, w) {
   const hMin = y + pad;
   const gerar = (x, yy, w2, h2) => [
     ret(x, yy, w2, h2, fundo),
-    txt(x + pad - 0.3, yy + pad - 2.6, linhaUnica("“"), E.aspas, corAspas),
+    txt(x + pad - 0.1, yy + pad - 0.2, linhaUnica("“"), E.aspas, corAspas),
     txt(x + pad, yy + yQ, lq, eq, cor),
     ...(la.length ? [txt(x + pad, yy + yA, la, E.autor, cor)] : []),
     ...(lc.length ? [txt(x + pad, yy + yC, lc, E.legenda, b.corCredito ?? COR.cremeSuave)] : []),
@@ -643,9 +653,9 @@ function lista(b, w) {
 function fluxo(b, w) {
   const n = b.itens.length;
   const sinais = b.sinais ?? [];
-  const sw = sinais.length ? 4 : 1.4;
+  const sw = sinais.length ? 2.6 : 1.4;
   const cw = (w - sw * (n - 1)) / n;
-  const pad = 1.6;
+  const pad = 1.2;
   const iw = cw - 2 * pad;
   let tam = b.tamTitulo ?? 2.4;
   for (const it of b.itens) tam = Math.min(tam, caberPalavra(it.titulo, tam, iw));
@@ -657,7 +667,7 @@ function fluxo(b, w) {
   const et = cels.reduce((e, c) => entrelinhaSegura(c.lt, e, iw), display(tam));
   const h = Math.max(...cels.map((c) => pad + c.lt.length * et.alt + (c.lx.length ? 0.4 + c.lx.length * ex.alt : 0) + pad));
   const cores = b.cores ?? b.itens.map((_, i) => (i === n - 1 && sinais.includes("=") ? COR.preto : COR.vermelho));
-  const es = display(4, 4);
+  const es = display(3.6, 3.6);
   return {
     h,
     gerar: (x, y) => {
@@ -713,14 +723,38 @@ function lado(b, w, pag) {
   };
 }
 
+// equipe: um retrato redondo por integrante, com o nome embaixo (foto vazia = círculo liso)
+function equipe(b, w) {
+  const n = b.itens.length;
+  const gap = b.gap ?? 2;
+  const cw = (w - gap * (n - 1)) / n;
+  const d = Math.min(cw, b.diametro ?? cw);
+  const en = E.autor;
+  const nomes = b.itens.map((it) => quebrar(it.nome, en, cw));
+  const hNomes = Math.max(...nomes.map((l) => l.length)) * en.alt;
+  const h = d + 0.9 + hNomes;
+  return {
+    h,
+    gerar: (x, y) => {
+      const els = [];
+      b.itens.forEach((it, i) => {
+        const xc = x + i * (cw + gap);
+        els.push({ k: "retrato", x: xc + (cw - d) / 2, y, w: d, h: d, src: it.foto ?? null });
+        els.push(txt(xc, y + d + 0.9, nomes[i], en, COR.preto, "centro", cw));
+      });
+      return els;
+    },
+  };
+}
+
 const espaco = (b) => ({ h: b.h ?? 2, resto: b.resto, gerar: () => [] });
 
 const regra = (b) => ({ h: b.esp ?? 0.35, gerar: (x, y, w) => [ret(x, y, w, b.esp ?? 0.35, b.cor ?? COR.preto)] });
 
 // sumário: número da página num quadrado vermelho, título e linha fina
 function indice(b, w) {
-  const q = 8;
-  const et = display(2.5);
+  const q = 6;
+  const et = display(1.8);
   const es = E.numTexto;
   const lw = w - q - 2.6;
   const itens = b.itens.map((it) => {
@@ -729,9 +763,9 @@ function indice(b, w) {
     const ls = it.sub ? quebrar(it.sub, es, lw) : [];
     return { ...it, lt, ls, et: eti, h: Math.max(q, lt.length * eti.alt + (ls.length ? 0.3 + ls.length * es.alt : 0)) };
   });
-  const GAP_LINHA = 1.4;
+  const GAP_LINHA = 1.2;
   const h = itens.reduce((s, it) => s + it.h, 0) + GAP_LINHA * (itens.length - 1);
-  const en = display(4.2, 4.2);
+  const en = display(3.6, 3.6);
   return {
     h,
     gerar: (x, y, w2) => {
@@ -752,7 +786,7 @@ function indice(b, w) {
   };
 }
 
-const CRIAR = { rotulo, titulo, lead, texto: blocoTexto, foto, mapa, numeros, grafico, citacao, lista, fluxo, caixa, lado, espaco, regra, indice };
+const CRIAR = { rotulo, titulo, lead, texto: blocoTexto, foto, mapa, numeros, grafico, citacao, lista, fluxo, caixa, lado, espaco, regra, indice, equipe };
 
 function criar(b, w, pag) {
   const f = CRIAR[b.t];
@@ -796,7 +830,7 @@ function cabecalho(els, secao, x) {
 }
 
 function numeroPagina(els, pag, cor = COR.preto) {
-  const est = display(2, 2.2);
+  const est = display(1.8, 2);
   const t = linhaUnica(String(pag.numero).padStart(2, "0"));
   if (pag.lado === "dir") els.push(txt(LARG - MARGEM_FORA - 8, ALT - 5.6, t, est, cor, "dir", 8));
   else els.push(txt(MARGEM_FORA, ALT - 5.6, t, est, cor));
@@ -886,25 +920,26 @@ function sumario(p, pag, R, entradas) {
   const { x0, x1 } = margens(pag);
   const ed = R.editorial;
   const blocos = [
-    { t: "titulo", texto: "Sumário", tam: 11, cor: COR.vermelho },
+    { t: "titulo", texto: "Sumário", tam: 6, cor: COR.vermelho },
     {
-      t: "lado", antes: 2, gap: 3.4, resto: true, larguras: [1.12, 1.18],
+      t: "lado", antes: 1.6, gap: 3.4, resto: true, larguras: [1.04, 1.26],
       colunas: [
         [{ t: "indice", itens: entradas }],
         [{
           t: "caixa", resto: true, fundo: COR.bege,
           blocos: [
             { t: "rotulo", texto: ed.titulo },
-            { t: "titulo", texto: ed.chamada, tam: 3, antes: 1.2 },
-            { t: "texto", p: ed.texto, colunas: 1, capitular: true, antes: 1.4 },
-            { t: "lead", texto: `— ${ed.assinatura}`, antes: 1.2, cor: COR.vermelho },
+            { t: "titulo", texto: ed.chamada, tam: 2.6, antes: 1 },
+            { t: "texto", p: ed.texto, colunas: 1, capitular: true, antes: 1.2 },
+            { t: "lead", texto: `— ${ed.assinatura}`, antes: 1, cor: COR.vermelho },
           ],
         }],
       ],
     },
-    { t: "regra", antes: 2.4 },
-    { t: "rotulo", texto: "Expediente", cor: COR.preto, antes: 1.4 },
-    { t: "lead", est: "numTexto", texto: R.expediente, antes: 0.8 },
+    { t: "regra", antes: 2 },
+    { t: "rotulo", texto: "Equipe", cor: COR.preto, antes: 1.3 },
+    { t: "equipe", itens: R.equipe ?? [], antes: 1.2, diametro: 9 },
+    ...(R.expediente ? [{ t: "lead", est: "legenda", texto: R.expediente, antes: 1.2 }] : []),
   ];
   els.push(...gerarPilha(blocos, { x: x0, y: 6, w: x1 - x0, h: BASE - 6 }, pag));
   numeroPagina(els, pag);
@@ -913,21 +948,20 @@ function sumario(p, pag, R, entradas) {
 
 // fontes e notas: 2 colunas por página, em letra pequena; diminui até caber em n páginas
 function paginasFontes(f, pags) {
-  for (let esc = 1; esc >= 0.7 - 1e-6; esc -= 0.05) {
-    const r = tentarFontes(f, pags, esc, false);
-    if (r) return r;
-  }
+  const r = tentarFontes(f, pags, false);
+  if (r) return r;
   pags[0].avisos.push("as fontes não couberam nas páginas reservadas");
-  return tentarFontes(f, pags, 0.7, true);
+  return tentarFontes(f, pags, true);
 }
 
-function tentarFontes(f, pags, esc, forcar) {
-  const ef = { fam: SANS, peso: 400, tam: 1.1 * esc, alt: 1.55 * esc };
-  const eu = { fam: SANS, peso: 400, tam: 0.95 * esc, alt: 1.35 * esc };
-  const en = { fam: SANS, peso: 600, tam: 1.1 * esc, alt: 1.55 * esc };
-  const ei = display(1.9 * esc, 2.3 * esc);
-  const ep = { fam: SANS, peso: 400, tam: 1.2 * esc, alt: 1.75 * esc };
-  const recuo = 3.4 * esc;
+// letra pequena, mas sempre nos degraus da escala
+function tentarFontes(f, pags, forcar) {
+  const ef = { fam: SANS, peso: 400, tam: 1.1, alt: 1.45 };
+  const eu = { fam: SANS, peso: 400, tam: 0.95, alt: 1.25 };
+  const en = { fam: SANS, peso: 600, tam: 1.1, alt: 1.45 };
+  const ei = display(1.8, 2.2);
+  const ep = { fam: SANS, peso: 400, tam: 1.1, alt: 1.55 };
+  const recuo = 3.4;
   const gap = 2.4;
 
   // cada página: duas colunas; a primeira tem o título e a introdução em cima
@@ -938,7 +972,7 @@ function tentarFontes(f, pags, esc, forcar) {
     const cw = (x1 - x0 - gap) / 2;
     let yTopo = TOPO;
     if (i === 0) {
-      const tit = titulo({ texto: f.titulo, tam: 9, cor: COR.vermelho }, x1 - x0);
+      const tit = titulo({ texto: f.titulo, tam: 6, cor: COR.vermelho }, x1 - x0);
       const intro = lead({ texto: f.intro, est: "numTexto" }, x1 - x0);
       topoDe.push({ x0, w: x1 - x0, tit, intro });
       yTopo = TOPO + tit.h + 1.6 + intro.h + 2.6;
@@ -956,7 +990,7 @@ function tentarFontes(f, pags, esc, forcar) {
     const yU = lt.length * ef.alt + 0.2;
     const h = lu.length ? yU + lu.length * eu.alt : lt.length * ef.alt;
     unidades.push({
-      h, antes: 1.0,
+      h, antes: 0.8,
       gerar: (x, y, w) => [
         txt(x, y, linhaUnica(`[${it.n}]`), en, COR.vermelho),
         txt(x + recuo, y, lt, ef, COR.preto),
@@ -1031,7 +1065,7 @@ function montarCapa(R) {
   const w = LARG - 2 * m;
   const h = medirPilha(blocos, w, avisos).h;
   const y = ALT - 4.6 - h;
-  els.push(ret(0, y - 3.6, LARG, ALT - y + 3.6, "rgba(24,22,20,.88)"));
+  els.push(ret(0, y - 3.6, LARG, ALT - y + 3.6, "rgba(28,26,24,.88)"));
   els.push(...gerarPilha(blocos, { x: m, y, w, h }, avisos));
   return { tipo: "pagina", fundo: COR.preto, els };
 }
@@ -1039,15 +1073,21 @@ function montarCapa(R) {
 function montarContracapa(R) {
   const c = R.contracapa;
   const els = [ret(0, 0, LARG, ALT, COR.vermelho)];
-  const m = 8;
+  const m = 6;
   const w = LARG - 2 * m;
-  const tf = caberPalavra(c.texto, 4.4, w);
-  const lf = quebrar(c.texto, display(tf), w);
+  // cada frase (separadas por \n) fica numa linha só, no maior degrau em que todas cabem;
+  // a última frase sai em creme, para fechar a revista com ela
+  const frases = c.texto.split("\n");
+  const tf = Math.min(...frases.map((t) => caberLinha(t, c.tam ?? 8.4, w)));
+  const lf = frases.map((t) => quebrar(t, display(tf), w)[0]);
   const ef = entrelinhaSegura(lf, display(tf), w, "centro");
   const hf = lf.length * ef.alt;
   const y = (ALT - (3 + hf)) / 2;
   els.push(ret(LARG / 2 - 6, y, 12, 0.5, COR.preto));
-  els.push(txt(m, y + 3, lf, ef, COR.preto, "centro", w));
+  lf.forEach((l, i) => {
+    const cor = i === lf.length - 1 && lf.length > 1 ? COR.creme : COR.preto;
+    els.push(txt(m, y + 3 + i * ef.alt, [l], ef, cor, "centro", w));
+  });
   els.push(txt(m, ALT - 9, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme, "centro", w));
   return { tipo: "pagina", fundo: COR.vermelho, els };
 }
