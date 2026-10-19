@@ -31,7 +31,7 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 - [x] **Perspectiva sociológica**: partes 2 e 3 (págs. 6–13).
 - [x] **Soluções possíveis**: parte 4 e propostas (págs. 14–15).
 - [x] **Conclusão**: "Uma crise de renda, raça e território" (pág. 15) e contracapa.
-- [x] **Gênero revista, em português**: capa, sumário, editorial, seções, olhos, legendas, expediente e equipe.
+- [x] **Gênero revista, em português**: capa, sumário, editorial, seções, olhos, legendas e equipe.
 
 ### Requisitos técnicos
 
@@ -47,7 +47,7 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 ### Pendências da equipe
 
 - [ ] **Créditos das imagens**: confirmar autor e permissão das colagens e fotos em `assets/fotos/` e colocar nas legendas.
-- [x] **Fotos da equipe** (pág. 2): os seis integrantes.
+- [x] **Fotos da equipe** (pág. 2): os seis integrantes, em ordem alfabética.
 - [ ] **Vídeo em inglês** (5 a 7 min), simulando a apresentação do Brasil na ONU.
 - [ ] **Apresentação da revista** (até 10 min).
 
@@ -104,4 +104,4 @@ O mapa é desenhado pelo próprio site (`mapa-biomas.js`): cada bioma é pintado
 
 ### Antes de publicar
 
-As fotos da equipe ficam em `assets/equipe/` e a lista em `dados.js`, em `equipe` (`foto: null` deixa o círculo vazio). Confirme autor e permissão de cada imagem em `assets/fotos/` e coloque o crédito na legenda (`legenda` em `dados.js`).
+As fotos da equipe ficam em `assets/equipe/` e a lista, em ordem alfabética, em `dados.js`, em `equipe` (`foto: null` deixa o círculo vazio). Confirme autor e permissão de cada imagem em `assets/fotos/` e coloque o crédito na legenda (`legenda` em `dados.js`).
