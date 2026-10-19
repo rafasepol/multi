@@ -182,7 +182,7 @@ const REVISTA = {
               { t: "rotulo", texto: "Passe o mouse ou toque no mapa" },
               {
                 t: "lead", est: "numTexto", antes: 0.8,
-                texto: "Em 2024, o fogo atingiu 30 milhões de hectares, 62% acima da média anual: o recorde da série do MapBiomas. [5] No mapa, cada bioma mostra seus focos e quanto queimou.",
+                texto: "Em 2024, o fogo atingiu 30 milhões de hectares, recorde do MapBiomas; 72,7% era vegetação nativa. [5] Esses incêndios lançaram 241 milhões de t de CO₂e, que nem entram na conta oficial. [2]",
               },
               {
                 t: "grafico", antes: 2.2, tamTitulo: 1.8, rotulos: 0.46,
@@ -468,7 +468,8 @@ const REVISTA = {
       modelo: "materia",
       secao: "3 · Casos documentados",
       blocos: [
-        { t: "rotulo", texto: "Norte Energia e Belo Monte" },
+        { t: "lead", est: "numTexto", cor: SUAVE, texto: "Rio abaixo da aldeia Kalapalo, no Pará, o Xingu mostra outro lado do problema: decisões sobre energia e mineração também mudam a vida de quem depende do rio." },
+        { t: "rotulo", texto: "Norte Energia e Belo Monte", antes: 2 },
         { t: "titulo", texto: "Belo Monte e a disputa pelas águas do Xingu", tam: 4.6, antes: 0.8 },
         {
           t: "numeros", fundo: VERMELHO, antes: 2, tam: 4.6,
@@ -602,7 +603,7 @@ const REVISTA = {
         },
         {
           t: "titulo", antes: 2.4, resto: true, fundo: PRETO, cor: CREME, tam: 2.2, pad: 2.4,
-          texto: "Enfrentar a crise com justiça é reduzir o dano na origem e garantir que a proteção chegue a quem mais precisa.",
+          texto: "A pergunta deixa de ser quanto o Brasil emite e passa a ser quem paga a conta.",
         },
       ],
     },
@@ -639,7 +640,7 @@ const REVISTA = {
               t: "texto", colunas: 1, cor: CREME, antes: 1.2,
               p: [
                 "Os dados desta revista mostram um padrão. As emissões vêm de atividades concretas: os combustíveis fósseis no mundo e, no Brasil, sobretudo o desmatamento para pasto e lavoura. Os danos caem com mais força sobre quem tem menos renda, sobre a população preta, parda e indígena e sobre quem tem menos voz nas decisões.",
-                "Por isso, a crise climática brasileira não é só ambiental. Cortar as emissões na origem e proteger quem já sofre são partes da mesma resposta.",
+                "E quem decide raramente é quem paga, como mostram Belo Monte e Belo Sun. Por isso, a crise climática brasileira não é só ambiental: o risco desigual é um fato social (pág. 6), produzido por escolhas — e escolhas podem ser refeitas. Cortar as emissões na origem e proteger quem já sofre são partes da mesma resposta.",
               ],
             },
           ],
