@@ -1,6 +1,6 @@
 // Cenário em volta da revista: chão, grama, luz e a queimada.
 //
-// A história: na capa a floresta está viva (grama verde); ao chegar na contracapa,
+// A história: na capa o campo está seco, na estiagem (capim cor de palha); ao chegar na contracapa,
 // uma frente de fogo se espalha a partir da revista e deixa tudo queimado,
 // como nas queimadas que vêm depois do desmatamento.
 // Os efeitos visuais ficam nos shaders (pasta shaders/); aqui só controlamos
@@ -39,8 +39,8 @@ const BRASAS_RESTO = 0.35; // brasas que continuam acesas depois que o fogo pass
 
 // Luz nos dois momentos da história (cores em 0–1)
 const LUZ_VIVA = {
-  sol: [1.0, 0.97, 0.88],       // sol limpo
-  ambiente: [0.4, 0.46, 0.5],
+  sol: [1.0, 0.9, 0.74],        // sol baixo de fim de tarde, quente
+  ambiente: [0.42, 0.4, 0.38],
   direcao: [-0.35, 0.4, 0.85],
   nevoa: [0.8, 0.88, 0.92],
   forcaNevoa: 0.0,

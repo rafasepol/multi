@@ -1,6 +1,6 @@
 # Revista
 
-Revista web em 3D do trabalho multidisciplinar do 2º ano: mudanças climáticas e justiça climática no Brasil. A revista fica sobre um campo de grama e as páginas viram como numa revista de verdade. Na capa a floresta está viva; na contracapa passa uma frente de fogo.
+Revista web em 3D do trabalho multidisciplinar do 2º ano: mudanças climáticas e justiça climática no Brasil. A revista fica sobre um campo de capim seco, na estiagem, e as páginas viram como numa revista de verdade. Na contracapa o campo pega fogo.
 
 Feita com Three.js (pela CDN) e shaders GLSL, sem instalar nada.
 

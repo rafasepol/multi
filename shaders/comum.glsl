@@ -128,6 +128,13 @@ float sombraRevista(vec2 q) {
   return mix(0.8, 1.0, smoothstep(0.0, 0.1, distanciaPilhas(q)));
 }
 
+// ---------- Vinheta ----------
+
+// o campo escurece longe da revista, para o olho ir direto para ela
+float vinheta(vec2 q) {
+  return mix(1.0, 0.35, smoothstep(1.6, 5.0, length(q * vec2(0.75, 1.0))));
+}
+
 // ---------- Névoa ----------
 
 // leve névoa quente no cenário seco, mais forte ao longe
