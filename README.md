@@ -12,7 +12,7 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 
 ### Pesquisa e dados (estatística)
 
-- [x] **Fontes confiáveis** (IBGE, IPEA, ONU, Banco Mundial ou equivalentes): IBGE (renda, pobreza, favelas), ONU/IPCC, SEEG, INPE, MapBiomas, Fiocruz, EPE, TCU e MPF — 37 fontes com link e data (págs. 16–17).
+- [x] **Fontes confiáveis** (IBGE, IPEA, ONU, Banco Mundial ou equivalentes): IBGE (renda, pobreza, favelas), ONU/IPCC, OMM, SEEG, INPE, MapBiomas, Fiocruz, EPE, TCU, MPF e FMI — 43 fontes com link e data (págs. 18–19).
 - [x] **Dados atualizados**: emissões, fogo, pobreza e desmatamento de 2024; renda de 2023.
 - [x] **Gráficos, tabelas ou infográficos**: 4 gráficos (págs. 4, 7 e 11), mapa interativo do fogo (pág. 5) e blocos de números (págs. 4, 8, 11, 12 e 15).
 - [x] **Interpretação dos dados**: cada gráfico tem legenda com a fonte e um texto que explica o que ele mostra.
@@ -22,7 +22,7 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 - [x] **Causas sociais, econômicas e políticas**: emissões por setor e fronteira agropecuária (págs. 4 e 11), ocupação do território (pág. 8), licenças e interesses (pág. 13).
 - [x] **Consequências sociais** (desigualdade, exclusão): quem perde mais (pág. 7), racismo ambiental (pág. 8), histórias reais (pág. 9). *Violência, citada como exemplo no PDF, não é tratada.*
 - [x] **Teoria sociológica ligada à realidade brasileira**: Durkheim (pág. 6), Weber e Bourdieu (pág. 7), Kowarick, Rolnik, Bullard e Acselrad (pág. 8), Fraser (pág. 14).
-- [x] **Políticas públicas propostas**: 6 propostas da equipe, cada uma ligada a um dado (pág. 15).
+- [x] **Políticas públicas propostas**: 6 propostas da equipe, cada uma ligada a um dado (pág. 15), e o fundo climático pago por grandes fortunas e lucros fósseis, no editorial (pág. 17).
 
 ### Estrutura da revista
 
@@ -30,8 +30,8 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 - [x] **Análise de dados**: págs. 4, 5, 7, 8 e 11.
 - [x] **Perspectiva sociológica**: partes 2 e 3 (págs. 6–13).
 - [x] **Soluções possíveis**: parte 4 e propostas (págs. 14–15).
-- [x] **Conclusão**: "Uma crise de renda, raça e território" (pág. 15) e contracapa.
-- [x] **Gênero revista, em português**: capa, sumário, editorial, seções, olhos, legendas e equipe.
+- [x] **Conclusão**: "Uma crise de renda, raça e território" (pág. 15), editorial de opinião "Quem lucra com o fogo deve pagar por ele" (págs. 16–17) e contracapa.
+- [x] **Gênero revista, em português**: capa, sumário, apresentação, editorial de opinião, seções, olhos, legendas e equipe.
 
 ### Requisitos técnicos
 
@@ -56,17 +56,17 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 
 | Critério | Pontos | Onde está |
 |---|---|---|
-| Qualidade da pesquisa e uso de fontes confiáveis | 1,0 | Fontes e notas (págs. 16–17) |
-| Clareza e profundidade da análise sociológica | 2,0 | Partes 2 a 4 (págs. 6–15) |
+| Qualidade da pesquisa e uso de fontes confiáveis | 1,0 | Fontes e notas (págs. 18–19) |
+| Clareza e profundidade da análise sociológica | 2,0 | Partes 2 a 4 e editorial (págs. 6–17) |
 | Arquitetura da informação, padrão visual e navegação | 2,0 | Sumário com links, escala, paleta, componentes |
 | Revista digital / apresentação | 3,0 | Revista 3D, versão em texto e PDF |
 | Vídeo em inglês | 2,0 | Pendente |
 
 ## Três jeitos de ler
 
-- **Revista em 3D** (`index.html`): 18 páginas, montadas a partir de `dados.js`. No computador aparecem as duas páginas abertas; com a tela em pé (celular), uma página por vez.
+- **Revista em 3D** (`index.html`): 20 páginas, montadas a partir de `dados.js`. No computador aparecem as duas páginas abertas; com a tela em pé (celular), uma página por vez.
 - **Versão em texto** (`texto.html`): o mesmo conteúdo em HTML comum, para celular, leitor de tela, tradutor e busca. Monta-se sozinha a partir de `dados.js`.
-- **PDF** (`revista.pdf`): as 18 páginas, para imprimir ou mandar por e-mail.
+- **PDF** (`revista.pdf`): as 20 páginas, para imprimir ou mandar por e-mail.
 
 ## Como abrir
 
@@ -88,7 +88,7 @@ Com `?fps` no fim do endereço, aparecem os quadros por segundo.
 
 ## Se o texto ou as fotos mudarem
 
-Edite `dados.js`: lá estão o texto, as fontes e o espelho das 18 páginas (quais blocos vão em cada página). As fotos ficam em `assets/fotos/`. Se algo não couber, o console do navegador (F12) avisa qual página passou do limite. A versão em texto muda junto.
+Edite `dados.js`: lá estão o texto, as fontes e o espelho das 20 páginas (quais blocos vão em cada página). As fotos ficam em `assets/fotos/`. Se algo não couber, o console do navegador (F12) avisa qual página passou do limite. A versão em texto muda junto.
 
 Depois, gere o PDF de novo: abra <http://localhost:5500/imprimir.html>, espere aparecer "Pronto" e use **Imprimir → Salvar como PDF** (margens: nenhuma; gráficos de fundo: ligados). Salve por cima de `revista.pdf`.
 

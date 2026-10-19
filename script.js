@@ -22,7 +22,7 @@ import { criarCamera } from "./camera.js";
 import { criarCenario } from "./cenario.js";
 import { criarMapa3D } from "./mapa3d.js";
 
-// As 18 páginas são planejadas em dados.js e montadas por diagramacao.js.
+// As 20 páginas são planejadas em dados.js e montadas por diagramacao.js.
 await carregarFontes(); // a capa e a diagramação do texto usam as fontes da revista
 const paginas = diagramar(REVISTA);
 

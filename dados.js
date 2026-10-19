@@ -5,7 +5,7 @@
 //
 // `paginas` é o espelho da revista: as páginas de dentro, na ordem (a capa e a contracapa
 // entram sozinhas). Modelos:
-//   sumario    sumário, editorial e expediente
+//   sumario    sumário, quadro "Nesta edição" e equipe
 //   abertura   abre uma parte: foto no alto (ou `destaque`, uma frase grande, se não houver
 //              foto), faixa com número e título, matéria embaixo
 //   materia    página de matéria: uma pilha de blocos (pode ter uma coluna `lateral` colorida)
@@ -17,7 +17,7 @@
 //   titulo   { texto, tam, cor, fundo }          título grande em caixa alta
 //   lead     { texto, cor }                      frase de abertura em destaque
 //   texto    { p: [parágrafos ou { inter }], colunas, capitular }
-//   foto     { src, h ou resto, legenda, foco: [x, y], conter, mesclar }
+//   foto     { src, h ou resto, legenda, foco: [x, y], conter, mesclar, filtro, duotom }
 //   mapa     { id }                              mapa "Fogo no Brasil" (dados em mapaFogo)
 //   numeros  { itens: [{ n, texto }], colunas, fundo, tam }
 //   grafico  { titulo, barras: [[rótulo, valor, texto]], max, eixo, legenda }
@@ -75,8 +75,9 @@ const REVISTA = {
     destaques: ["Quem sofre", "Quem causa", "Justiça climática"],
     credito: "Mulheres Kayapó em protesto na COP30, Belém (PA), 2025. Foto: Mirna Wabi-Sabi / Unsplash.",
   },
+  // quadro de apresentação da pág. 2 (o editorial de opinião fica nas págs. 16 e 17)
   editorial: {
-    titulo: "Editorial",
+    titulo: "Nesta edição",
     chamada: "Clima, desigualdade e decisões no mesmo mapa",
     texto: [
       "Uma casa levada pela água, uma aldeia cercada pela seca e uma criança exposta ao calor fazem parte da mesma discussão. A crise climática encontra um Brasil em que renda, moradia, infraestrutura e poder já são distribuídos de forma desigual.",
@@ -612,7 +613,69 @@ const REVISTA = {
       ],
     },
 
-    // 16 e 17
+    // 16 e 17 — editorial: a opinião da equipe, em forma de artigo
+    {
+      modelo: "materia",
+      secao: "Editorial",
+      sumario: { titulo: "Quem lucra com o fogo deve pagar por ele", sub: "Editorial" },
+      blocos: [
+        {
+          t: "foto", src: FOTO.queimada, h: 30, foco: [0.5, 0.5],
+          filtro: "grayscale(1) contrast(1.4) brightness(1.05)", duotom: VERMELHO,
+          legenda: "Queimada em área de vegetação nativa.",
+        },
+        { t: "rotulo", texto: "A opinião da equipe", antes: 2.4 },
+        { t: "titulo", texto: "Quem lucra com o fogo deve pagar por ele", tam: 4.6, antes: 0.8 },
+        {
+          t: "texto", colunas: 1, antes: 1.8,
+          p: [
+            "“No dia seguinte, vi tudo acabado, queimado”, relata Rosely, nascida e criada no Pantanal. [6] Seu depoimento, assim como o de milhares de outras vítimas, revela uma realidade cada vez mais comum no Brasil: o avanço das queimadas impulsionado pela crise climática. Esse cenário se agrava tanto pelo aquecimento acelerado do planeta quanto por um sistema injusto, em que poucos lucram com a destruição e muitos pagam por ela.",
+            "Em primeiro lugar, o avanço das queimadas evidencia como o colapso ambiental intensifica a vulnerabilidade das populações locais. Segundo a Organização Meteorológica Mundial, os últimos onze anos foram os mais quentes já registrados, o que tem agravado estiagens severas. [38] O cenário se reflete no Pantanal, onde secas atípicas transformaram grande parte do bioma em combustível. [39] Contudo, os impactos extrapolam a biosfera: ao reduzir territórios ancestrais e de subsistência a cinzas, o fogo desampara comunidades desprovidas de recursos socioeconômicos para se proteger ou se reconstruir.",
+          ],
+        },
+      ],
+    },
+    {
+      modelo: "materia",
+      secao: "Editorial",
+      blocos: [
+        {
+          t: "texto", colunas: 1,
+          p: [
+            "Além disso, essa crise tem responsáveis bem estabelecidos. De acordo com o Carbon Majors Report, apenas 100 produtoras de petróleo, gás e carvão respondem por cerca de 71% das emissões industriais globais desde 1988 [40] e seguem lucrando com o apoio de subsídios estatais. [41] No Brasil, essa lógica se repete: o país amplia a exploração do petróleo, inclusive na foz do Amazonas [42], enquanto o investimento na prevenção de incêndios permanece insuficiente. Assim, quem paga a conta são ribeirinhos e indígenas, como a pantaneira Rosely, que pouco contribuíram para o problema.",
+          ],
+        },
+        {
+          t: "citacao", antes: 2, fundo: PRETO, tam: 3.6,
+          texto: "Ecologia sem luta de classes é jardinagem",
+          autor: "Frase atribuída ao seringueiro Chico Mendes",
+          credito: "Não há solução ambiental sem enfrentar quem lucra com a destruição.",
+        },
+        {
+          t: "texto", colunas: 1, antes: 2,
+          p: [
+            "Portanto, fica claro que as queimadas no Pantanal são fruto de uma crise climática produzida por poucos e sofrida por muitos, e é urgente que quem a provoca pague por ela. Para isso, o Congresso Nacional deve, por meio de lei complementar, regulamentar o imposto sobre grandes fortunas, previsto na Constituição de 1988 e jamais aplicado [43], além de taxar os lucros de empresas de combustíveis fósseis. Esses recursos devem formar um fundo climático, gerido pelo Ministério do Meio Ambiente e Mudança do Clima, que financie brigadas e a reconstrução das comunidades atingidas, a fim de reparar quem mais sofre.",
+          ],
+        },
+        {
+          t: "caixa", antes: 1.6, fundo: VERMELHO, resto: true,
+          blocos: [
+            { t: "rotulo", texto: "O que defendemos", cor: CREME },
+            {
+              t: "lista", colunas: 3, antes: 1.2, est: "numTexto", tamTitulo: 1.8, cor: CREME, corTitulo: CREME, corEstrela: PRETO,
+              itens: [
+                { titulo: "Taxar as grandes fortunas", texto: "regulamentar o imposto previsto na Constituição." },
+                { titulo: "Taxar o lucro fóssil", texto: "quem mais emite paga mais." },
+                { titulo: "Fundo climático", texto: "brigadas e reconstrução para as comunidades atingidas." },
+              ],
+            },
+            { t: "lead", texto: "— A equipe editorial", cor: CREME, antes: 1 },
+          ],
+        },
+      ],
+    },
+
+    // 18 e 19
     { modelo: "fontes", paginas: 2, sumario: { titulo: "Fontes e notas", sub: "Referências e checagem" } },
   ],
 
@@ -657,6 +720,12 @@ const REVISTA = {
       { n: 35, texto: "Alma Preta. Governo aprova Plano Clima e define metas para reduzir emissões até 2035. 16 dez. 2025.", url: "https://almapreta.com.br/sessao/politica/governo-aprova-plano-clima-e-define-metas-para-reduzir-emissoes-ate-2035/" },
       { n: 36, texto: "BRASIL. Lei 14.904, de 27 de junho de 2024 — diretrizes para planos de adaptação à mudança do clima.", url: "https://www2.camara.leg.br/legin/fed/lei/2024/lei-14904-27-junho-2024-795864-norma-pl.html" },
       { n: 37, texto: "Estado de Minas. Como funcionam os alertas de desastres da Defesa Civil no seu celular. 25 fev. 2026.", url: "https://www.em.com.br/trends/2026/02/7362378-como-funcionam-os-alertas-de-desastres-da-defesa-civil-no-seu-celular.html" },
+      { n: 38, texto: "OMM. WMO confirms 2025 was one of warmest years on record. 14 jan. 2026.", url: "https://wmo.int/news/media-centre/wmo-confirms-2025-was-one-of-warmest-years-record" },
+      { n: 39, texto: "MapBiomas. Nota técnica: seca extrema e incêndios no Pantanal em 2024. Jul. 2024.", url: "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/07/Mapbiomas_Nota-Tecnica_Pantanal_12.07.24.pdf" },
+      { n: 40, texto: "CDP. Carbon Majors Report 2017. 10 jul. 2017.", url: "https://www.cdp.net/press-releases/new-report-shows-just-100-companies-are-source-of-over-70-of-emissions" },
+      { n: 41, texto: "FMI. IMF Fossil Fuel Subsidies Data: 2023 Update. Ago. 2023.", url: "https://www.imf.org/en/Publications/WP/Issues/2023/08/22/IMF-Fossil-Fuel-Subsidies-Data-2023-Update-537281" },
+      { n: 42, texto: "Metrópoles. Ibama libera Petrobras a pesquisar petróleo na Foz do Amazonas. 20 out. 2025.", url: "https://www.metropoles.com/brasil/petrobras-obtem-autorizacao-para-pesquisar-petroleo-na-foz-do-amazonas" },
+      { n: 43, texto: "BRASIL. Constituição Federal de 1988, art. 153, VII.", url: "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm" },
     ],
     notas: [
       {

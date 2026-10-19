@@ -15,7 +15,7 @@ export const LARG = 80;
 export const ALT = 100;
 
 // A revista inteira (capa e contracapa incluídas) tem no máximo este número de páginas
-export const MAX_PAGINAS = 18;
+export const MAX_PAGINAS = 20;
 
 // Duas famílias: Anton (títulos, números e aspas) e Inter (texto)
 export const DISPLAY = '"Anton", Impact, "Arial Narrow", sans-serif';
@@ -471,7 +471,7 @@ function foto(b, w) {
   const gerar = (x, y, w2, h2) => {
     const hFoto = h2 - hl;
     return [
-      { k: "foto", x, y, w: w2, h: hFoto, src: b.src, foco: b.foco, conter: b.conter, mesclar: b.mesclar, fundo: b.fundo },
+      { k: "foto", x, y, w: w2, h: hFoto, src: b.src, foco: b.foco, conter: b.conter, mesclar: b.mesclar, fundo: b.fundo, filtro: b.filtro, duotom: b.duotom },
       placa(x, y, w2, hFoto),
       ...(leg.length ? [txt(x, y + hFoto + 0.7, leg, E.legenda, b.corLegenda ?? COR.suave)] : []),
     ];
@@ -958,17 +958,18 @@ function sumario(p, pag, R, entradas) {
 
 // fontes e notas: 2 colunas por página, em letra pequena; diminui até caber em n páginas
 function paginasFontes(f, pags) {
-  const r = tentarFontes(f, pags, false);
+  const r = tentarFontes(f, pags, false) ?? tentarFontes(f, pags, false, true);
   if (r) return r;
   pags[0].avisos.push("as fontes não couberam nas páginas reservadas");
-  return tentarFontes(f, pags, true);
+  return tentarFontes(f, pags, true, true);
 }
 
 // letra pequena, mas sempre nos degraus da escala
-function tentarFontes(f, pags, forcar) {
-  const ef = { fam: SANS, peso: 400, tam: 1.1, alt: 1.45 };
-  const eu = { fam: SANS, peso: 400, tam: 0.95, alt: 1.25 };
-  const en = { fam: SANS, peso: 600, tam: 1.1, alt: 1.45 };
+// compacto: as referências descem para o menor degrau da escala (0,95)
+function tentarFontes(f, pags, forcar, compacto = false) {
+  const ef = compacto ? { fam: SANS, peso: 400, tam: 0.95, alt: 1.3 } : { fam: SANS, peso: 400, tam: 1.1, alt: 1.45 };
+  const eu = compacto ? { fam: SANS, peso: 400, tam: 0.95, alt: 1.2 } : { fam: SANS, peso: 400, tam: 0.95, alt: 1.25 };
+  const en = compacto ? { fam: SANS, peso: 600, tam: 0.95, alt: 1.3 } : { fam: SANS, peso: 600, tam: 1.1, alt: 1.45 };
   const ei = display(1.8, 2.2);
   const ep = { fam: SANS, peso: 400, tam: 1.1, alt: 1.55 };
   const recuo = 3.4;
@@ -982,7 +983,7 @@ function tentarFontes(f, pags, forcar) {
     const cw = (x1 - x0 - gap) / 2;
     let yTopo = TOPO;
     if (i === 0) {
-      const tit = titulo({ texto: f.titulo, tam: 6, cor: COR.vermelho }, x1 - x0);
+      const tit = titulo({ texto: f.titulo, tam: 4.6, cor: COR.vermelho }, x1 - x0);
       const intro = lead({ texto: f.intro, est: "numTexto" }, x1 - x0);
       topoDe.push({ x0, w: x1 - x0, tit, intro });
       yTopo = TOPO + tit.h + 1.6 + intro.h + 2.6;
@@ -996,11 +997,12 @@ function tentarFontes(f, pags, forcar) {
   for (const it of f.itens) {
     const lt = quebrar(it.texto, ef, cw - recuo);
     // fonte sem endereço: só o texto, sem link
-    const lu = it.url ? quebrarPorCaractere(it.url, eu, (cw - recuo) * FOLGA).map((t) => linhaUnica(t)[0]) : [];
+    // o endereço aparece sem "https://" e "www." (o link continua completo)
+    const lu = it.url ? quebrarPorCaractere(it.url.replace(/^https?:\/\/(www\.)?/, ""), eu, (cw - recuo) * FOLGA).map((t) => linhaUnica(t)[0]) : [];
     const yU = lt.length * ef.alt + 0.2;
     const h = lu.length ? yU + lu.length * eu.alt : lt.length * ef.alt;
     unidades.push({
-      h, antes: 0.8,
+      h, antes: 0.6,
       gerar: (x, y, w) => [
         txt(x, y, linhaUnica(`[${it.n}]`), en, COR.vermelho),
         txt(x + recuo, y, lt, ef, COR.preto),
