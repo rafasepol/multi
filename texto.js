@@ -171,7 +171,7 @@ R.paginas.forEach((p, i) => {
             el("span", { class: "nome" }, m.nome),
           ),
         )),
-        el("p", { class: "legenda" }, R.expediente),
+        R.expediente ? el("p", { class: "legenda" }, R.expediente) : null,
       ),
     );
     return;

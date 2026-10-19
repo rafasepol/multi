@@ -62,7 +62,6 @@ const REVISTA = {
     { nome: "Sophia Castro", foto: "assets/equipe/sophia-castro.jpg" },
     { nome: "Rafael Manzato", foto: "assets/equipe/rafael-manzato.jpg" },
   ],
-  expediente: "Pesquisa, redação e design: a equipe. Imagens: seleção da equipe (créditos em verificação).",
   capa: {
     foto: FOTO.mascara,
     foco: [0.5, 0],

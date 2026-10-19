@@ -939,7 +939,7 @@ function sumario(p, pag, R, entradas) {
     { t: "regra", antes: 2 },
     { t: "rotulo", texto: "Equipe", cor: COR.preto, antes: 1.3 },
     { t: "equipe", itens: R.equipe ?? [], antes: 1.2, diametro: 9 },
-    { t: "lead", est: "legenda", texto: R.expediente, antes: 1.2 },
+    ...(R.expediente ? [{ t: "lead", est: "legenda", texto: R.expediente, antes: 1.2 }] : []),
   ];
   els.push(...gerarPilha(blocos, { x: x0, y: 6, w: x1 - x0, h: BASE - 6 }, pag));
   numeroPagina(els, pag);
