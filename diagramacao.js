@@ -1058,7 +1058,7 @@ function tentarFontes(f, pags, forcar) {
 }
 
 // capa e contracapa
-// Capa em estilo cartaz construtivista: fundo vermelho, chamada enorme na diagonal, faixa
+// Capa em estilo cartaz: fundo vermelho, chamada enorme na diagonal, faixa
 // preta inclinada e a foto embaixo. A inclinação de tudo segue a mesma reta da faixa.
 function montarCapa(R) {
   const c = R.capa;
@@ -1080,7 +1080,6 @@ function montarCapa(R) {
   els.push({ k: "poli", cor: COR.preto, pts: [[0, Y0], [LARG, Y0 - QUEDA], [LARG, Y0 - QUEDA + ESP], [0, Y0 + ESP]] });
 
   els.push(txt(m, 3, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme));
-  els.push({ k: "estrela", x: 66, y: 13.5, r: 8.2, cor: COR.preto });
 
   // chamada: uma linha por frase (\n), todas no mesmo degrau, giradas junto com a faixa
   const linhas = c.chamada.split("\n");
