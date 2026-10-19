@@ -59,8 +59,8 @@ const REVISTA = {
     { nome: "Matheus Botana", foto: "assets/equipe/matheus-botana.jpg" },
     { nome: "Guilherme Senatore", foto: "assets/equipe/guilherme-senatore.jpg" },
     { nome: "Emanuelly Mendes", foto: "assets/equipe/emanuelly-mendes.jpg" },
-    { nome: "Sophia Castro", foto: null },
-    { nome: "Rafael Manzato", foto: null },
+    { nome: "Sophia Castro", foto: "assets/equipe/sophia-castro.jpg" },
+    { nome: "Rafael Manzato", foto: "assets/equipe/rafael-manzato.jpg" },
   ],
   expediente: "Pesquisa, redação e design: a equipe. Imagens: seleção da equipe (créditos em verificação).",
   capa: {

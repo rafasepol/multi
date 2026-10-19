@@ -47,7 +47,7 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 ### Pendências da equipe
 
 - [ ] **Créditos das imagens**: confirmar autor e permissão das colagens e fotos em `assets/fotos/` e colocar nas legendas.
-- [ ] **Fotos da Sophia Castro e do Rafael Manzato** na equipe (pág. 2).
+- [x] **Fotos da equipe** (pág. 2): os seis integrantes.
 - [ ] **Vídeo em inglês** (5 a 7 min), simulando a apresentação do Brasil na ONU.
 - [ ] **Apresentação da revista** (até 10 min).
 
