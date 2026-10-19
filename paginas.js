@@ -130,6 +130,15 @@ function desenharFoto(ctx, el, g) {
     ctx.drawImage(img, (iw - sw) * fx, (ih - sh) * fy, sw, sh, r.x0, r.y0, W, H);
   }
   ctx.restore();
+  // duotom (capa): a foto, já em tons de cinza pelo filtro, é tingida com uma cor —
+  // o branco vira a cor e o preto continua preto, como num cartaz impresso em duas cores
+  if (el.duotom) {
+    ctx.save();
+    ctx.globalCompositeOperation = "multiply";
+    ctx.fillStyle = el.duotom;
+    ctx.fillRect(r.x0, r.y0, W, H);
+    ctx.restore();
+  }
 }
 
 function desenharElemento(ctx, el, g, links) {

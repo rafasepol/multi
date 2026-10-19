@@ -65,9 +65,9 @@ const REVISTA = {
   ],
   capa: {
     foto: FOTO.cop30,
-    foco: [0.42, 0.7],
-    chamada: "A crise\ntem dono.",
-    subtitulo: "Quem lucra com o fogo e a fumaça não paga a conta. Quem paga mora na beira do rio, na encosta, na aldeia.",
+    foco: [0.62, 0.5],
+    chamada: "O lucro\né deles.\nA conta\né nossa.",
+    subtitulo: "Eles lucram com o fogo e a fumaça. Quem paga mora na beira do rio, na encosta, na aldeia.",
     destaques: ["Quem sofre", "Quem causa", "Justiça climática"],
     credito: "Mulheres Kayapó em protesto na COP30, Belém (PA), 2025. Foto: Mirna Wabi-Sabi / Unsplash.",
   },

@@ -1058,74 +1058,63 @@ function tentarFontes(f, pags, forcar) {
 }
 
 // capa e contracapa
-// Capa em estilo cartaz: fundo vermelho, chamada enorme na diagonal, faixa
-// preta inclinada e a foto embaixo. A inclinação de tudo segue a mesma reta da faixa.
+// Capa em estilo cartaz de protesto: a foto ocupa a página inteira em duas cores (vermelho e
+// preto), e a chamada enorme atravessa a capa em faixas inclinadas, como um lambe-lambe.
 function montarCapa(R) {
   const c = R.capa;
-  const m = 5;
-  // faixa preta: borda de cima vai de (0, Y0) a (LARG, Y0 - QUEDA); espessura vertical ESP
-  const Y0 = 40;
-  const QUEDA = 8;
-  const ESP = 15;
-  const ang = (Math.atan2(-QUEDA, LARG) * 180) / Math.PI;
+  const m = 4.5;
+  const ang = -7;
   const rad = (ang * Math.PI) / 180;
-  const yBorda = (x) => Y0 - (QUEDA * x) / LARG; // borda de cima da faixa na coluna x
-
-  const els = [];
-  // foto de baixo até um pouco acima da faixa (a faixa cobre a emenda)
-  els.push({ k: "foto", x: 0, y: Y0 - QUEDA - 2, w: LARG, h: ALT - (Y0 - QUEDA - 2), src: c.foto, foco: c.foco, filtro: "contrast(1.12) saturate(1.12)" });
-  // vermelho do alto, cortado na diagonal
-  els.push({ k: "poli", cor: COR.vermelho, pts: [[0, 0], [LARG, 0], [LARG, Y0 - QUEDA], [0, Y0]] });
-  // faixa preta inclinada
-  els.push({ k: "poli", cor: COR.preto, pts: [[0, Y0], [LARG, Y0 - QUEDA], [LARG, Y0 - QUEDA + ESP], [0, Y0 + ESP]] });
-
-  els.push(txt(m, 3, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme));
-
-  // chamada: uma linha por frase (\n), todas no mesmo degrau, giradas junto com a faixa
-  const linhas = c.chamada.split("\n");
-  const wTit = 62;
-  const tam = Math.min(...linhas.map((t) => caberLinha(t, c.tam ?? 12, wTit)));
-  const et = display(tam, tam * 0.98);
-  const x0 = m;
-  const y0 = 8.4;
-  linhas.forEach((t, i) => {
-    const d = i * et.alt;
-    const el = txt(x0 - d * Math.sin(rad), y0 + d * Math.cos(rad), quebrar(t, et, 200), et, i === 0 ? COR.preto : COR.creme);
-    el.rot = ang;
-    els.push(el);
-  });
-
-  // dentro da faixa preta: a linha fina e, embaixo, os destaques como carimbos vermelhos,
-  // tudo girado junto com a faixa. Coordenadas locais (a ao longo da faixa, b para baixo)
-  // viram coordenadas da página por estes vetores:
   const ua = [Math.cos(rad), Math.sin(rad)];
   const nb = [-Math.sin(rad), Math.cos(rad)];
   const ponto = (o, a, b) => [o[0] + a * ua[0] + b * nb[0], o[1] + a * ua[1] + b * nb[1]];
-  const ed = display(2.2);
-  const hc = 4.4;
-  const el = E.lead;
-  const ls = quebrar(c.subtitulo, el, LARG - 2 * m - 4);
-  const hBloco = ls.length * el.alt + 1.4 + hc;
-  const o = [m, yBorda(m) + (ESP * Math.cos(rad) - hBloco) / 2];
-  const sub = txt(o[0], o[1], ls, el, COR.creme);
-  sub.rot = ang;
-  els.push(sub);
-  let a = 0;
-  const b = ls.length * el.alt + 1.4;
-  for (const d of c.destaques) {
-    const lw = largura(d.toUpperCase(), ed) + 3;
-    els.push({ k: "poli", cor: COR.vermelho, pts: [ponto(o, a, b), ponto(o, a + lw, b), ponto(o, a + lw, b + hc), ponto(o, a, b + hc)] });
-    const p = ponto(o, a + 1.5, b + (hc - ed.alt) / 2);
-    const t = txt(p[0], p[1], linhaUnica(d), ed, COR.creme);
+  // faixa inclinada com texto: retângulo girado (poli) e a linha por cima
+  const faixa = (els, o, texto, est, corFundo, corTexto, pad = 1.6) => {
+    const w = largura(texto.toUpperCase(), est) + 2 * pad;
+    // em cima, espaço a mais para os acentos (Á, É...) ficarem dentro da faixa
+    const topo = pad * 0.7 + (est.alta ? est.tam * 0.22 : 0);
+    const h = est.alt + topo + pad * 0.7;
+    els.push({ k: "poli", cor: corFundo, pts: [ponto(o, 0, 0), ponto(o, w, 0), ponto(o, w, h), ponto(o, 0, h)] });
+    const p = ponto(o, pad, topo);
+    const t = txt(p[0], p[1], linhaUnica(est.alta ? texto.toUpperCase() : texto), est, corTexto);
     t.rot = ang;
     els.push(t);
-    a += lw + 1.4;
+    return h;
+  };
+
+  const els = [];
+  // foto inteira em duotom vermelho e preto
+  els.push({ k: "foto", x: 0, y: 0, w: LARG, h: ALT, src: c.foto, foco: c.foco, filtro: "grayscale(1) contrast(1.45) brightness(1.08)", duotom: COR.vermelho });
+  // escurece o alto para a chamada saltar
+  els.push({ k: "poli", cor: "rgba(28,26,24,.55)", pts: [[0, 0], [LARG, 0], [LARG, 30], [0, 44]] });
+
+  // edição numa tarja preta reta, no topo
+  els.push(ret(0, 0, LARG, 6.4, COR.preto));
+  els.push(txt(m, (6.4 - E.rotulo.alt) / 2, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme));
+
+  // chamada: cada linha numa faixa própria, alternando creme e preto
+  const linhas = c.chamada.split("\n");
+  const tam = Math.min(...linhas.map((t) => caberLinha(t, c.tam ?? 12, LARG - 2 * m - 4)));
+  const et = display(tam, tam * 0.94);
+  let o = [m - 1, 13];
+  linhas.forEach((t, i) => {
+    const claro = i % 2 === 0;
+    const h = faixa(els, o, t, et, claro ? COR.creme : COR.preto, claro ? COR.preto : COR.creme, 1.4);
+    o = ponto(o, i % 2 ? -1.2 : 3.2, h - 0.2);
+  });
+
+  // destaques: carimbos pretos logo abaixo da chamada; a faixa da foto fica livre embaixo
+  const ed = display(2.2);
+  let oc = ponto(o, 1.2, 2);
+  for (const d of c.destaques) {
+    faixa(els, oc, d, ed, COR.preto, COR.creme, 1.3);
+    oc = ponto(oc, largura(d.toUpperCase(), ed) + 2.6 + 1.4, 0);
   }
   if (c.credito) {
-    els.push(ret(0, ALT - 6, LARG, 6, COR.preto));
-    els.push(txt(m, ALT - 6 + (6 - E.legenda.alt) / 2, quebrar(c.credito, E.legenda, LARG - 2 * m), E.legenda, COR.creme));
+    els.push(ret(0, ALT - 5.4, LARG, 5.4, COR.preto));
+    els.push(txt(m, ALT - 5.4 + (5.4 - E.legenda.alt) / 2, quebrar(c.credito, E.legenda, LARG - 2 * m), E.legenda, COR.creme));
   }
-  return { tipo: "pagina", fundo: COR.vermelho, els };
+  return { tipo: "pagina", fundo: COR.preto, els };
 }
 
 function montarContracapa(R) {
