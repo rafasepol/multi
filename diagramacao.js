@@ -294,6 +294,10 @@ export function entrelinhaSegura(linhas, est, w = 0, alinhar = "esq") {
 
 const ret = (x, y, w, h, cor) => ({ k: "ret", x, y, w, h, cor });
 
+// área que salta da página em 3D quando o mouse passa por cima (script.js).
+// Não desenha nada: o pedaço da página dentro dela sobe como um cartão.
+const placa = (x, y, w, h, redondo = false) => ({ k: "placa", x, y, w, h, redondo });
+
 function txt(x, y, linhas, est, cor, alinhar = "esq", w = 0) {
   const el = { k: "texto", x, y, linhas, est, cor, alinhar, w };
   if (alinhar !== "esq") el.ws = linhas.map((l) => larguraLinha(l, est));
@@ -468,6 +472,7 @@ function foto(b, w) {
     const hFoto = h2 - hl;
     return [
       { k: "foto", x, y, w: w2, h: hFoto, src: b.src, foco: b.foco, conter: b.conter, mesclar: b.mesclar, fundo: b.fundo },
+      placa(x, y, w2, hFoto),
       ...(leg.length ? [txt(x, y + hFoto + 0.7, leg, E.legenda, b.corLegenda ?? COR.suave)] : []),
     ];
   };
@@ -520,6 +525,8 @@ function numeros(b, w) {
       linhas.forEach((l, il) => {
         l.forEach((c, ic) => {
           const xc = x + pad + ic * (cw + gap);
+          // cada número sai da página como um cartão (com uma folga em volta do texto)
+          els.push(placa(xc - 0.8, yy - 0.8, cw + 1.6, c.h + 1.6));
           if (regua) els.push(ret(xc, yy, cw, 0.35, corN));
           els.push(txt(xc, yy + topo, linhaUnica(c.n), en, corN));
           if (c.lt.length) els.push(txt(xc, yy + topo + en.alt + 0.5, c.lt, et, corT));
@@ -603,6 +610,7 @@ function citacao(b, w) {
   const hMin = y + pad;
   const gerar = (x, yy, w2, h2) => [
     ret(x, yy, w2, h2, fundo),
+    placa(x, yy, w2, h2),
     txt(x + pad - 0.1, yy + pad - 0.2, linhaUnica("“"), E.aspas, corAspas),
     txt(x + pad, yy + yQ, lq, eq, cor),
     ...(la.length ? [txt(x + pad, yy + yA, la, E.autor, cor)] : []),
@@ -675,6 +683,7 @@ function fluxo(b, w) {
       cels.forEach((c, i) => {
         const xc = x + i * (cw + sw);
         els.push(ret(xc, y, cw, h, cores[i]));
+        els.push(placa(xc, y, cw, h));
         els.push(txt(xc + pad, y + pad, c.lt, et, COR.creme));
         if (c.lx.length) els.push(txt(xc + pad, y + pad + c.lt.length * et.alt + 0.4, c.lx, ex, COR.creme));
         if (i < n - 1 && sinais[i]) {
@@ -740,6 +749,7 @@ function equipe(b, w) {
       b.itens.forEach((it, i) => {
         const xc = x + i * (cw + gap);
         els.push({ k: "retrato", x: xc + (cw - d) / 2, y, w: d, h: d, src: it.foto ?? null });
+        els.push(placa(xc + (cw - d) / 2, y, d, d, true));
         els.push(txt(xc, y + d + 0.9, nomes[i], en, COR.preto, "centro", cw));
       });
       return els;
@@ -1048,25 +1058,62 @@ function tentarFontes(f, pags, forcar) {
 }
 
 // capa e contracapa
+// Capa em estilo cartaz de protesto: a foto ocupa a página inteira em duas cores (vermelho e
+// preto), e a chamada enorme atravessa a capa em faixas inclinadas, como um lambe-lambe.
 function montarCapa(R) {
   const c = R.capa;
-  const avisos = { avisos: [] };
-  const m = 5;
-  const hTopo = 3 + E.rotulo.alt + 2.6;
-  // a foto começa abaixo da faixa com a edição, para não esconder o alto da imagem
-  const els = [{ k: "foto", x: 0, y: hTopo, w: LARG, h: ALT - hTopo, src: c.foto, foco: c.foco }];
-  els.push(ret(0, 0, LARG, hTopo, COR.vermelho));
-  els.push(txt(m, 3, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme));
-  const blocos = [
-    { t: "titulo", texto: c.chamada, tam: 5.6, cor: COR.creme },
-    { t: "lead", texto: c.subtitulo, cor: COR.cremeSuave, antes: 1.4 },
-    { t: "fluxo", itens: c.destaques.map((d) => ({ titulo: d })), tamTitulo: 1.9, antes: 2.2 },
-  ];
-  const w = LARG - 2 * m;
-  const h = medirPilha(blocos, w, avisos).h;
-  const y = ALT - 4.6 - h;
-  els.push(ret(0, y - 3.6, LARG, ALT - y + 3.6, "rgba(28,26,24,.88)"));
-  els.push(...gerarPilha(blocos, { x: m, y, w, h }, avisos));
+  const m = 4.5;
+  const ang = -7;
+  const rad = (ang * Math.PI) / 180;
+  const ua = [Math.cos(rad), Math.sin(rad)];
+  const nb = [-Math.sin(rad), Math.cos(rad)];
+  const ponto = (o, a, b) => [o[0] + a * ua[0] + b * nb[0], o[1] + a * ua[1] + b * nb[1]];
+  // faixa inclinada com texto: retângulo girado (poli) e a linha por cima
+  const faixa = (els, o, texto, est, corFundo, corTexto, pad = 1.6) => {
+    const w = largura(texto.toUpperCase(), est) + 2 * pad;
+    // em cima, espaço a mais para os acentos (Á, É...) ficarem dentro da faixa
+    const topo = pad * 0.7 + (est.alta ? est.tam * 0.22 : 0);
+    const h = est.alt + topo + pad * 0.7;
+    els.push({ k: "poli", cor: corFundo, pts: [ponto(o, 0, 0), ponto(o, w, 0), ponto(o, w, h), ponto(o, 0, h)] });
+    const p = ponto(o, pad, topo);
+    const t = txt(p[0], p[1], linhaUnica(est.alta ? texto.toUpperCase() : texto), est, corTexto);
+    t.rot = ang;
+    els.push(t);
+    return h;
+  };
+
+  const els = [];
+  // foto inteira em duotom vermelho e preto
+  els.push({ k: "foto", x: 0, y: 0, w: LARG, h: ALT, src: c.foto, foco: c.foco, filtro: "grayscale(1) contrast(1.45) brightness(1.08)", duotom: COR.vermelho });
+  // escurece o alto para a chamada saltar
+  els.push({ k: "poli", cor: "rgba(28,26,24,.55)", pts: [[0, 0], [LARG, 0], [LARG, 30], [0, 44]] });
+
+  // edição numa tarja preta reta, no topo
+  els.push(ret(0, 0, LARG, 6.4, COR.preto));
+  els.push(txt(m, (6.4 - E.rotulo.alt) / 2, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme));
+
+  // chamada: cada linha numa faixa própria, alternando creme e preto
+  const linhas = c.chamada.split("\n");
+  const tam = Math.min(...linhas.map((t) => caberLinha(t, c.tam ?? 12, LARG - 2 * m - 4)));
+  const et = display(tam, tam * 0.94);
+  let o = [m - 1, 13];
+  linhas.forEach((t, i) => {
+    const claro = i % 2 === 0;
+    const h = faixa(els, o, t, et, claro ? COR.creme : COR.preto, claro ? COR.preto : COR.creme, 1.4);
+    o = ponto(o, i % 2 ? -1.2 : 3.2, h - 0.2);
+  });
+
+  // destaques: carimbos pretos logo abaixo da chamada; a faixa da foto fica livre embaixo
+  const ed = display(2.2);
+  let oc = ponto(o, 1.2, 2);
+  for (const d of c.destaques) {
+    faixa(els, oc, d, ed, COR.preto, COR.creme, 1.3);
+    oc = ponto(oc, largura(d.toUpperCase(), ed) + 2.6 + 1.4, 0);
+  }
+  if (c.credito) {
+    els.push(ret(0, ALT - 5.4, LARG, 5.4, COR.preto));
+    els.push(txt(m, ALT - 5.4 + (5.4 - E.legenda.alt) / 2, quebrar(c.credito, E.legenda, LARG - 2 * m), E.legenda, COR.creme));
+  }
   return { tipo: "pagina", fundo: COR.preto, els };
 }
 
