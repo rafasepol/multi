@@ -44,6 +44,10 @@ const SUAVE = "#665e53";
 const FOTO = {
   // capa: protesto indígena na COP30 (Mirna Wabi-Sabi, Unsplash License)
   cop30: "assets/fotos/capa-cop30.jpg",
+  // colagens e cartaz enviados pela equipe (créditos a confirmar)
+  chamines: "assets/fotos/colagem-chamines.jpg",
+  globo: "assets/fotos/colagem-globo.jpg",
+  cartaz: "assets/fotos/cartaz-capitalismo.jpg",
   // colagens escolhidas pela equipe
   fabrica: "assets/fotos/colagem-fabrica.jpg",
   cigarro: "assets/fotos/colagem-cigarro.jpg",
@@ -349,42 +353,27 @@ const REVISTA = {
       ],
     },
 
-    // 9 — três histórias, sem fotos (as falas são de reportagens)
+    // 9 — três histórias, ao lado da colagem das chaminés (seca, tempestade, enchente)
     {
       modelo: "materia",
       secao: "2 · Histórias reais",
       blocos: [
-        { t: "titulo", texto: "Roca Sales (RS): a água baixa, a perda fica", tam: 3.6 },
         {
-          t: "lado", antes: 1.3, larguras: [1, 1.8],
+          t: "lado", larguras: [1.25, 1.35], gap: 3.4, resto: true,
           colunas: [
-            [{ t: "citacao", resto: true, fundo: PRETO, tam: 2.2, texto: "Não tem onde morar", autor: "Júlia Almeida, 20 anos", credito: "Agência Brasil, 23 jun. 2024 [12]" }],
-            [{
-              t: "texto", colunas: 1,
-              p: ["Depois das enchentes de 2024, Júlia contou que ficou difícil achar moradia longe da água, e os aluguéis subiram. [12] Segundo o World Weather Attribution, o aquecimento global dobrou a chance de chuvas como aquelas e as deixou de 6% a 9% mais intensas. [13]"],
-            }],
-          ],
-        },
-        { t: "titulo", texto: "Xingu (MT): a floresta em volta seca", tam: 3.6, antes: 2.4 },
-        {
-          t: "lado", antes: 1.3, larguras: [1.8, 1],
-          colunas: [
-            [{
-              t: "texto", colunas: 1,
-              p: ["Na aldeia Tanguro, do povo Kalapalo, há trechos de rio em que é preciso empurrar o barco, e a mandioca rende menos. O território é cercado por pastos e soja; um estudo citado pela reportagem atribui ao desmatamento 74% da queda das chuvas na estação seca desde 1985. [14]"],
-            }],
-            [{ t: "citacao", resto: true, tam: 2.2, texto: "Hoje a gente está com escassez de alimentos", autor: "Sikan Kalapalo, estudante", credito: "((o))eco, 20 out. 2025 [14]" }],
-          ],
-        },
-        { t: "titulo", texto: "Marajó (PA): a erosão levou a casa", tam: 3.6, antes: 2.4 },
-        {
-          t: "lado", antes: 1.3, larguras: [1, 1.8],
-          colunas: [
-            [{ t: "citacao", resto: true, fundo: PRETO, tam: 2.2, texto: "Nunca pensei que veria algo assim", autor: "Ivanil Brito, Soure (PA)", credito: "((o))eco, 25 out. 2024 [15]" }],
-            [{
-              t: "texto", colunas: 1,
-              p: ["Em fevereiro de 2024, a erosão levou em três dias a casa de Ivanil, na Vila do Pesqueiro: animais, móveis, documentos e os materiais da faculdade dos filhos. Outras quatro famílias também perderam a casa. O Serviço Geológico do Brasil tinha apontado o risco na vila cerca de dez anos antes. [15]"],
-            }],
+            [{ t: "foto", src: FOTO.chamines, resto: true, min: 30, foco: [0.55, 0.5], legenda: "Colagem: das chaminés saem a seca, a tempestade e a enchente." }],
+            [
+              { t: "rotulo", texto: "Quando a crise tem endereço" },
+              { t: "titulo", texto: "Roca Sales (RS): a água baixa, a perda fica", tam: 2.8, antes: 1 },
+              { t: "lead", texto: "“Não tem onde morar”, diz Júlia Almeida, 20 anos. [12]", cor: VERMELHO, antes: 0.8 },
+              { t: "texto", colunas: 1, antes: 0.8, p: ["Depois das enchentes de 2024, ficou difícil achar moradia longe da água, e os aluguéis subiram. [12] O aquecimento global dobrou a chance de chuvas como aquelas. [13]"] },
+              { t: "titulo", texto: "Xingu (MT): a floresta em volta seca", tam: 2.8, antes: 2.6 },
+              { t: "lead", texto: "“Hoje a gente está com escassez de alimentos”, diz Sikan Kalapalo. [14]", cor: VERMELHO, antes: 0.8 },
+              { t: "texto", colunas: 1, antes: 0.8, p: ["Na aldeia Tanguro, há trechos de rio em que é preciso empurrar o barco. Em volta, pasto e soja: um estudo atribui ao desmatamento 74% da queda das chuvas na seca desde 1985. [14]"] },
+              { t: "titulo", texto: "Marajó (PA): a erosão levou a casa", tam: 2.8, antes: 2.6 },
+              { t: "lead", texto: "“Nunca pensei que veria algo assim”, diz Ivanil Brito. [15]", cor: VERMELHO, antes: 0.8 },
+              { t: "texto", colunas: 1, antes: 0.8, p: ["Em fevereiro de 2024, a erosão levou em três dias a casa de Ivanil, na Vila do Pesqueiro, em Soure. O risco tinha sido apontado cerca de dez anos antes. [15]"] },
+            ],
           ],
         },
       ],
@@ -419,46 +408,47 @@ const REVISTA = {
       ],
     },
 
-    // 11
+    // 11 — texto ao lado da colagem do executivo pisando no planeta
     {
       modelo: "materia",
       secao: "3 · Empresas e emissões",
-      lateral: {
-        largura: 22,
-        blocos: [
-          { t: "rotulo", texto: "Em números", cor: CREME },
-          {
-            t: "numeros", colunas: 1, tam: 6, antes: 2, corNumero: CREME, corTexto: CREME,
-            itens: [
-              { n: "32", texto: "empresas ligadas a mais da metade do CO₂ mundial de combustíveis fósseis e cimento em 2024 [17]" },
-              { n: "214,3 mi t", texto: "de CO₂e vieram dos transportes no Brasil em 2024, de 431,3 mi t da matriz energética [18]" },
-              { n: "97%", texto: "ou mais da vegetação nativa perdida no Brasil em seis anos teve a agropecuária como vetor [19]" },
-            ],
-          },
-        ],
-      },
       blocos: [
         { t: "titulo", texto: "Quem está por trás das emissões", tam: 4.6 },
         {
-          t: "texto", colunas: 1, antes: 2,
-          p: [
-            { inter: "No mundo: carvão, petróleo e gás" },
-            "Quando gasolina, diesel, carvão e gás são queimados, o carbono vira CO₂. O Carbon Majors atribui essas emissões a quem produziu e vendeu os combustíveis: em 2024, cinco estatais somaram 18% do total mundial. [17] Na edição anterior do levantamento, a Petrobras estava entre as 36 empresas que respondiam por mais da metade das emissões de 2023. [20]",
+          t: "lado", antes: 2, larguras: [1.55, 1], gap: 3.4, resto: true,
+          colunas: [
+            [
+              {
+                t: "texto", colunas: 1,
+                p: [
+                  { inter: "No mundo: carvão, petróleo e gás" },
+                  "O Carbon Majors atribui as emissões a quem produziu e vendeu os combustíveis: em 2024, cinco estatais somaram 18% do total mundial. [17] A Petrobras estava entre as 36 maiores da edição anterior. [20]",
+                ],
+              },
+              {
+                t: "grafico", antes: 2, tamTitulo: 1.8, rotulos: 0.46,
+                titulo: "Cinco grandes produtores (2024)",
+                max: 5,
+                barras: [["Saudi Aramco", 4.28, "4,28%"], ["Coal India", 3.92, "3,92%"], ["CHN Energy", 3.91, "3,91%"], ["Nat. Iranian Oil", 3.13, "3,13%"], ["Gazprom", 2.76, "2,76%"]],
+                legenda: "Gráfico 4. % do CO₂ global de combustíveis fósseis e cimento. Carbon Majors [17].",
+              },
+              {
+                t: "texto", colunas: 1, antes: 2,
+                p: [
+                  { inter: "No Brasil: a fronteira agropecuária" },
+                  "Aqui pesa a terra: cerca de 80% das emissões por uso da terra saem da Amazônia e do Cerrado, abertos para pasto e lavoura. [2; 19] A responsabilidade passa também por quem compra, financia e vende o que sai dali.",
+                ],
+              },
+            ],
+            [{ t: "foto", src: FOTO.globo, resto: true, min: 30, foco: [0.5, 0.6], legenda: "Colagem: o executivo e o planeta." }],
           ],
         },
         {
-          t: "grafico", antes: 2.2, tamTitulo: 1.8, rotulos: 0.42,
-          titulo: "Cinco grandes produtores (2024)",
-          eixo: "% do CO₂ global de combustíveis fósseis e cimento",
-          max: 5,
-          barras: [["Saudi Aramco", 4.28, "4,28%"], ["Coal India", 3.92, "3,92%"], ["CHN Energy", 3.91, "3,91%"], ["National Iranian Oil Co.", 3.13, "3,13%"], ["Gazprom", 2.76, "2,76%"]],
-          legenda: "Gráfico 4. Carbon Majors, ano-base 2024 [17]. Não inclui o desmatamento.",
-        },
-        {
-          t: "texto", colunas: 1, antes: 2.2,
-          p: [
-            { inter: "No Brasil: a fronteira agropecuária" },
-            "Aqui, o maior peso vem da terra: cerca de 80% das emissões por uso da terra saem da Amazônia e do Cerrado, onde a vegetação dá lugar a pastos e lavouras. [2; 19] Na nossa leitura, a responsabilidade não é só de quem derruba a floresta: passa também por quem compra, financia e vende o que sai dessas áreas.",
+          t: "numeros", antes: 2.4, tam: 3.6, colunas: 3,
+          itens: [
+            { n: "32", texto: "empresas ligadas a mais da metade do CO₂ mundial de fósseis e cimento (2024) [17]" },
+            { n: "214,3 mi t", texto: "de CO₂e dos transportes no Brasil, de 431,3 mi t da energia (2024) [18]" },
+            { n: "97%", texto: "ou mais da vegetação nativa perdida em seis anos teve a agropecuária como vetor [19]" },
           ],
         },
       ],
@@ -481,34 +471,16 @@ const REVISTA = {
           ],
         },
         {
-          t: "lado", antes: 2.2, gap: 3,
-          colunas: [
-            [{
-              t: "texto", colunas: 1,
-              p: ["A Norte Energia opera a hidrelétrica de Belo Monte, no Pará. Além do corte de árvores, o desvio de água para gerar energia muda o rio e as florestas alagáveis. Numa ação civil pública, o MPF relata poços e cacimbas secos. [21; 22]"],
-            }],
-            [{
-              t: "texto", colunas: 1,
-              p: ["A Justiça Federal reconheceu danos à vida aquática, à navegação e às comunidades, com seca de igapós e prejuízo à reprodução dos peixes. Para quem depende do rio, menos água compromete deslocamento, pesca e comida. [23]"],
-            }],
-          ],
+          t: "texto", colunas: 1, antes: 2.4,
+          p: ["A hidrelétrica desvia a água do Xingu para gerar energia. A Justiça reconheceu danos à vida aquática, à navegação e às comunidades, e o MPF relata poços secos: para quem depende do rio, menos água é menos pesca e menos comida. [21; 22; 23]"],
         },
         { t: "titulo", texto: "Belo Sun: mineração em disputa", tam: 4.6, antes: 3.4 },
         {
-          t: "lado", antes: 1.8, gap: 3,
-          colunas: [
-            [{
-              t: "texto", colunas: 1,
-              p: ["A Belo Sun quer extrair ouro na Volta Grande do Xingu. Em abril de 2026, o MPF contestou a retomada da licença, e lideranças Xikrin e de Marapanim apontaram riscos e falhas na consulta às comunidades. [24; 25]"],
-            }],
-            [{
-              t: "texto", colunas: 1,
-              p: ["A empresa diz que o licenciamento é feito por etapas e que o projeto não desvia água do Xingu. Em junho, o TRF1 registrou uma conciliação: nenhuma obra durante a negociação. O MPF não aderiu. [26; 27]"],
-            }],
-          ],
+          t: "texto", colunas: 1, antes: 1.8,
+          p: ["A Belo Sun quer extrair ouro na Volta Grande. O MPF e lideranças Xikrin contestam a licença e a consulta às comunidades; a empresa diz que o projeto não desvia água do rio. [24; 25; 26] Em junho de 2026, o TRF1 suspendeu obras durante a negociação, sem adesão do MPF. [27]"],
         },
         {
-          t: "lead", est: "legenda", antes: 2.4, cor: SUAVE,
+          t: "lead", est: "legenda", antes: 2.4, cor: SUAVE, resto: true,
           texto: "Situação dos processos em junho de 2026. Alegações do MPF não equivalem a condenação.",
         },
       ],
@@ -541,31 +513,22 @@ const REVISTA = {
             }],
           ],
         },
-        { t: "rotulo", texto: "Os interesses que pesam nas decisões", antes: 3 },
         {
-          t: "lado", antes: 1.2, gap: 3,
+          t: "lado", antes: 3, larguras: [1, 1.3], gap: 3.4, resto: true,
           colunas: [
-            [{
-              t: "texto", colunas: 1,
-              p: ["Empresas buscam receita; governos falam em abastecimento e desenvolvimento. Em 2015, o Ministério de Minas e Energia justificou Belo Monte pela energia renovável e pelos custos. [32]"],
-            }],
-            [{
-              t: "texto", colunas: 1,
-              p: ["Reservar mais água para o rio reduz a parcela das turbinas, e o TCU discutiu os efeitos em geração e tarifas. [33] Na nossa leitura, os ganhos chegam a consumidores e investidores; os custos ficam no território."],
-            }],
-          ],
-        },
-        {
-          t: "lado", antes: 2.8, resto: true, gap: 3,
-          colunas: [
-            [{
-              t: "titulo", resto: true, fundo: PRETO, cor: CREME, tam: 2.8, pad: 2.6,
-              texto: "Renovável não quer dizer sem emissões nem sem efeitos",
-            }],
-            [{
-              t: "texto", colunas: 1,
-              p: ["Reservatórios podem emitir metano pela decomposição da matéria orgânica alagada; não há medição específica para Belo Monte. [34] E os efeitos sobre o rio, a pesca e as comunidades existem mesmo quando a energia é limpa."],
-            }],
+            [{ t: "foto", src: FOTO.cartaz, h: 37, conter: true, legenda: "Cartaz do Partido Socialista francês: “O capitalismo mata a natureza. Salvemos a vida.”" }],
+            [
+              { t: "rotulo", texto: "Os interesses que pesam nas decisões" },
+              {
+                t: "texto", colunas: 1, antes: 1.2,
+                p: ["Empresas buscam receita; governos falam em desenvolvimento. Em 2015, o governo justificou Belo Monte pela energia renovável e pelos custos. [32] Mais água para o rio é menos para as turbinas, e o TCU discutiu o efeito nas tarifas. [33] Na nossa leitura, os ganhos vão para consumidores e investidores; os custos ficam no território."],
+              },
+              { t: "titulo", texto: "Renovável não quer dizer sem efeitos", tam: 2.2, cor: VERMELHO, antes: 2.4 },
+              {
+                t: "texto", colunas: 1, antes: 1,
+                p: ["Reservatórios podem emitir metano pela matéria orgânica alagada, e não há medição específica para Belo Monte. [34]"],
+              },
+            ],
           ],
         },
       ],

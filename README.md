@@ -47,7 +47,7 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 
 ### Pendências da equipe
 
-- [ ] **Créditos das imagens**: a foto da capa já tem crédito (Mirna Wabi-Sabi, Unsplash License); falta confirmar autor e permissão das colagens e das outras fotos em `assets/fotos/` e colocar nas legendas.
+- [ ] **Créditos das imagens**: a foto da capa já tem crédito (Mirna Wabi-Sabi, Unsplash License); falta confirmar autor e permissão das colagens (inclusive `colagem-chamines.jpg`, `colagem-globo.jpg` e `cartaz-capitalismo.jpg`, das págs. 9, 11 e 13) e das outras fotos em `assets/fotos/` e colocar nas legendas.
 - [x] **Fotos da equipe** (pág. 2): os seis integrantes, em ordem alfabética.
 - [ ] **Vídeo em inglês** (5 a 7 min), simulando a apresentação do Brasil na ONU.
 - [ ] **Apresentação da revista** (até 10 min).
