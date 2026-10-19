@@ -53,14 +53,14 @@ const FOTO = {
 
 const REVISTA = {
   edicao: "Germinare Tech • 2º F • Outubro de 2026",
-  // integrantes do grupo, na ordem em que aparecem; foto: null deixa o círculo vazio
+  // integrantes do grupo, em ordem alfabética; foto: null deixa o círculo vazio
   equipe: [
-    { nome: "Rafael Lopes", foto: "assets/equipe/rafael-lopes.jpg" },
-    { nome: "Matheus Botana", foto: "assets/equipe/matheus-botana.jpg" },
-    { nome: "Guilherme Senatore", foto: "assets/equipe/guilherme-senatore.jpg" },
     { nome: "Emanuelly Mendes", foto: "assets/equipe/emanuelly-mendes.jpg" },
-    { nome: "Sophia Castro", foto: "assets/equipe/sophia-castro.jpg" },
+    { nome: "Guilherme Senatore", foto: "assets/equipe/guilherme-senatore.jpg" },
+    { nome: "Matheus Botana", foto: "assets/equipe/matheus-botana.jpg" },
+    { nome: "Rafael Lopes", foto: "assets/equipe/rafael-lopes.jpg" },
     { nome: "Rafael Manzato", foto: "assets/equipe/rafael-manzato.jpg" },
+    { nome: "Sophia Castro", foto: "assets/equipe/sophia-castro.jpg" },
   ],
   capa: {
     foto: FOTO.mascara,
