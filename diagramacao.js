@@ -1073,15 +1073,21 @@ function montarCapa(R) {
 function montarContracapa(R) {
   const c = R.contracapa;
   const els = [ret(0, 0, LARG, ALT, COR.vermelho)];
-  const m = 8;
+  const m = 6;
   const w = LARG - 2 * m;
-  const tf = caberPalavra(c.texto, 4.4, w);
-  const lf = quebrar(c.texto, display(tf), w);
+  // cada frase (separadas por \n) fica numa linha só, no maior degrau em que todas cabem;
+  // a última frase sai em creme, para fechar a revista com ela
+  const frases = c.texto.split("\n");
+  const tf = Math.min(...frases.map((t) => caberLinha(t, c.tam ?? 8.4, w)));
+  const lf = frases.map((t) => quebrar(t, display(tf), w)[0]);
   const ef = entrelinhaSegura(lf, display(tf), w, "centro");
   const hf = lf.length * ef.alt;
   const y = (ALT - (3 + hf)) / 2;
   els.push(ret(LARG / 2 - 6, y, 12, 0.5, COR.preto));
-  els.push(txt(m, y + 3, lf, ef, COR.preto, "centro", w));
+  lf.forEach((l, i) => {
+    const cor = i === lf.length - 1 && lf.length > 1 ? COR.creme : COR.preto;
+    els.push(txt(m, y + 3 + i * ef.alt, [l], ef, cor, "centro", w));
+  });
   els.push(txt(m, ALT - 9, linhaUnica(R.edicao.toUpperCase()), E.rotulo, COR.creme, "centro", w));
   return { tipo: "pagina", fundo: COR.vermelho, els };
 }

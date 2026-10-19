@@ -721,6 +721,6 @@ const REVISTA = {
   },
 
   contracapa: {
-    texto: "Nenhuma meta climática está completa se as pessoas afetadas continuam sem condições de reconstruir a própria vida.",
+    texto: "O clima não escolhe suas vítimas.\nA desigualdade escolhe.",
   },
 };
