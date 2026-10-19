@@ -25,7 +25,7 @@ void main() {
 
   vec3 luz = uCorAmbiente * ao * (0.6 + 0.4 * vSombra)
            + uCorSol * (difusa * 0.9 + contraluz) * ao * vSombra;
-  vec3 cor = vCor * luz;
+  vec3 cor = vCor * luz * vinheta(vMundo.xy);
 
   // brilho suave do sol na ponta das folhas
   vec3 meio = normalize(uDirSol + v);

@@ -120,13 +120,16 @@ void main() {
   vec3 n = normalize(cross(lat3, tangente));
   vNormal = normalize(n + lat3 * lado * 0.5);
 
-  // cor: verde viva (escura na raiz, clara na ponta) ou carvão com ponta de cinza.
-  // "mancha" varia o tom em áreas grandes, como num gramado de verdade.
+  // cor: capim seco da estiagem (palha com manchas de verde-oliva, escuro na raiz)
+  // ou carvão com ponta de cinza. "mancha" varia o tom em áreas grandes, como num
+  // campo de verdade; o seco combina com o vermelho e o preto da revista e anuncia o fogo.
   float tom = iForma.w;
   float mancha = ruido(raiz * 0.35 + 3.0);
-  vec3 vivaBase = vec3(0.07, 0.16, 0.04);
-  vec3 vivaPonta = vec3(0.36, 0.55, 0.16) * (1.0 + tom * 0.15) * mix(0.82, 1.15, mancha)
-                 + vec3(tom * 0.04 + mancha * 0.05, 0.0, 0.0);
+  vec3 vivaBase = vec3(0.07, 0.055, 0.03);
+  vec3 palha = vec3(0.78, 0.6, 0.3);
+  vec3 oliva = vec3(0.32, 0.38, 0.14);
+  vec3 vivaPonta = mix(oliva, palha, smoothstep(0.3, 0.6, mancha + tom * 0.18))
+                 * (1.0 + tom * 0.12) * mix(0.85, 1.1, mancha);
   vec3 queimadaBase = vec3(0.025, 0.024, 0.023);
   vec3 queimadaPonta = mix(vec3(0.08, 0.078, 0.075), vec3(0.55, 0.54, 0.52),
                            clamp(tom * 0.6 + mancha * 0.4, 0.0, 1.0)); // carvão / cinza

@@ -34,6 +34,8 @@ void main() {
               + smoothstep(0.55, 0.85, ruido(q * 3.7)) * 0.4;
   corQueimada = mix(corQueimada, vec3(0.5, 0.49, 0.47), cinza * 0.6);
 
+  // chão seco: a foto da floresta puxada para terra batida
+  corViva = mix(corViva, vec3(dot(corViva, vec3(0.3, 0.59, 0.11))) * vec3(1.15, 0.95, 0.7), 0.6);
   vec3 cor = mix(corViva * 0.85, corQueimada, queimado);
 
   // a grama densa escurece o chão embaixo dela; na queimada o chão fica exposto
@@ -41,7 +43,7 @@ void main() {
   float difusa = max(dot(n, uDirSol), 0.0);
   float sombra = sombraRevista(q);
   vec3 luz = uCorAmbiente * oclusao + uCorSol * difusa * sombra * oclusao;
-  vec3 final = aplicarNevoa(cor * luz, vMundo);
+  vec3 final = aplicarNevoa(cor * luz * vinheta(q), vMundo);
 
   // brasas no chão: pontinhos acesos que piscam na frente do fogo e atrás dela
   float b = brasas(q) * smoothstep(0.45, 0.75, ruido(q * 23.0 + uTempo * 0.5));
