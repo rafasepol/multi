@@ -721,6 +721,6 @@ const REVISTA = {
   },
 
   contracapa: {
-    texto: "O clima não escolhe suas vítimas.\nA desigualdade escolhe.",
+    texto: "A crise não é natural.\nA desigualdade também não.",
   },
 };
