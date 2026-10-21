@@ -1,6 +1,7 @@
-// Mascote da ONU em 3D: um bichinho redondo no azul da ONU, com o emblema (o mapa-múndi visto
-// do polo norte entre dois ramos de oliveira) na barriga, bracinhos, perninhas e um broto na
-// cabeça. Ele respira, pisca, acena, pula e pode se virar e se inclinar.
+// Mascote da ONU em 3D: um boneco no azul da ONU, sóbrio (a revista trata de um tema sério),
+// com o emblema (o mapa-múndi visto do polo norte entre dois ramos de oliveira) na barriga e
+// um broto na cabeça, sinal de recomeço. Ele respira, pisca, acena, faz um gesto de apresentar
+// e pode se virar e se inclinar.
 //
 // Este módulo só monta o boneco (criarMascote). Quem usa:
 // - mascote3d.js: o mascote em pé na grama queimada, ao lado da contracapa da revista;
@@ -18,18 +19,16 @@ import { feature } from "https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/+esm
 const COR = {
   azul: "#009edb", // azul da ONU
   branco: "#ffffff",
-  olho: "#1b2233",
-  bochecha: "#ff8fab",
-  boca: "#3a1d2e",
-  lingua: "#ff6f8d",
-  broto: "#6dbb45",
+  olho: "#14202e",   // olhos, sobrancelhas e boca
+  sapato: "#1f2d3a",
+  broto: "#5c9e3f",
   sombra: "#0b3a5c",
 };
 
 // medidas de montagem (o corpo é uma esfera de raio ~1 em volta da origem)
-const CHAO = -1.36;   // sola dos pés
-const QUADRIL = -0.9; // onde o tronco dobra para se inclinar
-export const ALTURA_MASCOTE = 2.75; // do chão à ponta do broto
+const CHAO = -1.44;    // sola dos pés
+const QUADRIL = -0.95; // onde o tronco dobra para se inclinar
+export const ALTURA_MASCOTE = 2.8; // do chão à ponta do broto
 
 // ---------- Emblema da ONU, desenhado numa tela 2D ----------
 
@@ -140,14 +139,14 @@ function desenharEmblema(poligonos) {
 
 // ---------- Formas ----------
 
-// corpo: uma esfera esticada, um pouco mais larga embaixo, como uma bala de goma
+// corpo: um ovo em pé, um pouco mais largo embaixo
 function geometriaCorpo() {
   let geo = new THREE.SphereGeometry(1, 128, 96);
   const p = geo.attributes.position, v = new THREE.Vector3();
   for (let i = 0; i < p.count; i++) {
     v.fromBufferAttribute(p, i);
-    const largura = 1 - 0.06 * v.y;
-    p.setXYZ(i, v.x * largura, v.y * 1.04, v.z * largura * 0.9);
+    const largura = 1 - 0.05 * v.y;
+    p.setXYZ(i, v.x * largura * 0.94, v.y * 1.12, v.z * largura * 0.88);
   }
   // junta a costura da esfera, para a luz não marcar uma linha nas costas
   geo.deleteAttribute("normal");
@@ -192,16 +191,17 @@ function texturaSombra() {
 export async function criarMascote({ renderer, reflexo = 0.9, corSombra = COR.sombra, forcaSombra = 0.32 }) {
   const estudio = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
 
-  // plástico macio, como um boneco de vinil
+  // acabamento fosco, de escultura pintada, e não de brinquedo de plástico
   const material = (cor, extra = {}) => new THREE.MeshPhysicalMaterial({
-    color: cor, roughness: 0.42, clearcoat: 0.35, clearcoatRoughness: 0.3, envMap: estudio, envMapIntensity: reflexo, ...extra,
+    color: cor, roughness: 0.58, clearcoat: 0.12, clearcoatRoughness: 0.5, envMap: estudio, envMapIntensity: reflexo, ...extra,
   });
-  const azul = material(COR.azul, { sheen: 0.6, sheenRoughness: 0.45, sheenColor: new THREE.Color("#c4ecff") });
-  const branco = material(COR.branco, { roughness: 0.5 });
-  const verde = material(COR.broto, { roughness: 0.5, side: THREE.DoubleSide });
+  const azul = material(COR.azul);
+  const escuro = material(COR.olho, { roughness: 0.35, clearcoat: 0.3, clearcoatRoughness: 0.3 });
+  const sapato = material(COR.sapato, { roughness: 0.35, clearcoat: 0.5, clearcoatRoughness: 0.2 });
+  const verde = material(COR.broto, { side: THREE.DoubleSide });
   const esfera = new THREE.SphereGeometry(1, 48, 32);
 
-  // raiz: no chão, entre os pés · boneco: pula, gira e amassa a partir dos pés ·
+  // raiz: no chão, entre os pés · boneco: gira a partir dos pés ·
   // pecas: tudo nas medidas de montagem · tronco: corpo e braços, que dobram no quadril
   const raiz = new THREE.Group();
   const boneco = new THREE.Group();
@@ -234,72 +234,60 @@ export async function criarMascote({ renderer, reflexo = 0.9, corSombra = COR.so
     return peca;
   }
 
-  // olhos grandes com dois brilhos
-  function olho() {
-    const grupo = new THREE.Group();
-    const globo = new THREE.Mesh(esfera, material(COR.olho, { roughness: 0.15, clearcoat: 1, clearcoatRoughness: 0.05 }));
-    globo.scale.set(0.13, 0.165, 0.075);
-    const luz = new THREE.MeshBasicMaterial({ color: COR.branco });
-    const brilho = new THREE.Mesh(esfera, luz);
-    brilho.scale.set(0.036, 0.042, 0.014);
-    brilho.position.set(0.037, 0.06, 0.062);
-    const brilhinho = new THREE.Mesh(esfera, luz);
-    brilhinho.scale.set(0.018, 0.018, 0.01);
-    brilhinho.position.set(-0.043, -0.062, 0.06);
-    grupo.add(globo, brilho, brilhinho);
-    return grupo;
-  }
-  const olhos = [-1, 1].map((lado) => colar(olho(), lado * 0.31, 0.33, 0.038));
+  // olhos ovais e pequenos, sem brilhos desenhados (o reflexo vem da luz)
+  const olhos = [-1, 1].map((lado) => {
+    const olho = new THREE.Group();
+    const globo = new THREE.Mesh(esfera, escuro);
+    globo.scale.set(0.075, 0.1, 0.045);
+    olho.add(globo);
+    return colar(olho, lado * 0.26, 0.42, 0.022);
+  });
 
-  // bochechas rosadas
+  // sobrancelhas retas: olhar atento e calmo (inclinadas, de cima pareciam bravas)
+  const geoTraco = new THREE.CapsuleGeometry(0.018, 0.11, 4, 12).rotateZ(Math.PI / 2);
   for (const lado of [-1, 1]) {
-    const bochecha = new THREE.Mesh(esfera, material(COR.bochecha, { roughness: 0.7, clearcoat: 0, transparent: true, opacity: 0.85 }));
-    bochecha.scale.set(0.1, 0.058, 0.014);
-    colar(bochecha, lado * 0.55, 0.16, 0.006);
+    const sobrancelha = new THREE.Group();
+    sobrancelha.add(new THREE.Mesh(geoTraco, escuro));
+    colar(sobrancelha, lado * 0.26, 0.56, 0.004);
   }
 
-  // boca aberta em "D", com a língua
+  // boca fechada, um arco raso: um sorriso discreto
   const boca = new THREE.Group();
-  const meiaLua = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 40, 20, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2),
-    material(COR.boca, { roughness: 0.6, clearcoat: 0, side: THREE.DoubleSide })
-  );
-  meiaLua.scale.set(0.09, 0.074, 0.034);
-  const lingua = new THREE.Mesh(esfera, material(COR.lingua, { roughness: 0.55, clearcoat: 0 }));
-  lingua.scale.set(0.043, 0.02, 0.022);
-  lingua.position.set(0, -0.038, 0.014);
-  boca.add(meiaLua, lingua);
-  colar(boca, 0, 0.17, 0.016);
+  const arco = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.013, 8, 32, 0.9), escuro);
+  arco.rotation.z = -Math.PI / 2 - 0.45; // arco centrado embaixo
+  arco.position.y = 0.16;
+  boca.add(arco);
+  colar(boca, 0, 0.2, 0.004);
 
   // emblema na barriga, projetado de frente sobre o corpo
   const emblema = new THREE.CanvasTexture(desenharEmblema(await carregarTerra()));
   emblema.colorSpace = THREE.SRGBColorSpace;
   emblema.anisotropy = renderer.capabilities.getMaxAnisotropy();
   corpo.add(new THREE.Mesh(
-    new DecalGeometry(corpo, new THREE.Vector3(0, -0.37, 0.9), new THREE.Euler(), new THREE.Vector3(1.02, 1.02, 1.2)),
+    new DecalGeometry(corpo, new THREE.Vector3(0, -0.36, 0.9), new THREE.Euler(), new THREE.Vector3(1.0, 1.0, 1.2)),
     material(COR.branco, {
-      map: emblema, emissive: COR.branco, emissiveMap: emblema, emissiveIntensity: 0.12,
+      map: emblema, emissive: COR.branco, emissiveMap: emblema, emissiveIntensity: 0.1,
       transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4,
     })
   ));
 
-  // broto na cabeça: um cabinho e duas folhas
+  // broto na cabeça: um cabinho e duas folhas pequenas
   const broto = new THREE.Group();
-  broto.position.set(0, 1.02, -0.02);
+  broto.position.set(0, 1.1, -0.02);
   const cabo = new THREE.Mesh(
     new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(
-      new THREE.Vector3(0, -0.05, 0), new THREE.Vector3(0, 0.12, 0), new THREE.Vector3(0.04, 0.2, 0)), 20, 0.026, 12),
+      new THREE.Vector3(0, -0.05, 0), new THREE.Vector3(0, 0.1, 0), new THREE.Vector3(0.03, 0.16, 0)), 20, 0.02, 12),
     verde
   );
   const geoFolha = geometriaFolha();
   const folhaGrande = new THREE.Mesh(geoFolha, verde);
-  folhaGrande.scale.setScalar(0.27);
-  folhaGrande.position.set(0.04, 0.2, 0);
-  folhaGrande.rotation.set(0.15, 0, 0.45);
+  folhaGrande.scale.setScalar(0.2);
+  folhaGrande.position.set(0.03, 0.16, 0);
+  folhaGrande.rotation.set(0.15, 0, 0.4);
   const folhaPequena = new THREE.Mesh(geoFolha, verde);
-  folhaPequena.scale.setScalar(0.21);
-  folhaPequena.position.set(0.035, 0.19, 0);
-  folhaPequena.rotation.set(-0.15, Math.PI, 0.55);
+  folhaPequena.scale.setScalar(0.15);
+  folhaPequena.position.set(0.025, 0.15, 0);
+  folhaPequena.rotation.set(-0.15, Math.PI, 0.5);
   broto.add(cabo, folhaGrande, folhaPequena);
   corpo.add(broto);
 
@@ -308,88 +296,81 @@ export async function criarMascote({ renderer, reflexo = 0.9, corSombra = COR.so
   // pontos de referência para quem usa o boneco: o meio do corpo e o alto da cabeça
   const centro = new THREE.Object3D();
   const topo = new THREE.Object3D();
-  topo.position.y = 1.45;
+  topo.position.y = 1.5;
   doTronco.add(centro, topo);
 
-  // braços: o da esquerda (de quem olha) acena; o da direita fica solto
+  // braços: o da esquerda (de quem olha) acena; o da direita faz o gesto de apresentar
   function braco(lado) {
     const ombro = new THREE.Group();
-    ombro.position.set(lado * 0.86, -0.1, 0.05);
-    const bracinho = new THREE.Mesh(new THREE.CapsuleGeometry(0.13, 0.28, 8, 24), azul);
-    bracinho.position.y = -0.22;
-    const mao = new THREE.Mesh(esfera, branco);
-    mao.scale.set(0.16, 0.16, 0.145);
-    mao.position.y = -0.46;
+    ombro.position.set(lado * 0.86, -0.05, 0.02);
+    const bracinho = new THREE.Mesh(new THREE.CapsuleGeometry(0.12, 0.36, 8, 24), azul);
+    bracinho.position.y = -0.25;
+    const mao = new THREE.Mesh(esfera, azul);
+    mao.scale.set(0.135, 0.15, 0.12);
+    mao.position.y = -0.5;
     ombro.add(bracinho, mao);
     doTronco.add(ombro);
     return ombro;
   }
   const bracoAceno = braco(-1);
-  const bracoSolto = braco(1);
-  bracoSolto.rotation.x = -0.25;
+  const bracoGesto = braco(1);
 
-  // pernas curtinhas e pés brancos, virados um pouco para fora
+  // pernas e sapatos escuros, virados um pouco para fora
   for (const lado of [-1, 1]) {
-    const perna = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.2, 8, 24), azul);
-    perna.position.set(lado * 0.38, -1.05, 0.02);
-    const pe = new THREE.Mesh(esfera, branco);
-    pe.scale.set(0.2, 0.13, 0.28);
-    pe.position.set(lado * 0.4, CHAO + 0.13, 0.1);
-    pe.rotation.y = lado * 0.25;
+    const perna = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.22, 8, 24), azul);
+    perna.position.set(lado * 0.36, -1.13, 0.0);
+    const pe = new THREE.Mesh(esfera, sapato);
+    pe.scale.set(0.18, 0.11, 0.27);
+    pe.position.set(lado * 0.37, CHAO + 0.11, 0.08);
+    pe.rotation.y = lado * 0.18;
     pecas.add(perna, pe);
   }
 
   const materialSombra = new THREE.MeshBasicMaterial({
     map: texturaSombra(), color: corSombra, transparent: true, opacity: forcaSombra, depthWrite: false,
   });
-  const sombra = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 1.35), materialSombra);
+  const sombra = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.3), materialSombra);
   sombra.rotation.x = -Math.PI / 2;
   sombra.position.y = 0.002;
   raiz.add(sombra);
 
   // ---------- Movimento ----------
 
-  const ALTURA_PULO = 0.9;
   let tempo = 0;
   let faseAceno = 0;
+  const suave = (x) => x * x * (3 - 2 * x);
 
   // dt: segundos desde a última pose. Pose:
   //   virar     giro do boneco inteiro, em radianos (positivo = para a esquerda dele)
   //   inclinar  quanto o tronco tomba para trás (para olhar para cima), em radianos
-  //   pulo      andamento de um pulo, de 0 a 1 (fora disso, parado no chão)
-  //   animo     0 = calmo; 1 = animado (acena mais rápido e levanta o outro braço)
-  function posar(dt, { virar = 0, inclinar = 0, pulo = -1, animo = 0 } = {}) {
+  //   aceno     0 = braço junto ao corpo; 1 = acenando (o braço da esquerda de quem olha)
+  //   gesto     andamento (0 a 1) do gesto de apresentar: ele acena com a cabeça e estende
+  //             o outro braço para a frente, com calma; fora disso, parado
+  function posar(dt, { virar = 0, inclinar = 0, aceno = 0, gesto = -1 } = {}) {
     tempo += dt;
-    faseAceno += dt * (7 + 6 * animo);
-    const respiro = Math.sin(tempo * 2.2) * 0.015;
+    faseAceno += dt * 5;
+    const respiro = Math.sin(tempo * 1.5) * 0.007;
     corpo.scale.set(1 + respiro, 1 - respiro, 1 + respiro);
-    bracoAceno.rotation.z = -2.3 + Math.sin(faseAceno) * (0.28 + 0.12 * animo);
-    bracoSolto.rotation.z = 0.55 + Math.sin(tempo * 2.2) * 0.03 + 0.6 * animo;
-    broto.rotation.z = Math.sin(tempo * 1.6) * 0.1;
-    // pisca a cada 4 s, por 0,15 s
-    const fase = tempo % 4;
-    const aberto = fase > 3.85 ? Math.abs(fase - 3.925) / 0.075 : 1;
+    broto.rotation.z = Math.sin(tempo * 1.2) * 0.05;
+    // pisca a cada 5 s, por 0,15 s
+    const fase = tempo % 5;
+    const aberto = fase > 4.85 ? Math.abs(fase - 4.925) / 0.075 : 1;
     for (const o of olhos) o.scale.y = Math.max(0.08, aberto);
 
-    boneco.rotation.y = virar;
-    tronco.rotation.x = -inclinar;
+    const a = suave(THREE.MathUtils.clamp(aceno, 0, 1));
+    bracoAceno.rotation.z = THREE.MathUtils.lerp(-0.25, -2.25 + Math.sin(faseAceno) * 0.2, a);
 
-    // pulo: agacha, sobe esticado e cai amassando
-    let altura = 0;
-    let estica = 0;
-    if (pulo >= 0 && pulo < 1) {
-      if (pulo < 0.18) estica = -0.16 * Math.sin((pulo / 0.18) * Math.PI);
-      else if (pulo < 0.82) {
-        const v = (pulo - 0.18) / 0.64;
-        altura = 4 * v * (1 - v) * ALTURA_PULO;
-        estica = 0.1 * Math.sin(v * Math.PI);
-      } else estica = -0.14 * Math.sin(((pulo - 0.82) / 0.18) * Math.PI);
+    // gesto: o braço sobe para a frente, segura um pouco e volta; a cabeça acena no começo
+    let braco = 0;
+    let aceneCabeca = 0;
+    if (gesto >= 0 && gesto < 1) {
+      braco = gesto < 0.3 ? suave(gesto / 0.3) : gesto < 0.75 ? 1 : 1 - suave((gesto - 0.75) / 0.25);
+      if (gesto < 0.35) aceneCabeca = Math.sin((gesto / 0.35) * Math.PI) * 0.12;
     }
-    boneco.position.y = altura;
-    boneco.scale.set(1 - estica * 0.5, 1 + estica, 1 - estica * 0.5);
-    const longe = altura / ALTURA_PULO;
-    sombra.scale.setScalar(1 - 0.3 * longe);
-    materialSombra.opacity = forcaSombra * (1 - 0.5 * longe);
+    bracoGesto.rotation.set(-1.2 * braco, 0, 0.25 + 0.15 * braco);
+
+    boneco.rotation.y = virar;
+    tronco.rotation.x = -inclinar + aceneCabeca;
   }
   posar(0);
 

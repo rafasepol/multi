@@ -1,8 +1,9 @@
 // Mascote da ONU em pé na grama queimada, ao lado da contracapa.
 //
 // Ele aparece quando a frente de fogo passa pelo lugar dele (cenario.js) e some quando a
-// revista sai da contracapa. Fica olhando para o ponteiro; cada clique (ou toque) nele faz
-// ele pular e dizer a próxima fala de REVISTA.mascote (dados.js), num balão sobre a cabeça.
+// revista sai da contracapa. Acena ao aparecer e fica olhando para o ponteiro; cada clique
+// (ou toque) nele faz um gesto de apresentar e mostra a próxima fala de REVISTA.mascote
+// (dados.js), num balão sobre a cabeça.
 // O boneco vem de mascote.js; aqui ele é posto no chão da revista (z para cima) e ganha uma
 // luz só dele, com as cores do sol e das brasas do cenário.
 //
@@ -19,8 +20,8 @@ const VIRADA_MAX = 0.45;     // quanto ele gira para acompanhar o ponteiro (radi
 const SEGUIR = 6;            // quão rápido ele gira até o ponteiro
 const MOLA = 160;            // aparecer e sumir: mola com um pouco de balanço
 const BALANCO = 0.35;        // 1 = sem balanço
-const DURACAO_PULO = 0.65;   // segundos
-const DURACAO_ANIMO = 2.5;   // segundos de aceno animado depois de um clique
+const DURACAO_GESTO = 1.8;   // segundos do gesto de apresentar, depois de um clique
+const DURACAO_ACENO = 2.4;   // segundos de aceno quando ele aparece
 const DURACAO_FALA = 5;      // segundos que o balão fica na tela
 const ATRASO_OI = 0.8;       // segundos depois de aparecer até dizer "oi"
 const FOLGA_FOGO = 0.45;     // o fogo precisa passar desta distância além dos pés dele
@@ -86,10 +87,9 @@ export async function criarMascote3D({ scene, renderer, camera, canvas, cenario,
   let virar = 0;       // giro extra, para olhar o ponteiro
   let alvoChao = null; // ponto do chão sob o ponteiro
   let s = 0, vs = 0;   // tamanho (0 = sumido, 1 = inteiro) e velocidade da mola
-  let pulo = -1;       // andamento do pulo (0–1); -1 = no chão
-  let animo = 0;
+  let gesto = -1;      // andamento do gesto de apresentar (0–1); -1 = parado
+  let tempoAceno = 0;  // segundos de aceno que faltam
   let tempoOi = -1;    // contagem para o "oi" depois de aparecer
-  let sobre = false;   // ponteiro em cima dele
 
   // Lugar: à esquerda da contracapa (deitada em x de -largura a 0, y de -1 a 1), no meio do
   // chão que sobra até a borda da tela; se não couber (tela em pé), acima da revista.
@@ -136,8 +136,7 @@ export async function criarMascote3D({ scene, renderer, camera, canvas, cenario,
   }
 
   function clicar() {
-    pulo = 0;
-    animo = 1;
+    gesto = 0;
     tempoOi = -1;
     if (cfg.falas?.length) {
       falar(cfg.falas[proxima]);
@@ -147,7 +146,6 @@ export async function criarMascote3D({ scene, renderer, camera, canvas, cenario,
 
   function sair() {
     alvoChao = null;
-    sobre = false;
   }
 
   // ---------- Quadro a quadro ----------
@@ -164,7 +162,10 @@ export async function criarMascote3D({ scene, renderer, camera, canvas, cenario,
     const distFogo = lugar.distanceTo(u.uFogoCentro.value);
     const queimado = u.uFogoRaio.value > distFogo + FOLGA_FOGO;
     const alvo = estado === "contracapa" && visivel && queimado ? 1 : 0;
-    if (alvo && s < 0.01 && vs <= 0) tempoOi = ATRASO_OI;
+    if (alvo && s < 0.01 && vs <= 0) {
+      tempoOi = ATRASO_OI;
+      tempoAceno = DURACAO_ACENO;
+    }
     const k = alvo ? MOLA : MOLA * 2;
     for (let i = 0; i < 4; i++) { // passos pequenos: a mola não dispara com quadros lentos
       vs += (k * (alvo - s) - 2 * Math.sqrt(k) * BALANCO * vs) * (dt / 4);
@@ -175,10 +176,9 @@ export async function criarMascote3D({ scene, renderer, camera, canvas, cenario,
     pe.visible = s > 0.001;
     if (!pe.visible) {
       balao.hidden = true;
-      pulo = -1;
-      animo = 0;
+      gesto = -1;
+      tempoAceno = 0;
       tempoOi = -1;
-      sobre = false;
       return;
     }
 
@@ -190,16 +190,18 @@ export async function criarMascote3D({ scene, renderer, camera, canvas, cenario,
       : 0;
     virar += (alvoVirar - virar) * (1 - Math.exp(-SEGUIR * dt));
 
-    if (pulo >= 0) {
-      pulo += dt / DURACAO_PULO;
-      if (pulo >= 1) pulo = -1;
+    if (gesto >= 0) {
+      gesto += dt / DURACAO_GESTO;
+      if (gesto >= 1) gesto = -1;
     }
-    animo = Math.max(sobre ? 0.4 : 0, animo - dt / DURACAO_ANIMO);
+    // acena ao aparecer: o braço sobe, balança e desce
+    tempoAceno = Math.max(0, tempoAceno - dt);
+    const aceno = Math.min(1, tempoAceno / 0.5, (DURACAO_ACENO - tempoAceno) / 0.5);
 
     pe.position.set(lugar.x, lugar.y, 0);
     pe.rotation.z = frente;
     pe.scale.setScalar(escala * Math.max(0, s));
-    mascote.posar(dt, { virar, inclinar: INCLINACAO, pulo, animo });
+    mascote.posar(dt, { virar, inclinar: INCLINACAO, aceno, gesto });
 
     // luz: o sol e o céu do cenário (fumaça, tom alaranjado) e as brasas, que vão se apagando
     cor(sol.color, u.uCorSol.value);
@@ -230,8 +232,7 @@ export async function criarMascote3D({ scene, renderer, camera, canvas, cenario,
     // ponteiro está em cima dele
     apontar(x, y, pontoDoChao) {
       alvoChao = pontoDoChao;
-      sobre = acertou(x, y);
-      return sobre;
+      return acertou(x, y);
     },
     // clique ou toque: devolve true se foi nele
     tocar(x, y) {
@@ -241,6 +242,6 @@ export async function criarMascote3D({ scene, renderer, camera, canvas, cenario,
     },
     sair,
     // para testes no console (revista.mascote().estado())
-    estado: () => ({ lugar: lugar.toArray(), tamanho: s, pulo, animo, fala: balao.hidden ? null : balao.textContent }),
+    estado: () => ({ lugar: lugar.toArray(), tamanho: s, gesto, aceno: tempoAceno, fala: balao.hidden ? null : balao.textContent }),
   };
 }
