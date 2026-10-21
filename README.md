@@ -42,7 +42,7 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 - [x] **Paleta com até 5 cores principais, além de neutros**: 4 principais (vermelho, vinho, laranja, âmbar) + neutros, em `paleta.js`.
 - [ ] **Imagens em boa resolução, sem distorção**: nenhuma é distorcida, mas `rio-grande-do-sul.jpg` e `colagem-fabrica.jpg` têm só 690 px de largura — trocar pelos originais em resolução maior.
 - [x] **Navegação entre capa, sumário e matérias**: setas, teclado, arrastar as páginas e toque no celular.
-- [x] **Interatividade**: mapa do fogo em 3D (pág. 5), barras dos gráficos que sobem e cartões que saltam da página ao passar o mouse (números, fluxos, citações, fotos e retratos da equipe) e o mascote da ONU na grama queimada da contracapa, que olha para o mouse e, ao ser clicado, faz um gesto de apresentar e fala.
+- [x] **Interatividade**: mapa do fogo em 3D (pág. 5), barras dos gráficos que sobem e cartões que saltam da página ao passar o mouse (números, fluxos, citações, fotos e retratos da equipe) e a plaquinha fincada na grama queimada da contracapa, que se apruma com o mouse em cima e abre o vídeo da equipe.
 - [x] **Sumário com links internos**: cada item leva à sua seção (na revista 3D e na versão em texto).
 
 ### Pendências da equipe
@@ -107,11 +107,9 @@ O mapa é desenhado pelo próprio site (`mapa-biomas.js`): cada bioma é pintado
 
 As fotos da equipe ficam em `assets/equipe/` e a lista, em ordem alfabética, em `dados.js`, em `equipe` (`foto: null` deixa o círculo vazio). Confirme autor e permissão de cada imagem em `assets/fotos/` e coloque o crédito na legenda (`legenda` em `dados.js`).
 
-## Mascote da ONU
+## Vídeo da equipe
 
-Um boneco no azul da ONU, sóbrio para combinar com o tema, com o emblema (mapa-múndi visto do polo norte entre ramos de oliveira) na barriga e um broto na cabeça, sinal de recomeço. Feito em 3D (Three.js), com acabamento fosco; ele respira e pisca.
+O vídeo fecha a revista. Na contracapa, quando o fogo passa, sai da cinza uma plaquinha discreta de papelão ("Assista ao nosso vídeo"), fincada na grama queimada ao lado da revista, do lado em que cabe na tela (de preferência à esquerda; em telas estreitas, acima ou abaixo, e um pouco menor). Clicar nele, ou no botão **▶ Vídeo** que aparece na barra da contracapa, abre o vídeo numa janela por cima da revista; ✕, Esc ou um clique fora fecham. A versão em texto ganha um link para o vídeo no fim.
 
-Ele fecha a revista: na contracapa, quando o fogo passa, ele surge em pé na grama queimada, ao lado da revista (com a tela em pé, acima dela), acena e diz "oi". Ele acompanha o mouse com o corpo; cada clique (ou toque) faz ele acenar com a cabeça, estender o braço como quem apresenta e dizer a próxima fala, num balão. As falas ficam em `dados.js`, em `mascote`. Ao sair da contracapa, ele some.
-
-- `mascote.js` monta o boneco; `mascote3d.js` põe ele na cena da revista (lugar, luz, ponteiro e balão).
-- `mascote.html` mostra o mascote sozinho: dá para girar arrastando e salvar um PNG com fundo transparente (**Baixar PNG**). A imagem pronta está em `assets/mascote/mascote-onu.png`.
+- O vídeo fica no YouTube (de preferência "Não listado", com incorporação permitida). O link fica em `dados.js`, em `video.youtube`; sem ele, a janela diz "Vídeo em breve".
+- `video.js` faz a janela; `cartaz3d.js` faz a plaquinha na cena.

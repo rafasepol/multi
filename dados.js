@@ -758,15 +758,15 @@ const REVISTA = {
     texto: "A crise não é natural.\nA desigualdade também não.",
   },
 
-  // Mascote da ONU, em pé na grama queimada ao lado da contracapa (mascote3d.js). Ele diz
-  // `oi` quando aparece; cada clique (ou toque) nele mostra a próxima fala, em ordem.
-  mascote: {
-    oi: "Oi! Clique em mim.",
-    falas: [
-      "Obrigado por ler a revista até o fim!",
-      "O broto na minha cabeça nasceu das cinzas. Dá para recomeçar.",
-      "Quem lucra com o fogo deve pagar por ele.",
-      "Justiça climática é proteger primeiro quem perde mais.",
-    ],
+  // Vídeo da equipe (video.js). Abre pelo cartaz fincado na grama queimada ao lado da
+  // contracapa (cartaz3d.js, com `chamada` em faixas, uma por linha) e pelo botão "Vídeo",
+  // que aparece na contracapa; a versão em texto ganha um link no fim. `youtube`: o link do
+  // vídeo (no YouTube, de preferência "Não listado", com incorporação permitida). Vazio, a
+  // janela diz "Vídeo em breve" e a versão em texto fica sem o link.
+  video: {
+    titulo: "Vídeo da equipe",
+    duracao: "12 min",
+    chamada: "Assista\nao nosso vídeo",
+    youtube: "https://www.youtube.com/watch?v=mXsVkwEWI-Q",
   },
 };

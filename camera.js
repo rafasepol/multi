@@ -142,6 +142,7 @@ export function criarCamera({ fov, altura }) {
     atualizar,
     abertura,
     totalmenteAberta,
+    parada: () => t >= 1, // já chegou à posição de destino
     pontoNoLivro,
     cantosNoChao,
     estado: () => destino,

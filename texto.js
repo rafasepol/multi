@@ -218,3 +218,8 @@ R.paginas.forEach((p, i) => {
 });
 
 raiz.append(el("p", { class: "contracapa" }, R.contracapa.texto));
+
+// vídeo da equipe (na revista em 3D, abre pelo cartaz da contracapa)
+if (R.video?.youtube) {
+  raiz.append(el("p", { class: "video-link" }, el("a", { href: R.video.youtube, rel: "noopener" }, `▶ Assistir ao ${R.video.titulo.toLowerCase()}`, R.video.duracao ? ` (${R.video.duracao})` : "")));
+}
