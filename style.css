@@ -35,6 +35,7 @@ html, body {
 #cena.link { cursor: pointer; }
 #cena.fora { cursor: default; } /* fora da revista (na grama) */
 #cena.mapa { cursor: crosshair; } /* sobre o mapa interativo */
+#cena.mascote { cursor: pointer; } /* sobre o mascote, na contracapa */
 
 /* Controles sobre a lombada */
 .controles {
@@ -145,3 +146,37 @@ html, body {
 .mapa-cartao__area { margin-top: 8px; font-size: 14px; line-height: 1.4; color: var(--preto); }
 .mapa-cartao__area[hidden] { display: none; }
 .mapa-cartao__fonte { margin-top: 6px; font-size: 12px; line-height: 1.35; font-style: italic; color: var(--suave); }
+
+/* Balão de fala do mascote (mascote3d.js): fica sobre a cabeça dele, com a ponta para baixo */
+.mascote-balao {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  width: max-content;
+  max-width: min(240px, calc(100vw - 16px));
+  padding: 10px 14px;
+  background: var(--creme);
+  color: var(--preto);
+  font: 600 15px/1.35 "Inter", system-ui, sans-serif;
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 14px));
+  animation: balao-entra .28s cubic-bezier(.3, 1.6, .5, 1);
+}
+.mascote-balao::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  margin-left: -9px;
+  border: 9px solid transparent;
+  border-bottom: 0;
+  border-top-color: var(--creme);
+}
+.mascote-balao[hidden] { display: none; }
+@keyframes balao-entra {
+  from { opacity: 0; transform: translate(-50%, calc(-100% - 4px)) scale(.85); }
+}

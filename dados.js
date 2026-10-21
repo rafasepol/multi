@@ -757,4 +757,16 @@ const REVISTA = {
   contracapa: {
     texto: "A crise não é natural.\nA desigualdade também não.",
   },
+
+  // Mascote da ONU, em pé na grama queimada ao lado da contracapa (mascote3d.js). Ele diz
+  // `oi` quando aparece; cada clique (ou toque) nele mostra a próxima fala, em ordem.
+  mascote: {
+    oi: "Oi! Clique em mim.",
+    falas: [
+      "Obrigado por ler a revista até o fim!",
+      "O broto na minha cabeça nasceu das cinzas. Dá para recomeçar.",
+      "Quem lucra com o fogo deve pagar por ele.",
+      "Justiça climática é proteger primeiro quem perde mais.",
+    ],
+  },
 };

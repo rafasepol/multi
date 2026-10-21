@@ -21,6 +21,7 @@ import { carregarShader } from "./carregar.js";
 import { criarCamera } from "./camera.js";
 import { criarCenario } from "./cenario.js";
 import { criarMapa3D } from "./mapa3d.js";
+import { criarMascote3D } from "./mascote3d.js";
 
 // As 20 páginas são planejadas em dados.js e montadas por diagramacao.js.
 await carregarFontes(); // a capa e a diagramação do texto usam as fontes da revista
@@ -161,6 +162,17 @@ const mapa = mapaNaPagina && typeof REVISTA !== "undefined" && REVISTA.mapaFogo
       return null;
     })
   : null;
+
+// ---------- Mascote ----------
+
+// O mascote da ONU fica na grama queimada, ao lado da contracapa (mascote3d.js). Ele só
+// aparece no fim, então carrega em segundo plano, sem atrasar a abertura da revista.
+let mascote = null;
+if (typeof REVISTA !== "undefined" && REVISTA.mascote) {
+  criarMascote3D({ scene, renderer, camera, canvas, cenario, largura, cfg: REVISTA.mascote })
+    .then((m) => (mascote = m))
+    .catch((erro) => console.warn("[mascote]", erro));
+}
 
 // O mapa 3D só aparece com a revista aberta e parada na página dele; fica exatamente
 // por cima do mapa impresso (mesma conta de paginas.js: a página de projeto LARG × ALT
@@ -924,6 +936,8 @@ function folhaDoLado(p) {
 }
 
 canvas.addEventListener("pointerdown", (e) => {
+  // clique (ou toque) no mascote: ele pula e fala
+  if (mascote?.tocar(e.clientX, e.clientY)) return;
   // no mapa interativo a página não vira: o clique (ou toque) deixa o mapa no alto
   if (mapa && mapa.tocar(e.clientX, e.clientY, e.pointerType !== "mouse")) return;
   const p = pontoDoEvento(e);
@@ -971,6 +985,16 @@ canvas.addEventListener("pointermove", (e) => {
     arrasto.clientY = e.clientY;
     if (Math.hypot(e.clientX - arrasto.x0, e.clientY - arrasto.y0) > 6) arrasto.moveu = true;
     atualizarAlvoArrasto();
+    return;
+  }
+
+  // o mascote olha para o ponteiro; em cima dele, o cursor vira a mãozinha de clicar
+  const noMascote = !!mascote && mascote.apontar(e.clientX, e.clientY, p);
+  canvas.classList.toggle("mascote", noMascote);
+  if (noMascote) {
+    canvas.classList.remove("fora", "link", "mapa");
+    definirHoverBarra(null);
+    definirHoverPlaca(null);
     return;
   }
 
@@ -1064,7 +1088,8 @@ canvas.addEventListener("pointerleave", () => {
   toqueEsquerda = null;
   cenario.definirMouse(null);
   mapa?.sair();
-  canvas.classList.remove("mapa");
+  mascote?.sair();
+  canvas.classList.remove("mapa", "mascote");
   definirHoverBarra(null);
   definirHoverPlaca(null);
 });
@@ -1136,6 +1161,7 @@ function atualizarTudo(dt) {
     abertura: cam.abertura(),
     visivel: cenarioVisivel(),
   });
+  mascote?.atualizar(dt, { estado: estadoDaCamera(), visivel: cenarioVisivel() });
 }
 
 // Contador de quadros por segundo (aparece com ?fps na URL)
@@ -1180,6 +1206,7 @@ quadro();
 window.revista = {
   folhas, paginas, texturas, proxima, anterior, irPara, atual, cam, cenario, links, mapa, barras3d, placas3d, ALTURA,
   largura: () => largura,
+  mascote: () => mascote, // carrega em segundo plano
   // congela/descongela o tempo (o desenho continua)
   pausar(valor = true) {
     pausado = valor;
