@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mascote da ONU</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { background: radial-gradient(circle at 50% 38%, #ffffff 0%, #e4f1fa 55%, #c9e2f3 100%); font-family: Inter, system-ui, sans-serif; }
+    canvas { display: block; width: 100vw; height: 100vh; touch-action: none; cursor: grab; }
+    canvas:active { cursor: grabbing; }
+    .barra { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; gap: 12px; align-items: center; }
+    .barra span { color: #4d6b80; font-size: 14px; }
+    .barra button { font: 600 15px Inter, system-ui, sans-serif; color: #fff; background: #009edb; border: 0; border-radius: 999px; padding: 12px 22px; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 120, 180, .3); }
+    .barra button:hover { background: #0089c0; }
+    /* ?exportar: só o mascote, sem fundo, para virar PNG */
+    body.exportar { background: transparent; }
+    body.exportar .barra { display: none; }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="cena" aria-label="Mascote da ONU em 3D. Arraste para girar."></canvas>
+  <div class="barra">
+    <span>Arraste para girar</span>
+    <button id="baixar" type="button">Baixar PNG</button>
+  </div>
+  <script type="module" src="mascote-visor.js"></script>
+</body>
+</html>

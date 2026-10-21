@@ -42,7 +42,7 @@ Requisitos do PDF "Análise e Reflexão Crítica sobre Temas Globais da ONU e do
 - [x] **Paleta com até 5 cores principais, além de neutros**: 4 principais (vermelho, vinho, laranja, âmbar) + neutros, em `paleta.js`.
 - [ ] **Imagens em boa resolução, sem distorção**: nenhuma é distorcida, mas `rio-grande-do-sul.jpg` e `colagem-fabrica.jpg` têm só 690 px de largura — trocar pelos originais em resolução maior.
 - [x] **Navegação entre capa, sumário e matérias**: setas, teclado, arrastar as páginas e toque no celular.
-- [x] **Interatividade**: mapa do fogo em 3D (pág. 5), barras dos gráficos que sobem e cartões que saltam da página ao passar o mouse (números, fluxos, citações, fotos e retratos da equipe).
+- [x] **Interatividade**: mapa do fogo em 3D (pág. 5), barras dos gráficos que sobem e cartões que saltam da página ao passar o mouse (números, fluxos, citações, fotos e retratos da equipe) e o mascote da ONU na grama queimada da contracapa, que olha para o mouse, pula e fala ao ser clicado.
 - [x] **Sumário com links internos**: cada item leva à sua seção (na revista 3D e na versão em texto).
 
 ### Pendências da equipe
@@ -106,3 +106,12 @@ O mapa é desenhado pelo próprio site (`mapa-biomas.js`): cada bioma é pintado
 ### Antes de publicar
 
 As fotos da equipe ficam em `assets/equipe/` e a lista, em ordem alfabética, em `dados.js`, em `equipe` (`foto: null` deixa o círculo vazio). Confirme autor e permissão de cada imagem em `assets/fotos/` e coloque o crédito na legenda (`legenda` em `dados.js`).
+
+## Mascote da ONU
+
+Um bichinho redondo no azul da ONU, com o emblema (mapa-múndi visto do polo norte entre ramos de oliveira) na barriga e um broto na cabeça, feito em 3D (Three.js). Ele respira, pisca e acena.
+
+Ele fecha a revista: na contracapa, quando o fogo passa, ele surge em pé na grama queimada, ao lado da revista (com a tela em pé, acima dela), e diz "oi". Ele acompanha o mouse com o corpo; cada clique (ou toque) faz ele pular e dizer a próxima fala, num balão. As falas ficam em `dados.js`, em `mascote`. Ao sair da contracapa, ele some.
+
+- `mascote.js` monta o boneco; `mascote3d.js` põe ele na cena da revista (lugar, luz, ponteiro e balão).
+- `mascote.html` mostra o mascote sozinho: dá para girar arrastando e salvar um PNG com fundo transparente (**Baixar PNG**). A imagem pronta está em `assets/mascote/mascote-onu.png`.
