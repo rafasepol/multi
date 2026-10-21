@@ -21,7 +21,8 @@ import { carregarShader } from "./carregar.js";
 import { criarCamera } from "./camera.js";
 import { criarCenario } from "./cenario.js";
 import { criarMapa3D } from "./mapa3d.js";
-import { criarMascote3D } from "./mascote3d.js";
+import { criarCartaz3D } from "./cartaz3d.js";
+import { abrirVideo, videoAberto } from "./video.js";
 
 // As 20 páginas são planejadas em dados.js e montadas por diagramacao.js.
 await carregarFontes(); // a capa e a diagramação do texto usam as fontes da revista
@@ -163,16 +164,13 @@ const mapa = mapaNaPagina && typeof REVISTA !== "undefined" && REVISTA.mapaFogo
     })
   : null;
 
-// ---------- Mascote ----------
+// ---------- Vídeo da equipe ----------
 
-// O mascote da ONU fica na grama queimada, ao lado da contracapa (mascote3d.js). Ele só
-// aparece no fim, então carrega em segundo plano, sem atrasar a abertura da revista.
-let mascote = null;
-if (typeof REVISTA !== "undefined" && REVISTA.mascote) {
-  criarMascote3D({ scene, renderer, camera, canvas, cenario, largura, cfg: REVISTA.mascote })
-    .then((m) => (mascote = m))
-    .catch((erro) => console.warn("[mascote]", erro));
-}
+// O vídeo (REVISTA.video em dados.js) abre numa janela por cima da revista (video.js), pelo
+// cartaz fincado na grama queimada ao lado da contracapa (cartaz3d.js) ou pelo botão
+// "Vídeo", que aparece na contracapa.
+const video = typeof REVISTA !== "undefined" ? REVISTA.video : null;
+const cartaz = video ? criarCartaz3D({ scene, camera, canvas, cenario, luzPagina, largura, cfg: video }) : null;
 
 // O mapa 3D só aparece com a revista aberta e parada na página dele; fica exatamente
 // por cima do mapa impresso (mesma conta de paginas.js: a página de projeto LARG × ALT
@@ -523,6 +521,7 @@ function atualizarSombra() {
 const btnAnterior = document.getElementById("btnAnterior");
 const btnProximo = document.getElementById("btnProximo");
 const indicador = document.getElementById("indicador");
+const btnVideo = document.getElementById("btnVideo");
 
 // página atual = quantas folhas estão (ou estão indo) para a esquerda
 function atual() {
@@ -542,6 +541,7 @@ function atualizarUI() {
   const a = atual();
   btnAnterior.disabled = a === 0;
   btnProximo.disabled = a === folhas.length;
+  btnVideo.hidden = !video || a !== folhas.length;
   if (a === 0) indicador.textContent = "Capa";
   else if (a === folhas.length) indicador.textContent = "Contracapa";
   else if (modoRetrato()) indicador.textContent = `Página ${foco === "esq" ? a * 2 : a * 2 + 1} de ${paginas.length}`;
@@ -607,7 +607,9 @@ function irPara(pagina) {
 
 btnProximo.addEventListener("click", proxima);
 btnAnterior.addEventListener("click", anterior);
+btnVideo.addEventListener("click", () => abrirVideo(video));
 document.addEventListener("keydown", (e) => {
+  if (videoAberto()) return; // com o vídeo aberto, as setas não viram a página
   if (e.key === "ArrowRight" || e.key === "PageDown") proxima();
   if (e.key === "ArrowLeft" || e.key === "PageUp") anterior();
 });
@@ -936,8 +938,11 @@ function folhaDoLado(p) {
 }
 
 canvas.addEventListener("pointerdown", (e) => {
-  // clique (ou toque) no mascote: ele pula e fala
-  if (mascote?.tocar(e.clientX, e.clientY)) return;
+  // clique (ou toque) no cartaz da contracapa: abre o vídeo
+  if (cartaz?.tocar(e.clientX, e.clientY)) {
+    abrirVideo(video);
+    return;
+  }
   // no mapa interativo a página não vira: o clique (ou toque) deixa o mapa no alto
   if (mapa && mapa.tocar(e.clientX, e.clientY, e.pointerType !== "mouse")) return;
   const p = pontoDoEvento(e);
@@ -988,10 +993,10 @@ canvas.addEventListener("pointermove", (e) => {
     return;
   }
 
-  // o mascote olha para o ponteiro; em cima dele, o cursor vira a mãozinha de clicar
-  const noMascote = !!mascote && mascote.apontar(e.clientX, e.clientY, p);
-  canvas.classList.toggle("mascote", noMascote);
-  if (noMascote) {
+  // sobre o cartaz da contracapa, o cursor vira a mãozinha de clicar
+  const noCartaz = !!cartaz && cartaz.apontar(e.clientX, e.clientY);
+  canvas.classList.toggle("cartaz", noCartaz);
+  if (noCartaz) {
     canvas.classList.remove("fora", "link", "mapa");
     definirHoverBarra(null);
     definirHoverPlaca(null);
@@ -1088,8 +1093,8 @@ canvas.addEventListener("pointerleave", () => {
   toqueEsquerda = null;
   cenario.definirMouse(null);
   mapa?.sair();
-  mascote?.sair();
-  canvas.classList.remove("mapa", "mascote");
+  cartaz?.sair();
+  canvas.classList.remove("mapa", "cartaz");
   definirHoverBarra(null);
   definirHoverPlaca(null);
 });
@@ -1161,7 +1166,7 @@ function atualizarTudo(dt) {
     abertura: cam.abertura(),
     visivel: cenarioVisivel(),
   });
-  mascote?.atualizar(dt, { estado: estadoDaCamera(), visivel: cenarioVisivel() });
+  cartaz?.atualizar(dt, { estado: estadoDaCamera(), cameraParada: cam.parada(), visivel: cenarioVisivel() });
 }
 
 // Contador de quadros por segundo (aparece com ?fps na URL)
@@ -1206,7 +1211,7 @@ quadro();
 window.revista = {
   folhas, paginas, texturas, proxima, anterior, irPara, atual, cam, cenario, links, mapa, barras3d, placas3d, ALTURA,
   largura: () => largura,
-  mascote: () => mascote, // carrega em segundo plano
+  cartaz,
   // congela/descongela o tempo (o desenho continua)
   pausar(valor = true) {
     pausado = valor;

@@ -135,6 +135,7 @@ blockquote a { color: var(--creme); }
 .fontes li:target { background: var(--bege); }
 
 .contracapa { white-space: pre-line; margin-top: 56px; background: var(--vermelho); color: var(--creme); padding: 32px 24px; font: 400 30px/1.2 "Anton", Impact, sans-serif; text-transform: uppercase; text-align: center; }
+.video-link { margin-top: 16px; text-align: center; font-weight: 600; }
 
 /* números e fontes dentro das caixas coloridas (ex.: a coluna "O calor também alcança o corpo") */
 .caixa.vermelha .numeros strong,
